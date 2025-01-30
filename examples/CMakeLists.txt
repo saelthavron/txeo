@@ -1,0 +1,2 @@
+add_executable(rhoe_example rhoe_main.cpp)
+target_link_libraries(rhoe_example PRIVATE rhoe)
