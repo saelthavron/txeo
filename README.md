@@ -1,10 +1,10 @@
-# Rhoe: A Developer-Friendly TensorFlow C++ Wrapper
+# Txeo: A Developer-Friendly TensorFlow C++ Wrapper
 
 [![License: Apache 2.0](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 
 ## 📝 Overview
 
-**Rhoe** is an intuitive **C++ wrapper for TensorFlow**, designed to simplify the TensorFlow C++ API while maintaining **high performance and flexibility**. It enables developers to work with TensorFlow in C++ as easily as in Python, without the steep learning curve of TensorFlow’s low-level C++ API.
+**Txeo** is an intuitive **C++ wrapper for TensorFlow**, designed to simplify the TensorFlow C++ API while maintaining **high performance and flexibility**. It enables developers to work with TensorFlow in C++ as easily as in Python, without the steep learning curve of TensorFlow’s low-level C++ API.
 
 ## ✨ Features
 
