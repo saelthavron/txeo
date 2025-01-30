@@ -1,0 +1,160 @@
+{
+  "version": 2,
+  "configurePresets": [
+    {
+      "name": "gcovClang",
+      "displayName": "Clang(gcov)",
+      "description": "Using compilers: clang.exe, clang++.exe",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/.out/build/${presetName}",
+      "cacheVariables": {
+        "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
+        "CMAKE_C_COMPILER": "$env{CLANG_DIR}/bin/clang",
+        "CMAKE_CXX_COMPILER": "$env{CLANG_DIR}/bin/clang++",
+        "CMAKE_CXX_FLAGS": "-O0 -coverage",
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_EXE_LINKER_FLAGS": "-fuse-ld=mold",
+        "CMAKE_SHARED_LINKER_FLAGS": "-fuse-ld=mold",
+        "CMAKE_MODULE_LINKER_FLAGS": "-fuse-ld=mold",
+        "TensorFlow_ROOT_DIR": "$env{TensorFlow_ROOT_DIR}",
+        "Protobuf_ROOT_DIR": "$env{Protobuf_ROOT_DIR}"
+      }
+    },
+    {
+      "name": "debugClang",
+      "displayName": "Clang(debug)",
+      "description": "Using compilers: clang, clang++",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/.out/build/${presetName}",
+      "cacheVariables": {
+        "CMAKE_INSTALL_PREFIX": "${sourceDir}/.out/install/${presetName}",
+        "CMAKE_C_COMPILER": "$env{CLANG_DIR}/bin/clang",
+        "CMAKE_CXX_COMPILER": "$env{CLANG_DIR}/bin/clang++",
+        "CMAKE_CXX_FLAGS": "-O0 -g -Wall -Wextra -fsanitize=address,undefined -fno-omit-frame-pointer",
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_EXE_LINKER_FLAGS": "-fuse-ld=mold",
+        "CMAKE_SHARED_LINKER_FLAGS": "-fuse-ld=mold",
+        "CMAKE_MODULE_LINKER_FLAGS": "-fuse-ld=mold",
+        "TensorFlow_ROOT_DIR": "$env{TensorFlow_ROOT_DIR}",
+        "Protobuf_ROOT_DIR": "$env{Protobuf_ROOT_DIR}"
+      }
+    },
+    {
+      "name": "releaseClang",
+      "displayName": "Clang(Release)",
+      "description": "Using compilers: clang, clang++",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/.out/build/${presetName}",
+      "cacheVariables": {
+        "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
+        "CMAKE_C_COMPILER": "$env{CLANG_DIR}/bin/clang",
+        "CMAKE_CXX_COMPILER": "$env{CLANG_DIR}/bin/clang++",
+        "CMAKE_CXX_FLAGS": "-O3 -march=native -DNDEBUG",
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_EXE_LINKER_FLAGS": "-fuse-ld=mold",
+        "CMAKE_SHARED_LINKER_FLAGS": "-fuse-ld=mold",
+        "CMAKE_MODULE_LINKER_FLAGS": "-fuse-ld=mold",
+        "TensorFlow_ROOT_DIR": "$env{TensorFlow_ROOT_DIR}",
+        "Protobuf_ROOT_DIR": "$env{Protobuf_ROOT_DIR}"
+      }
+    },
+    {
+      "name": "releaseGcc",
+      "displayName": "GCC(release)",
+      "description": "Using compilers: g++.exe, gcc.exe",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/.out/build/${presetName}",
+      "cacheVariables": {
+        "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
+        "CMAKE_C_COMPILER": "gcc",
+        "CMAKE_CXX_COMPILER": "g++",
+        "CMAKE_CXX_FLAGS": "-O3",
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_EXE_LINKER_FLAGS": "-fuse-ld=mold",
+        "CMAKE_SHARED_LINKER_FLAGS": "-fuse-ld=mold",
+        "CMAKE_MODULE_LINKER_FLAGS": "-fuse-ld=mold",
+        "TensorFlow_ROOT_DIR": "$env{TensorFlow_ROOT_DIR}",
+        "Protobuf_ROOT_DIR": "$env{Protobuf_ROOT_DIR}"
+      }
+    },
+    {
+      "name": "releaseIntel",
+      "displayName": "Intel Release",
+      "description": "Intel C++ Compiler (optimized for Intel architectures)",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/.out/build/${presetName}",
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "icx",
+        "CMAKE_CXX_COMPILER": "icpx",
+        "CMAKE_CXX_FLAGS": "-O3 -ipo -march=native -qopenmp -fp-model fast=2 -DNDEBUG",
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_EXE_LINKER_FLAGS": "-fuse-ld=mold",
+        "CMAKE_SHARED_LINKER_FLAGS": "-fuse-ld=mold",
+        "CMAKE_MODULE_LINKER_FLAGS": "-fuse-ld=mold",
+        "TensorFlow_ROOT_DIR": "$env{TensorFlow_ROOT_DIR}",
+        "Protobuf_ROOT_DIR": "$env{Protobuf_ROOT_DIR}"
+      },
+      "environment": {
+        "CC": "icx",
+        "CXX": "icpx"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "debugClang",
+      "description": "",
+      "displayName": "Clang(Debug)",
+      "jobs": 8,
+      "configurePreset": "debugClang"
+    },
+    {
+      "name": "gcovClang",
+      "description": "",
+      "displayName": "Clang(Gcov)",
+      "jobs": 8,
+      "configurePreset": "gcovClang"
+    },
+    {
+      "name": "releaseClang",
+      "description": "",
+      "displayName": "Clang(Release)",
+      "jobs": 8,
+      "configurePreset": "releaseClang"
+    },
+    {
+      "name": "releaseGcc",
+      "description": "",
+      "displayName": "Gcc(Release)",
+      "jobs": 8,
+      "configurePreset": "releaseGcc"
+    },
+    {
+      "name": "releaseIntel",
+      "description": "",
+      "displayName": "Intel(Release)",
+      "jobs": 8,
+      "configurePreset": "releaseIntel"
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "testClang",
+      "description": "",
+      "displayName": "Clang(Test)",
+      "configurePreset": "debugClang"
+    },
+    {
+      "name": "testGcc",
+      "description": "",
+      "displayName": "Gcc(Test)",
+      "configurePreset": "releaseGcc"
+    },
+    {
+      "name": "testIntel",
+      "description": "",
+      "displayName": "Intel(Test)",
+      "configurePreset": "releaseIntel"
+    }
+  ]
+}

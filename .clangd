@@ -1,4 +1,4 @@
-#CompileFlags: # Para incluir headers que não estejam nos includes do msys4
+#CompileFlags:
 #  Add: [-std=c++20, -Wunused-variable]
 
 Diagnostics:

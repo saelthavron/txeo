@@ -1,7 +1,7 @@
 # cmake/FindTensorFlow.cmake
 include(FindPackageHandleStandardArgs)
 
-#------------------- Find TensorFlow -------------------
+# Find TensorFlow
 find_path(TensorFlow_INCLUDE_DIR
   NAMES tensorflow/core/public/session.h
   HINTS
@@ -29,7 +29,7 @@ find_library(TensorFlow_FRAMEWORK_LIBRARY
     /opt/tensorflow/lib
 )
 
-#------------------- Find Protobuf (Required by TensorFlow) -------------------
+# Find Protobuf 
 find_path(Protobuf_INCLUDE_DIR
   NAMES google/protobuf/message.h
   HINTS
@@ -48,7 +48,7 @@ find_library(Protobuf_LIBRARY
     /opt/protobuf/lib
 )
 
-#------------------- Combine Results -------------------
+# Combine Results
 set(TensorFlow_INCLUDE_DIRS
   ${TensorFlow_INCLUDE_DIR}
   ${Protobuf_INCLUDE_DIR}  # Add Protobuf headers
@@ -60,7 +60,7 @@ set(TensorFlow_LIBRARIES
   ${Protobuf_LIBRARY}      # Link Protobuf
 )
 
-#------------------- Validate Found Dependencies -------------------
+# Validate Found Dependencies
 find_package_handle_standard_args(TensorFlow
   REQUIRED_VARS
     TensorFlow_INCLUDE_DIR
@@ -70,7 +70,7 @@ find_package_handle_standard_args(TensorFlow
     Protobuf_LIBRARY
 )
 
-#------------------- Create Imported Targets -------------------
+# Create Imported Targets
 if(TensorFlow_FOUND AND NOT TARGET TensorFlow::TensorFlow)
   # TensorFlow target
   add_library(TensorFlow::TensorFlow SHARED IMPORTED)

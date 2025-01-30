@@ -21,13 +21,13 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 find_package(TensorFlow REQUIRED COMPONENTS CXX)
 target_link_libraries(rhoe PUBLIC TensorFlow::TensorFlow)
 
-
+# Testing
 enable_testing()
 if(BUILD_TESTING)
   add_subdirectory(tests)  
 endif()
 
-
+# Instalation
 include(GNUInstallDirs)
 install(TARGETS rhoe
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
