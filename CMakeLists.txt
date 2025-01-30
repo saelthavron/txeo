@@ -1,25 +1,25 @@
 cmake_minimum_required (VERSION 3.20)
 
 
-project(rhoe LANGUAGES CXX VERSION 0.1 DESCRIPTION "RHOE - A DEVELOPER-FRIENDLY TENSORFLOW C++ WRAPPER")
+project(txeo LANGUAGES CXX VERSION 0.1 DESCRIPTION "TXEO - A DEVELOPER-FRIENDLY TENSORFLOW C++ WRAPPER")
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON) 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_EXTENSIONS OFF) #Turns off compiler non-standard features  
 
-add_library(rhoe)
-target_include_directories(rhoe PUBLIC
+add_library(txeo)
+target_include_directories(txeo PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>
 )
 
-add_subdirectory (src)
-add_subdirectory (examples)
+add_subdirectory(src)
+add_subdirectory(examples)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 find_package(TensorFlow REQUIRED COMPONENTS CXX)
-target_link_libraries(rhoe PUBLIC TensorFlow::TensorFlow)
+target_link_libraries(txeo PUBLIC TensorFlow::TensorFlow)
 
 # Testing
 enable_testing()
@@ -29,12 +29,31 @@ endif()
 
 # Instalation
 include(GNUInstallDirs)
-install(TARGETS rhoe
+install(TARGETS txeo EXPORT txeoTargets
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
 install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
+# Export configuration to allow `find_package(txeo REQUIRED)`
+install(EXPORT txeoTargets
+  FILE txeoConfig.cmake
+  NAMESPACE txeo::
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/txeo
+)
+
+# Provide package config files for CMake package discovery
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file(
+  "${CMAKE_CURRENT_BINARY_DIR}/txeoConfigVersion.cmake"
+  VERSION ${PROJECT_VERSION}
+  COMPATIBILITY AnyNewerVersion
+)
+
+install(FILES
+  "${CMAKE_CURRENT_BINARY_DIR}/txeoConfigVersion.cmake"
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/txeo
+)
 
 

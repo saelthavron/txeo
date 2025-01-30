@@ -34,3 +34,7 @@
 # Directories
 .out
 .vscode
+.xmake
+.my-xmake
+build
+

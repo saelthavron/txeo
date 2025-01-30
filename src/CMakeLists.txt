@@ -1,4 +1,4 @@
-target_sources(rhoe PRIVATE
+target_sources(txeo PRIVATE
   Tensor.cpp
   # Add other source files
 )
