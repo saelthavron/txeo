@@ -38,3 +38,5 @@
 .my-xmake
 build
 
+# Files
+CMakeUserPresets.json

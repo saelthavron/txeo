@@ -1,7 +1,13 @@
 #include "txeo/Tensor.h"
 #include <iostream>
+#include <string>
+#include <vector>
 
 int main() {
+
+  std::vector<std::string> vec{"roberto", "dias", "algarte"};
+
+  int a = 2;
 
   Tensor p{"roberto", "algarte"};
 

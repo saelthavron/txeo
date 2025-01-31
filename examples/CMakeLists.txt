@@ -1,2 +1,2 @@
-add_executable(txeo_example txeo_main.cpp)
+add_executable(txeo_example txeo_example.cpp)
 target_link_libraries(txeo_example PRIVATE txeo_static)

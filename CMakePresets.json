@@ -1,15 +1,10 @@
 {
-  "version": 2,
+  "version": 6,
   "configurePresets": [
     {
-      "environment": {
-        "Clang_HOME": "/opt/clang",
-        "TensorFlow_HOME": "/opt/tensorflow",
-        "Protobuf_HOME": "/opt/protobuf"
-      },
       "name": "gcovClang",
       "displayName": "Clang(gcov)",
-      "description": "Using compilers: clang.exe, clang++.exe",
+      "description": "Using compilers: clang, clang++",
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/.out/build/${presetName}",
       "cacheVariables": {
@@ -17,18 +12,14 @@
         "CMAKE_C_COMPILER": "$env{CLANG_DIR}/bin/clang",
         "CMAKE_CXX_COMPILER": "$env{CLANG_DIR}/bin/clang++",
         "CMAKE_CXX_FLAGS": "-O0 -coverage",
-        "CMAKE_BUILD_TYPE": "Debug",
-        "CMAKE_EXE_LINKER_FLAGS": "-fuse-ld=mold",
-        "CMAKE_SHARED_LINKER_FLAGS": "-fuse-ld=mold",
-        "CMAKE_MODULE_LINKER_FLAGS": "-fuse-ld=mold"
+        "CMAKE_BUILD_TYPE": "Debug"
+      },
+      "environment": {
+        "CC": "clang",
+        "CXX": "clang++"
       }
     },
     {
-      "environment": {
-        "Clang_HOME": "/opt/clang",
-        "TensorFlow_HOME": "/opt/tensorflow",
-        "Protobuf_HOME": "/opt/protobuf"
-      },
       "name": "debugClang",
       "displayName": "Clang(debug)",
       "description": "Using compilers: clang, clang++",
@@ -38,19 +29,16 @@
         "CMAKE_INSTALL_PREFIX": "${sourceDir}/.out/install/${presetName}",
         "CMAKE_C_COMPILER": "$env{Clang_HOME}/bin/clang",
         "CMAKE_CXX_COMPILER": "$env{Clang_HOME}/bin/clang++",
-        "CMAKE_CXX_FLAGS": "-O0 -g -Wall -Wextra -fsanitize=address,undefined -fno-omit-frame-pointer",
+        "CMAKE_CXX_FLAGS": "-g -O0 -fno-omit-frame-pointer -Wall -Wextra -Wpedantic -fsanitize=address,undefined -fno-optimize-sibling-calls",
         "CMAKE_BUILD_TYPE": "Debug",
-        "CMAKE_EXE_LINKER_FLAGS": "-fuse-ld=mold",
-        "CMAKE_SHARED_LINKER_FLAGS": "-fuse-ld=mold",
-        "CMAKE_MODULE_LINKER_FLAGS": "-fuse-ld=mold"
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+      },
+      "environment": {
+        "CC": "clang",
+        "CXX": "clang++"
       }
     },
     {
-      "environment": {
-        "Clang_HOME": "/opt/clang",
-        "TensorFlow_HOME": "/opt/tensorflow",
-        "Protobuf_HOME": "/opt/protobuf"
-      },
       "name": "releaseClang",
       "displayName": "Clang(Release)",
       "description": "Using compilers: clang, clang++",
@@ -58,24 +46,20 @@
       "binaryDir": "${sourceDir}/.out/build/${presetName}",
       "cacheVariables": {
         "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
-        "CMAKE_C_COMPILER": "$env{CLANG_DIR}/bin/clang",
-        "CMAKE_CXX_COMPILER": "$env{CLANG_DIR}/bin/clang++",
+        "CMAKE_C_COMPILER": "$env{CLANG_HOME}/bin/clang",
+        "CMAKE_CXX_COMPILER": "$env{CLANG_HOME}/bin/clang++",
         "CMAKE_CXX_FLAGS": "-O3 -march=native -DNDEBUG",
-        "CMAKE_BUILD_TYPE": "Release",
-        "CMAKE_EXE_LINKER_FLAGS": "-fuse-ld=mold",
-        "CMAKE_SHARED_LINKER_FLAGS": "-fuse-ld=mold",
-        "CMAKE_MODULE_LINKER_FLAGS": "-fuse-ld=mold"
+        "CMAKE_BUILD_TYPE": "Release"
+      },
+      "environment": {
+        "CC": "clang",
+        "CXX": "clang++"
       }
     },
     {
-      "environment": {
-        "Clang_HOME": "/opt/clang",
-        "TensorFlow_HOME": "/opt/tensorflow",
-        "Protobuf_HOME": "/opt/protobuf"
-      },
       "name": "releaseGcc",
       "displayName": "GCC(release)",
-      "description": "Using compilers: g++.exe, gcc.exe",
+      "description": "Using compilers: g++, gcc",
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/.out/build/${presetName}",
       "cacheVariables": {
@@ -83,55 +67,12 @@
         "CMAKE_C_COMPILER": "gcc",
         "CMAKE_CXX_COMPILER": "g++",
         "CMAKE_CXX_FLAGS": "-O3",
-        "CMAKE_BUILD_TYPE": "Release",
-        "CMAKE_EXE_LINKER_FLAGS": "-fuse-ld=mold",
-        "CMAKE_SHARED_LINKER_FLAGS": "-fuse-ld=mold",
-        "CMAKE_MODULE_LINKER_FLAGS": "-fuse-ld=mold"
+        "CMAKE_BUILD_TYPE": "Release"
+      },
+      "environment": {
+        "CC": "gcc",
+        "CXX": "g++"
       }
-    }
-  ],
-  "buildPresets": [
-    {
-      "name": "debugClang",
-      "description": "",
-      "displayName": "Clang(Debug)",
-      "jobs": 16,
-      "configurePreset": "debugClang"
-    },
-    {
-      "name": "gcovClang",
-      "description": "",
-      "displayName": "Clang(Gcov)",
-      "jobs": 16,
-      "configurePreset": "gcovClang"
-    },
-    {
-      "name": "releaseClang",
-      "description": "",
-      "displayName": "Clang(Release)",
-      "jobs": 16,
-      "configurePreset": "releaseClang"
-    },
-    {
-      "name": "releaseGcc",
-      "description": "",
-      "displayName": "Gcc(Release)",
-      "jobs": 16,
-      "configurePreset": "releaseGcc"
-    }
-  ],
-  "testPresets": [
-    {
-      "name": "testClang",
-      "description": "",
-      "displayName": "Clang(Test)",
-      "configurePreset": "debugClang"
-    },
-    {
-      "name": "testGcc",
-      "description": "",
-      "displayName": "Gcc(Test)",
-      "configurePreset": "releaseGcc"
     }
   ]
 }
