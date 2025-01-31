@@ -8,18 +8,11 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_EXTENSIONS OFF) #Turns off compiler non-standard features  
 
-add_library(txeo)
-target_include_directories(txeo PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<INSTALL_INTERFACE:include>
-)
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+find_package(TensorFlow REQUIRED COMPONENTS CXX)
 
 add_subdirectory(src)
 add_subdirectory(examples)
-
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-find_package(TensorFlow REQUIRED COMPONENTS CXX)
-target_link_libraries(txeo PUBLIC TensorFlow::TensorFlow)
 
 # Testing
 enable_testing()
@@ -29,7 +22,7 @@ endif()
 
 # Instalation
 include(GNUInstallDirs)
-install(TARGETS txeo EXPORT txeoTargets
+install(TARGETS txeo_static txeo_shared EXPORT txeoTargets
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}

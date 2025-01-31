@@ -1,6 +1,6 @@
 add_rules("mode.debug", "mode.release")
-includes("my-xmake/toolchains/myClang.lua")
-set_toolchains("icx")
+includes(".my-xmake/toolchains/myClang.lua")
+set_toolchains("myClang")
 set_languages("cxx20")
 
 
@@ -31,7 +31,6 @@ target("txeo_shared")
     set_kind("shared")
     add_files("src/*.cpp")
     add_includedirs("include/", { public = true })
-    add_defines("TXEO_SHARED")    
 
 target("txeo_example")
     set_kind("binary")
