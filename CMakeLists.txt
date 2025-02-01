@@ -19,7 +19,7 @@ if(BUILD_TESTING)
   add_subdirectory(tests)  
 endif()
 
-# Instalation
+# Txeo Instalation
 include(GNUInstallDirs)
 install(TARGETS txeo_static txeo_shared EXPORT txeoTargets
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -49,3 +49,17 @@ install(FILES
 )
 
 
+# Automating Doxygen
+find_package(Doxygen REQUIRED)
+
+set(DOXYGEN_IN ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile)
+
+add_custom_target(doxygen ALL
+    COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_IN}
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    COMMENT "Generating Doxygen documentation..."
+    VERBATIM
+)
+
+# Install documentation (optional)
+install(DIRECTORY ${DOXYGEN_OUT} DESTINATION share/docs)
