@@ -2,26 +2,8 @@
   "version": 6,
   "configurePresets": [
     {
-      "name": "gcovClang",
-      "displayName": "Clang(gcov)",
-      "description": "Using compilers: clang, clang++",
-      "generator": "Ninja",
-      "binaryDir": "${sourceDir}/.out/build/${presetName}",
-      "cacheVariables": {
-        "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
-        "CMAKE_C_COMPILER": "$env{CLANG_DIR}/bin/clang",
-        "CMAKE_CXX_COMPILER": "$env{CLANG_DIR}/bin/clang++",
-        "CMAKE_CXX_FLAGS": "-O0 -coverage",
-        "CMAKE_BUILD_TYPE": "Debug"
-      },
-      "environment": {
-        "CC": "clang",
-        "CXX": "clang++"
-      }
-    },
-    {
       "name": "debugClang",
-      "displayName": "Clang(debug)",
+      "displayName": "debug-clang",
       "description": "Using compilers: clang, clang++",
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/.out/build/${presetName}",
@@ -29,9 +11,24 @@
         "CMAKE_INSTALL_PREFIX": "${sourceDir}/.out/install/${presetName}",
         "CMAKE_C_COMPILER": "$env{Clang_HOME}/bin/clang",
         "CMAKE_CXX_COMPILER": "$env{Clang_HOME}/bin/clang++",
-        "CMAKE_CXX_FLAGS": "-g -O0 -fno-omit-frame-pointer -Wall -Wextra -Wpedantic -fsanitize=address,undefined -fno-optimize-sibling-calls",
+        "CMAKE_CXX_FLAGS": "-g -O0",
         "CMAKE_BUILD_TYPE": "Debug",
-        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+        "BUILD_TESTING": true
+      },
+      "environment": {
+        "CC": "clang",
+        "CXX": "clang++"
+      }
+    },
+    {
+      "name": "gcovrClang",
+      "displayName": "gcovr-clang",
+      "inherits": "debugClang",
+      "cacheVariables": {
+        "CMAKE_CXX_FLAGS": "-O0 -coverage",
+        "BUILD_TESTING": true,
+        "TXEO_ENABLE_COVERAGE": true
       },
       "environment": {
         "CC": "clang",
@@ -40,7 +37,7 @@
     },
     {
       "name": "releaseClang",
-      "displayName": "Clang(Release)",
+      "displayName": "release-clang",
       "description": "Using compilers: clang, clang++",
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/.out/build/${presetName}",
@@ -48,7 +45,7 @@
         "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
         "CMAKE_C_COMPILER": "$env{CLANG_HOME}/bin/clang",
         "CMAKE_CXX_COMPILER": "$env{CLANG_HOME}/bin/clang++",
-        "CMAKE_CXX_FLAGS": "-O3 -march=native -DNDEBUG",
+        "CMAKE_CXX_FLAGS": "-O3",
         "CMAKE_BUILD_TYPE": "Release"
       },
       "environment": {
@@ -58,7 +55,7 @@
     },
     {
       "name": "releaseGcc",
-      "displayName": "GCC(release)",
+      "displayName": "release-gcc",
       "description": "Using compilers: g++, gcc",
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/.out/build/${presetName}",
@@ -72,6 +69,23 @@
       "environment": {
         "CC": "gcc",
         "CXX": "g++"
+      }
+    },
+    {
+      "name": "releaseIntel",
+      "displayName": "Intel Release",
+      "description": "Intel C++ Compiler (optimized for Intel architectures)",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/.out/build/${presetName}",
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "icx",
+        "CMAKE_CXX_COMPILER": "icpx",
+        "CMAKE_CXX_FLAGS": "-O3",
+        "CMAKE_BUILD_TYPE": "Release"
+      },
+      "environment": {
+        "CC": "icx",
+        "CXX": "icpx"
       }
     }
   ]

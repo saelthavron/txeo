@@ -1,7 +1,8 @@
 
 set(TXEO_SOURCES Tensor.cpp)
 
-# Static Library
+#################################################### Static Library ####################################################
+
 add_library(txeo_static STATIC ${TXEO_SOURCES})
 target_include_directories(txeo_static PUBLIC
     $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
@@ -11,7 +12,14 @@ target_link_libraries(txeo_static PUBLIC TensorFlow::TensorFlow)
 set_target_properties(txeo_static PROPERTIES OUTPUT_NAME "txeo")
 
 
-# Dynamic Library
+
+#################################################### Dynamic Library ####################################################
+
+if(CMAKE_GENERATOR STREQUAL "Ninja" AND $ENV{CXX} STREQUAL "icpx") # Avoiding compatibility issues between Ninja and Intel compiler
+    set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
+    set(CMAKE_SKIP_RPATH FALSE)
+endif()
+
 add_library(txeo_shared SHARED ${TXEO_SOURCES})
 target_compile_definitions(txeo_shared PUBLIC TXEO_SHARED)
 target_include_directories(txeo_shared PUBLIC
@@ -20,3 +28,4 @@ target_include_directories(txeo_shared PUBLIC
 )
 target_link_libraries(txeo_shared PUBLIC TensorFlow::TensorFlow)
 set_target_properties(txeo_shared PROPERTIES OUTPUT_NAME "txeo")
+
