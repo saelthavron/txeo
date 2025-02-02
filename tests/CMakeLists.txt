@@ -1,4 +1,6 @@
 
+#################################################### Test Executable ####################################################
+
 find_package(GTest REQUIRED)
 
 add_executable(
@@ -9,7 +11,7 @@ add_executable(
 
 target_link_libraries(
   txeo_tests  
-  GTest::GTest GTest::Main pthread txeo_static 
+  GTest::GTest GTest::Main txeo_static 
 )
 
 include(GoogleTest)

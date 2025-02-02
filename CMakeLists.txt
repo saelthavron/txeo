@@ -13,13 +13,16 @@ find_package(TensorFlow REQUIRED COMPONENTS CXX)
 add_subdirectory(src)
 add_subdirectory(examples)
 
-# Testing
+#################################################### Testing ####################################################
+
 enable_testing()
 if(BUILD_TESTING)
   add_subdirectory(tests)  
 endif()
 
-# Txeo Instalation
+
+#################################################### Txeo Instalation ####################################################
+
 include(GNUInstallDirs)
 install(TARGETS txeo_static txeo_shared EXPORT txeoTargets
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -28,14 +31,12 @@ install(TARGETS txeo_static txeo_shared EXPORT txeoTargets
 )
 install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
-# Export configuration to allow `find_package(txeo REQUIRED)`
 install(EXPORT txeoTargets
   FILE txeoConfig.cmake
   NAMESPACE txeo::
   DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/txeo
 )
 
-# Provide package config files for CMake package discovery
 include(CMakePackageConfigHelpers)
 write_basic_package_version_file(
   "${CMAKE_CURRENT_BINARY_DIR}/txeoConfigVersion.cmake"
@@ -49,7 +50,8 @@ install(FILES
 )
 
 
-# Automating Doxygen
+#################################################### Automating Doxygen ####################################################
+
 find_package(Doxygen REQUIRED COMPONENTS dot)
 
 if(DOXYGEN_FOUND)
@@ -67,7 +69,8 @@ else()
 endif()
 
 
-#Automating gcovr
+#################################################### Automating gcovr ####################################################
+
 option(TXEO_ENABLE_COVERAGE "Enable code coverage reporting" OFF)
 
 if(TXEO_ENABLE_COVERAGE)

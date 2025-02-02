@@ -15,7 +15,8 @@ set_target_properties(txeo_static PROPERTIES OUTPUT_NAME "txeo")
 
 #################################################### Dynamic Library ####################################################
 
-if(CMAKE_GENERATOR STREQUAL "Ninja" AND $ENV{CXX} STREQUAL "icpx") # Avoiding compatibility issues between Ninja and Intel compiler
+# Avoiding compatibility issues between Ninja and Intel compiler
+if(CMAKE_GENERATOR STREQUAL "Ninja" AND $ENV{CXX} STREQUAL "icpx") 
     set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
     set(CMAKE_SKIP_RPATH FALSE)
 endif()
