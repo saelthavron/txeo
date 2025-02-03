@@ -2,8 +2,6 @@
 #ifndef TENSOR_H
 #define TENSOR_H
 
-#pragma once
-
 #include <string>
 
 /**

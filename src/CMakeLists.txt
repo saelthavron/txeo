@@ -1,5 +1,5 @@
 
-set(TXEO_SOURCES Tensor.cpp)
+set(TXEO_SOURCES TensorShape.cpp Tensor.cpp)
 
 #################################################### Static Library ####################################################
 

@@ -10,6 +10,7 @@ set(CMAKE_CXX_EXTENSIONS OFF) #Turns off compiler non-standard features
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 find_package(TensorFlow REQUIRED COMPONENTS CXX)
 
+include_directories(include) 
 add_subdirectory(src)
 add_subdirectory(examples)
 

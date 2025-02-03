@@ -1,6 +1,9 @@
 #include "txeo/detail/utils.h"
 #include <iostream>
 
+#include <memory>
+#include <sstream>
+#include <string>
 #include <tensorflow/core/framework/tensor.h>
 #include <tensorflow/core/framework/types.pb.h>
 
@@ -44,17 +47,27 @@ void create_tensor() {
   std::cout << "Value Matrix: \n" << mat2 << std::endl;
 }
 
+int multby2(const int &a) {
+  return 2 * a;
+}
+
 int main() {
 
-  tf::Tensor S(txeo::detail::get_tf_dtype<double>(), tf::TensorShape({}));
-  auto scal = S.scalar<double>();
-  scal() = 10;
-  std::cout << "Scalar: " << scal << std::endl;
-  std::cout << "Scalar dimensions: " << scal.NumDimensions << std::endl;
+  tf::TensorShape shp{1, 2};
 
-  txeo::detail::cpp_type<tf::DT_DOUBLE> number = 100.2;
+  std::cout << shp << std::endl;
 
-  std::cout << "Scalar: " << number << std::endl;
+  // shp.AddDim(10);
+
+  // std::vector vec{1, 2, 3, 4};
+
+  // std::stringstream os;
+
+  // os << "[";
+  // std::copy(std::begin(vec), std::end(vec) - 1, std::ostream_iterator<size_t>(os, ","));
+  // os << vec.back() << "]";
+
+  // std::cout << os.str() << std::endl;
 
   return 0;
 }
