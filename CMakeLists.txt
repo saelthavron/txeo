@@ -7,12 +7,13 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON) 
 set(CMAKE_CXX_EXTENSIONS OFF) #Turns off compiler non-standard features  
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-find_package(TensorFlow REQUIRED COMPONENTS CXX)
+
+#################################################### Source Directories ####################################################
 
 include_directories(include) 
 add_subdirectory(src)
 add_subdirectory(examples)
+
 
 #################################################### Testing ####################################################
 
@@ -22,7 +23,7 @@ if(BUILD_TESTING)
 endif()
 
 
-#################################################### Txeo Instalation ####################################################
+#################################################### Txeo Installation ####################################################
 
 include(GNUInstallDirs)
 install(TARGETS txeo_static txeo_shared EXPORT txeoTargets

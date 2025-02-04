@@ -1,6 +1,13 @@
 
 set(TXEO_SOURCES TensorShape.cpp Tensor.cpp)
 
+
+#################################################### Finding Tensorflow ####################################################
+
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+find_package(TensorFlow REQUIRED COMPONENTS CXX SHARED)
+
+
 #################################################### Static Library ####################################################
 
 add_library(txeo_static STATIC ${TXEO_SOURCES})
@@ -10,7 +17,6 @@ target_include_directories(txeo_static PUBLIC
 )
 target_link_libraries(txeo_static PUBLIC TensorFlow::TensorFlow)
 set_target_properties(txeo_static PROPERTIES OUTPUT_NAME "txeo")
-
 
 
 #################################################### Dynamic Library ####################################################

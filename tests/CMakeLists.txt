@@ -7,6 +7,7 @@ add_executable(
   txeo_tests
   txeo_tests.cpp
   tUtils.cpp
+  tTensorShape.cpp
 )  
 
 target_link_libraries(
