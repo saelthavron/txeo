@@ -1,5 +1,6 @@
 #ifndef TENSOR_SHAPE_H
 #define TENSOR_SHAPE_H
+#include <cstdint>
 #include <stdexcept>
 #pragma once
 
@@ -17,11 +18,12 @@ class TensorShapeError : public std::runtime_error {
 class TensorShape {
   private:
     struct Impl;
-    std::unique_ptr<Impl> _impl;
+    std::unique_ptr<Impl> _impl{nullptr};
 
   public:
-    explicit TensorShape(std::vector<int64_t> shape);
+    explicit TensorShape() = delete;
     explicit TensorShape(int order, int64_t dim);
+    explicit TensorShape(std::vector<int64_t> shape);
 
     TensorShape(const TensorShape &shape);
     TensorShape(TensorShape &&shape) noexcept;
@@ -30,10 +32,15 @@ class TensorShape {
     ~TensorShape() = default;
 
     [[nodiscard]] int order() const noexcept;
-    [[nodiscard]] int64_t tensor_dim() const noexcept;
+    [[nodiscard]] int64_t dim() const noexcept;
+    [[nodiscard]] int64_t number_of_elements() const noexcept { return this->dim(); };
     [[nodiscard]] int64_t axis_dim(int axis) const;
+    [[nodiscard]] std::vector<int64_t> axes_dims() const noexcept;
     [[nodiscard]] bool is_fully_defined() const noexcept;
     void push_dim_back(int64_t dim);
+
+    bool operator==(const TensorShape &shape) const;
+    bool operator!=(const TensorShape &shape) const;
 
     /*
 
@@ -43,7 +50,6 @@ class TensorShape {
     3. set_dim(int index, int64_t size)	Changes the size of an existing dimension.	void	✅
     Yes
     5. unknown_rank()	Checks if the rank is unknown.	bool	✅ Yes
-    6. operator== / operator!=
 
     */
 

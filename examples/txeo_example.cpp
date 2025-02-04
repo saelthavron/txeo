@@ -55,7 +55,7 @@ int main() {
 
   tf::TensorShape shp{1, 2};
 
-  std::cout << shp << std::endl;
+  std::cout << shp.unknown_rank() << std::endl;
 
   // shp.AddDim(10);
 
