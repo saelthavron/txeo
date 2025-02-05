@@ -1,5 +1,6 @@
 #ifndef TENSOR_H
 #define TENSOR_H
+#include <cstddef>
 #include <cstdint>
 #include <type_traits>
 #pragma once
@@ -46,18 +47,38 @@ class Tensor {
     [[nodiscard]] const txeo::TensorShape &shape();
     constexpr std::type_identity_t<T> type() const;
     [[nodiscard]] int order() const;
+    [[nodiscard]] int64_t dim() const;
+    [[nodiscard]] size_t size_in_bytes() const;
+    [[nodiscard]] const std::type_identity_t<T> *data() const;
+
+    T operator()() const;
+    T operator()(size_t x) const;
+    T operator()(size_t x, size_t y) const;
+    T operator()(size_t x, size_t y, size_t z) const;
+    T operator()(size_t x, size_t y, size_t z, size_t k) const;
+    T operator()(size_t x, size_t y, size_t z, size_t k, size_t w) const;
+
+    T at() const;
+    T at(size_t x) const;
+    T at(size_t x, size_t y) const;
+    T at(size_t x, size_t y, size_t z) const;
+    T at(size_t x, size_t y, size_t z, size_t k) const;
+    T at(size_t x, size_t y, size_t z, size_t k, size_t w) const;
+
+    template <typename... Args>
+    T element_at(Args... args);
+
+    template <typename U>
+    [[nodiscard]] bool is_equal_shape(const txeo::Tensor<U> &other) const;
 };
 
 #endif // TENSOR_H
 }
 
-// Assignment Operator: Assigns the value of one tensor to another.
-
-// DataType(): Returns the data type of the tensor.
-
-// Shape(): Returns the shape of the tensor as a tensorflow::TensorShape object.
-
-// NumElements(): Returns the total number of elements in the tensor.
+class TensorError : public std::runtime_error {
+  public:
+    using std::runtime_error::runtime_error;
+};
 
 // Slice(): Extracts a sub-tensor from the original tensor.
 
@@ -71,12 +92,7 @@ class Tensor {
 // Tensor::FromStringWithDefaultAndType(): Converts a string representation of a tensor with a
 // specified data type.
 
-// dtype()	Returns the data type (DT_FLOAT, etc.)
-// shape()	Returns the tensor shape
-// tensor_data()	Accesses raw memory
 // flat<T>()	Access tensor as a 1D array
 // matrix<T>()	Access tensor as a 2D matrix
-// NumElements()	Returns the number of elements
 // IsInitialized()	Checks if the tensor has memory allocated
-// IsSameSize(other)	Checks if two tensors have the same shape
 // set_shape(new_shape)	Changes the tensor shape (if valid)

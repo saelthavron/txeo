@@ -4,7 +4,7 @@
 
 namespace tf = tensorflow;
 
-TEST(TestUtils, TestTypes) {
+TEST(UtilsTest, TestTypes) {
   EXPECT_EQ(txeo::detail::get_tf_dtype<short>(), tf::DT_INT16);
   EXPECT_EQ(txeo::detail::get_tf_dtype<int>(), tf::DT_INT32);
   EXPECT_TRUE(txeo::detail::get_tf_dtype<long>() == tf::DT_INT32 ||
