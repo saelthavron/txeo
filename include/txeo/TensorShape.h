@@ -31,12 +31,13 @@ class TensorShape {
     void create_from_vector(P &&shape);
 
   public:
+    explicit TensorShape() = delete;
     TensorShape(const TensorShape &shape);
     TensorShape(TensorShape &&shape) noexcept;
-    TensorShape &operator=(const TensorShape &shape);
-    TensorShape &operator=(TensorShape &&shape) noexcept;
     ~TensorShape();
 
+    TensorShape &operator=(const TensorShape &shape);
+    TensorShape &operator=(TensorShape &&shape) noexcept;
     bool operator==(const TensorShape &shape) const;
     bool operator!=(const TensorShape &shape) const;
 
@@ -94,7 +95,7 @@ class TensorShape {
     [[nodiscard]] std::vector<int64_t> axes_dims() const noexcept;
 
     /**
-     * @brief Indicates whether the tensor shape has a negative(undefined) dimension or not
+     * @brief Indicates whether the tensor shape has any negative(undefined) dimensions or not
      *
      * @return true Does not have a negative dimension
      * @return false Has a negative dimension
@@ -122,6 +123,12 @@ class TensorShape {
      * @param axis Specified axis
      */
     void remove_axis(int axis);
+
+    /**
+     * @brief Removes all axes
+     *
+     */
+    void remove_all_axes();
 
     /**
      * @brief Sets a dimension in a specified axis

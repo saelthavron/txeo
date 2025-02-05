@@ -1,92 +1,3 @@
-// #include "txeo/TensorShape.h"
-// #include <gtest/gtest.h>
-// #include <sstream>
-
-// TEST(TensorShapeTest, ConstructFromVector) {
-//   std::vector<int64_t> shape = {2, 3, 4};
-//   txeo::TensorShape ts(shape);
-//   EXPECT_EQ(ts.number_of_axes(), 3);
-//   EXPECT_EQ(ts.axes_dims(), shape);
-//   EXPECT_TRUE(ts.is_fully_defined());
-// }
-
-// TEST(TensorShapeTest, ConstructFromnumber_of_axesAndDim) {
-//   txeo::TensorShape ts(3, 5);
-//   EXPECT_EQ(ts.number_of_axes(), 3);
-//   EXPECT_EQ(ts.axes_dims(), std::vector<int64_t>({5, 5, 5}));
-// }
-
-// TEST(TensorShapeTest, CopyConstructor) {
-//   txeo::TensorShape ts1({2, 3});
-//   txeo::TensorShape ts2(ts1);
-//   EXPECT_EQ(ts1, ts2);
-// }
-
-// TEST(TensorShapeTest, MoveConstructor) {
-//   txeo::TensorShape ts1({2, 3});
-//   txeo::TensorShape ts2(std::move(ts1));
-//   EXPECT_EQ(ts2.number_of_axes(), 2);
-//   EXPECT_EQ(ts2.axes_dims(), std::vector<int64_t>({2, 3}));
-// }
-
-// TEST(TensorShapeTest, AxisDim) {
-//   txeo::TensorShape ts({4, 5, 6});
-//   EXPECT_EQ(ts.axis_dim(1), 5);
-//   EXPECT_THROW(
-//       {
-//         auto result = ts.axis_dim(3);
-//         (void)result; // Avoiding incompatibility of gtest with [[nodiscard]]
-//       },
-//       txeo::TensorShapeError);
-//   EXPECT_THROW(
-//       {
-//         auto result = ts.axis_dim(-1);
-//         (void)result; // Avoiding incompatibility of gtest with [[nodiscard]]
-//       },
-//       txeo::TensorShapeError);
-// }
-
-// TEST(TensorShapeTest, InsertAxis) {
-//   txeo::TensorShape ts({2, 3});
-//   ts.insert_axis(1, 4);
-//   EXPECT_EQ(ts.axes_dims(), std::vector<int64_t>({2, 4, 3}));
-//   EXPECT_THROW(ts.insert_axis(3, 5), txeo::TensorShapeError);
-//   EXPECT_THROW(ts.insert_axis(-1, 5), txeo::TensorShapeError);
-//   EXPECT_THROW(ts.insert_axis(1, -5), txeo::TensorShapeError);
-// }
-
-// TEST(TensorShapeTest, RemoveAxis) {
-//   txeo::TensorShape ts({2, 3, 4});
-//   ts.remove_axis(1);
-//   EXPECT_EQ(ts.axes_dims(), std::vector<int64_t>({2, 4}));
-//   EXPECT_THROW(ts.remove_axis(2), txeo::TensorShapeError);
-//   EXPECT_THROW(ts.remove_axis(-1), txeo::TensorShapeError);
-// }
-
-// TEST(TensorShapeTest, SetAxisDim) {
-//   txeo::TensorShape ts({2, 3, 4});
-//   ts.set_dim(1, 7);
-//   EXPECT_EQ(ts.axes_dims(), std::vector<int64_t>({2, 7, 4}));
-//   EXPECT_THROW(ts.set_dim(3, 5), txeo::TensorShapeError);
-//   EXPECT_THROW(ts.set_dim(-1, 5), txeo::TensorShapeError);
-// }
-
-// TEST(TensorShapeTest, ComparisonOperators) {
-//   txeo::TensorShape ts1({2, 3, 4});
-//   txeo::TensorShape ts2({2, 3, 4});
-//   txeo::TensorShape ts3({2, 3, 5});
-//   EXPECT_TRUE(ts1 == ts2);
-//   EXPECT_FALSE(ts1 == ts3);
-//   EXPECT_TRUE(ts1 != ts3);
-// }
-
-// TEST(TensorShapeTest, StreamOperator) {
-//   txeo::TensorShape ts({2, 3, 4});
-//   std::stringstream ss;
-//   ss << ts;
-//   EXPECT_EQ(ss.str(), "[2,3,4]");
-// }
-
 #include "txeo/TensorShape.h"
 #include <gtest/gtest.h>
 #include <sstream>
@@ -180,6 +91,9 @@ TEST(TensorShapeTest, ShapeModifications) {
   EXPECT_THROW(shape.insert_axis(5, 2), TensorShapeError);
   EXPECT_THROW(shape.remove_axis(5), TensorShapeError);
   EXPECT_THROW(shape.set_dim(5, 2), TensorShapeError);
+
+  shape.remove_all_axes();
+  EXPECT_TRUE(shape.axes_dims().empty());
 }
 
 TEST(TensorShapeTest, ComparisonOperators) {

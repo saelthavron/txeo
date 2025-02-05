@@ -1,5 +1,6 @@
 #ifndef TXEO_UTILS_H
 #define TXEO_UTILS_H
+#include <memory>
 #pragma once
 
 #include "tensorflow/core/framework/types.h"
@@ -29,6 +30,15 @@ constexpr tf::DataType get_tf_dtype() {
 template <tf::DataType T>
 using cpp_type = typename tf::EnumToDataType<T>::Type;
 
+namespace tensor {
+
+inline void update_shape(auto &tf_tensor, auto &txeo_shape) {
+  txeo_shape->remove_all_axes();
+  for (auto &item : tf_tensor->shape().dim_sizes())
+    txeo_shape->push_axis_back(item);
+}
+
+} // namespace tensor
 } // namespace txeo::detail
 
 #endif

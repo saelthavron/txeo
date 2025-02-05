@@ -119,6 +119,10 @@ void TensorShape::remove_axis(int axis) {
   _impl->tf_shape->RemoveDim(axis);
 }
 
+void TensorShape::remove_all_axes() {
+  _impl->tf_shape->Clear();
+}
+
 void TensorShape::set_dim(int axis, int64_t dim) {
   if (axis < 0 || axis >= this->number_of_axes())
     throw TensorShapeError("Axis " + std::to_string(axis) + " not in the range [0," +
