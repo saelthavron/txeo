@@ -1,8 +1,12 @@
-#pragma once
 #ifndef TENSOR_H
 #define TENSOR_H
+#include <cstdint>
+#pragma once
 
-#include <string>
+#include "TensorShape.h"
+#include <memory>
+
+namespace txeo {
 
 /**
  * @brief Implements the mathematical concept of tensor, which is a magnitude of multiple order. A
@@ -10,17 +14,28 @@
  * Each order of the tensor has a dimension.
  *
  */
+template <typename T>
 class Tensor {
-
   private:
-    std::string nome;
-    std::string sobrenome;
+    struct Impl;
+    std::unique_ptr<Impl> _impl{nullptr};
+
+    template <typename P>
+    void create_from_shape(P &&shape);
+
+    template <typename P>
+    void create_from_vector(P &&shape);
 
   public:
-    Tensor(std::string nome, std::string sobrenome)
-        : nome(std::move(nome)), sobrenome(std::move(sobrenome)) {}
+    explicit Tensor(const txeo::TensorShape &shape);
+    explicit Tensor(txeo::TensorShape &&shape);
+    explicit Tensor(const std::vector<int64_t> &shape);
+    explicit Tensor(std::vector<int64_t> &&shape);
 
-    std::string nome_completo();
+    [[nodiscard]] txeo::TensorShape shape() const;
+
+    ~Tensor();
 };
 
 #endif // TENSOR_H
+}

@@ -209,13 +209,13 @@ TEST(TensorShapeTest, StreamOperator) {
 TEST(TensorShapeTest, NumberOfElements) {
   TensorShape shape({2, 3, 5});
 
-  EXPECT_EQ(shape.number_of_elements(), 2 * 3 * 5);
+  EXPECT_EQ(shape.calculate_capacity(), 2 * 3 * 5);
 }
 
 TEST(TensorShapeTest, EmptyShape) {
   TensorShape empty_shape(0, 0);
   EXPECT_EQ(empty_shape.number_of_axes(), 0);
-  EXPECT_EQ(empty_shape.number_of_elements(), 1); // Scalar
+  EXPECT_EQ(empty_shape.calculate_capacity(), 1); // Scalar
   EXPECT_TRUE(empty_shape.is_fully_defined());
 }
 

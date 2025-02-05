@@ -1,6 +1,9 @@
-#include "txeo/TensorShape.h"
+// #include "txeo/TensorShape.h"
+#include "txeo/detail/TensorShapePrivate.h"
 
+#include <algorithm>
 #include <cstdint>
+#include <iterator>
 #include <memory>
 #include <string>
 #include <tensorflow/core/framework/tensor_shape.h>
@@ -11,17 +14,24 @@ namespace txeo {
 
 namespace tf = tensorflow;
 
-struct TensorShape::Impl {
-    std::unique_ptr<tf::TensorShape> tf_shape{nullptr};
-};
+template <typename P>
+void TensorShape::create_from_vector(P &&shape) {
+  auto aux = std::forward<P>(shape);
 
-TensorShape::TensorShape(std::vector<int64_t> shape) : _impl{std::make_unique<Impl>()} {
-  for (auto item : shape) {
+  for (auto item : aux) {
     if (item < 0)
       throw TensorShapeError("Negative dimension is not allowed.");
   }
 
-  _impl->tf_shape = std::make_unique<tf::TensorShape>(shape);
+  _impl->tf_shape = std::make_unique<tf::TensorShape>(aux);
+}
+
+TensorShape::TensorShape(const std::vector<int64_t> &shape) : _impl{std::make_unique<Impl>()} {
+  this->create_from_vector(shape);
+}
+
+TensorShape::TensorShape(std::vector<int64_t> &&shape) : _impl{std::make_unique<Impl>()} {
+  this->create_from_vector<std::vector<int64_t>>(std::move(shape));
 }
 
 TensorShape::TensorShape(int number_of_axes, int64_t dim) : _impl{std::make_unique<Impl>()} {
@@ -52,14 +62,14 @@ TensorShape &TensorShape::operator=(TensorShape &&shape) noexcept {
   return *this;
 }
 
-TensorShape::~TensorShape() { // Defined here (not in the header) to avoid Impl incompleteness
-}
+// Defined here (not in the header) to avoid Impl incompleteness
+TensorShape::~TensorShape() = default;
 
 int TensorShape::number_of_axes() const noexcept {
   return _impl->tf_shape->dims();
 }
 
-int64_t TensorShape::number_of_elements() const noexcept {
+int64_t TensorShape::calculate_capacity() const noexcept {
   return _impl->tf_shape->num_elements();
 }
 
@@ -72,9 +82,9 @@ int64_t TensorShape::axis_dim(int axis) const {
 }
 
 std::vector<int64_t> TensorShape::axes_dims() const noexcept {
+  const auto &aux = _impl->tf_shape->dim_sizes();
   std::vector<int64_t> res;
-  for (int i{0}; i < this->number_of_axes(); ++i)
-    res.emplace_back(_impl->tf_shape->dim_size(i));
+  std::ranges::copy(std::begin(aux), std::end(aux), std::back_inserter(res));
 
   return res;
 }
@@ -86,7 +96,7 @@ bool TensorShape::is_fully_defined() const noexcept {
 void TensorShape::push_axis_back(int64_t dim) {
   if (dim < 0)
     throw TensorShapeError("Negative dimension is not allowed.");
-  std::cout << "NMumero de elementos: " << this->number_of_elements() << std::endl;
+  std::cout << "NMumero de elementos: " << this->calculate_capacity() << std::endl;
 
   _impl->tf_shape->AddDim(dim);
 }
