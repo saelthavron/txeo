@@ -1,4 +1,3 @@
-// #include "txeo/TensorShape.h"
 #include "txeo/detail/TensorShapePrivate.h"
 
 #include <algorithm>
@@ -24,6 +23,10 @@ void TensorShape::create_from_vector(P &&shape) {
   }
 
   _impl->tf_shape = std::make_unique<tf::TensorShape>(aux);
+  _impl->owns = true;
+}
+
+TensorShape::TensorShape() : _impl{std::make_unique<Impl>()} {
 }
 
 TensorShape::TensorShape(const std::vector<int64_t> &shape) : _impl{std::make_unique<Impl>()} {
@@ -38,16 +41,19 @@ TensorShape::TensorShape(int number_of_axes, int64_t dim) : _impl{std::make_uniq
   if (dim < 0 || number_of_axes < 0)
     throw TensorShapeError("Negative number_of_axes or dimension is not allowed.");
   _impl->tf_shape = std::make_unique<tf::TensorShape>(std::vector<int64_t>(number_of_axes, dim));
+  _impl->owns = true;
 }
 
 TensorShape::TensorShape(const TensorShape &shape) : _impl{std::make_unique<Impl>()} {
   if (this != &shape)
     _impl->tf_shape = std::make_unique<tf::TensorShape>(*shape._impl->tf_shape);
+  _impl->owns = true;
 }
 
 TensorShape::TensorShape(TensorShape &&shape) noexcept : _impl{std::make_unique<Impl>()} {
   if (this != &shape)
     _impl->tf_shape = std::make_unique<tf::TensorShape>(std::move(*shape._impl->tf_shape));
+  _impl->owns = true;
 }
 
 TensorShape &TensorShape::operator=(const TensorShape &shape) {
@@ -62,27 +68,26 @@ TensorShape &TensorShape::operator=(TensorShape &&shape) noexcept {
   return *this;
 }
 
-// Defined here (not in the header) to avoid Impl incompleteness
+// Defined here after "Impl" implementation in order to avoid incompleteness
 TensorShape::~TensorShape() = default;
 
 int TensorShape::number_of_axes() const noexcept {
-  return _impl->tf_shape->dims();
+  return _impl->owns ? _impl->tf_shape->dims() : _impl->ext_tf_shape->dims();
 }
 
 int64_t TensorShape::calculate_capacity() const noexcept {
-  return _impl->tf_shape->num_elements();
+  return _impl->owns ? _impl->tf_shape->num_elements() : _impl->ext_tf_shape->num_elements();
 }
 
 int64_t TensorShape::axis_dim(int axis) const {
   if (axis < 0 || axis >= this->number_of_axes())
     throw TensorShapeError("Axis " + std::to_string(axis) + " not in the range [0," +
                            std::to_string(this->number_of_axes() - 1) + "]");
-  auto res = _impl->tf_shape->dim_size(axis);
-  return res;
+  return _impl->owns ? _impl->tf_shape->dim_size(axis) : _impl->ext_tf_shape->dim_size(axis);
 }
 
 std::vector<int64_t> TensorShape::axes_dims() const noexcept {
-  const auto &aux = _impl->tf_shape->dim_sizes();
+  const auto &aux = _impl->owns ? _impl->tf_shape->dim_sizes() : _impl->ext_tf_shape->dim_sizes();
   std::vector<int64_t> res;
   std::ranges::copy(std::begin(aux), std::end(aux), std::back_inserter(res));
 
@@ -90,7 +95,7 @@ std::vector<int64_t> TensorShape::axes_dims() const noexcept {
 }
 
 bool TensorShape::is_fully_defined() const noexcept {
-  return _impl->tf_shape->IsFullyDefined();
+  return _impl->owns ? _impl->tf_shape->IsFullyDefined() : _impl->ext_tf_shape->IsFullyDefined();
 }
 
 void TensorShape::push_axis_back(int64_t dim) {
@@ -132,16 +137,23 @@ void TensorShape::set_dim(int axis, int64_t dim) {
 }
 
 bool TensorShape::operator==(const TensorShape &shape) const {
-  return *this->_impl->tf_shape == *shape._impl->tf_shape;
+  if (_impl->owns)
+    return *this->_impl->tf_shape == *shape._impl->tf_shape;
+
+  return *this->_impl->ext_tf_shape == *shape._impl->ext_tf_shape;
 }
 
 bool TensorShape::operator!=(const TensorShape &shape) const {
-  return *this->_impl->tf_shape != *shape._impl->tf_shape;
+  if (_impl->owns)
+    return *this->_impl->tf_shape != *shape._impl->tf_shape;
+  return *this->_impl->ext_tf_shape != *shape._impl->ext_tf_shape;
 }
 
 std::ostream &operator<<(std::ostream &os, const TensorShape &shape) {
-  os << shape._impl->tf_shape->DebugString();
-
+  if (shape._impl->owns)
+    os << shape._impl->tf_shape->DebugString();
+  else
+    os << shape._impl->ext_tf_shape->DebugString();
   return os;
 }
 

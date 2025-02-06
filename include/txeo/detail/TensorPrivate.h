@@ -10,7 +10,7 @@
 template <typename T>
 struct txeo::Tensor<T>::Impl {
     std::unique_ptr<tensorflow::Tensor> tf_tensor{nullptr};
-    std::unique_ptr<txeo::TensorShape> txeo_shape{nullptr};
+    txeo::TensorShape txeo_shape{};
 };
 
 #endif

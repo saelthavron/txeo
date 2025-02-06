@@ -30,8 +30,9 @@ class TensorShape {
     template <typename P>
     void create_from_vector(P &&shape);
 
+    explicit TensorShape();
+
   public:
-    explicit TensorShape() = delete;
     TensorShape(const TensorShape &shape);
     TensorShape(TensorShape &&shape) noexcept;
     ~TensorShape();

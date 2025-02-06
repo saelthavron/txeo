@@ -20,9 +20,7 @@ void Tensor<T>::create_from_shape(P &&shape) {
   auto aux = std::forward<P>(shape);
   _impl->tf_tensor =
       std::make_unique<tf::Tensor>(txeo::detail::get_tf_dtype<T>(), *aux._impl->tf_shape);
-  _impl->txeo_shape = std::make_unique<txeo::TensorShape>(std::vector<int64_t>{});
-
-  txeo::detail::tensor::update_shape(_impl->tf_tensor, _impl->txeo_shape);
+  _impl->txeo_shape._impl->ext_tf_shape = &_impl->tf_tensor->shape();
 }
 
 template <typename T>
@@ -31,16 +29,14 @@ void Tensor<T>::create_from_vector(P &&shape) {
   txeo::TensorShape aux{std::forward<P>(shape)};
   _impl->tf_tensor =
       std::make_unique<tf::Tensor>(txeo::detail::get_tf_dtype<T>(), *aux._impl->tf_shape);
-  _impl->txeo_shape = std::make_unique<txeo::TensorShape>(std::vector<int64_t>{});
-  txeo::detail::tensor::update_shape(_impl->tf_tensor, _impl->txeo_shape);
+  _impl->txeo_shape._impl->ext_tf_shape = &_impl->tf_tensor->shape();
 }
 
 template <typename T>
 inline Tensor<T>::Tensor(const Tensor &tensor) : _impl{std::make_unique<Impl>()} {
   if (this != &tensor) {
     _impl->tf_tensor = std::make_unique<tf::Tensor>(*tensor._impl->tf_tensor);
-    _impl->txeo_shape = std::make_unique<txeo::TensorShape>(std::vector<int64_t>{});
-    txeo::detail::tensor::update_shape(_impl->tf_tensor, _impl->txeo_shape);
+    _impl->txeo_shape._impl->ext_tf_shape = &_impl->tf_tensor->shape();
   }
 }
 
@@ -48,18 +44,27 @@ template <typename T>
 inline Tensor<T>::Tensor(Tensor &&tensor) noexcept : _impl{std::make_unique<Impl>()} {
   if (this != &tensor) {
     _impl->tf_tensor = std::make_unique<tf::Tensor>(std::move(*tensor._impl->tf_tensor));
-    _impl->txeo_shape = std::make_unique<txeo::TensorShape>(std::vector<int64_t>{});
-    txeo::detail::tensor::update_shape(_impl->tf_tensor, _impl->txeo_shape);
+    _impl->txeo_shape._impl->ext_tf_shape = &_impl->tf_tensor->shape();
   }
 }
 
-// Defined here after Impl implementation in order to avoid incompleteness
+// Defined here after "Impl" implementation in order to avoid incompleteness
 template <typename T>
 Tensor<T>::~Tensor() = default;
 
 template <typename T>
 Tensor<T>::Tensor(const txeo::TensorShape &shape) : _impl{std::make_unique<Impl>()} {
   this->create_from_shape(shape);
+}
+
+template <typename T>
+inline Tensor<T>::Tensor(const std::vector<int64_t> &shape) : _impl{std::make_unique<Impl>()} {
+  this->create_from_vector(shape);
+}
+
+template <typename T>
+inline Tensor<T>::Tensor(std::vector<int64_t> &&shape) : _impl{std::make_unique<Impl>()} {
+  this->create_from_vector(std::move(shape));
 }
 
 template <typename T>
@@ -107,23 +112,23 @@ Tensor<T>::Tensor(txeo::TensorShape &&shape) : _impl{std::make_unique<Impl>()} {
 
 template <typename T>
 inline const txeo::TensorShape &Tensor<T>::shape() {
-  return *_impl->txeo_shape;
+  return _impl->txeo_shape;
 }
 
 template <typename T>
 inline int Tensor<T>::order() const {
-  return _impl->txeo_shape->number_of_axes();
+  return _impl->txeo_shape.number_of_axes();
 }
 
 template <typename T>
 template <typename U>
 inline bool Tensor<T>::is_equal_shape(const txeo::Tensor<U> &other) const {
-  return *_impl->txeo_shape == *other._impl->txeo_shape;
+  return _impl->txeo_shape == other._impl->txeo_shape;
 }
 
 template <typename T>
 inline int64_t Tensor<T>::dim() const {
-  return _impl->txeo_shape->calculate_capacity();
+  return _impl->txeo_shape.calculate_capacity();
 }
 
 template <typename T>
@@ -183,9 +188,9 @@ template <typename T>
 inline T Tensor<T>::at(size_t x) const {
   if (this->order() != 1)
     throw TensorError("This tensor is not a vector.");
-  if (_impl->txeo_shape->axis_dim(0) >= (int64_t)x)
+  if (_impl->txeo_shape.axis_dim(0) >= (int64_t)x)
     throw TensorError("Axis " + std::to_string(0) + " not in the range [0," +
-                      std::to_string(_impl->txeo_shape->axis_dim(0) - 1) + "]");
+                      std::to_string(_impl->txeo_shape.axis_dim(0) - 1) + "]");
 
   return (*this)(x);
 }
