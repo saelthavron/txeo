@@ -142,50 +142,50 @@ inline const std::type_identity_t<T> *Tensor<T>::data() const {
 }
 
 template <typename T>
-inline T Tensor<T>::operator()() const {
+inline T &Tensor<T>::operator()() {
   const auto &aux = _impl->tf_tensor->template scalar<T>();
   return aux();
 }
 
 template <typename T>
-inline T Tensor<T>::operator()(size_t x) const {
+inline T &Tensor<T>::operator()(size_t x) {
   const auto &aux = _impl->tf_tensor->template tensor<T, 1>();
   return aux(x);
 }
 
 template <typename T>
-inline T Tensor<T>::operator()(size_t x, size_t y) const {
+inline T &Tensor<T>::operator()(size_t x, size_t y) {
   const auto &aux = _impl->tf_tensor->template tensor<T, 2>();
   return aux(x, y);
 }
 
 template <typename T>
-inline T Tensor<T>::operator()(size_t x, size_t y, size_t z) const {
+inline T &Tensor<T>::operator()(size_t x, size_t y, size_t z) {
   const auto &aux = _impl->tf_tensor->template tensor<T, 3>();
   return aux(x, y, z);
 }
 
 template <typename T>
-inline T Tensor<T>::operator()(size_t x, size_t y, size_t z, size_t k) const {
+inline T &Tensor<T>::operator()(size_t x, size_t y, size_t z, size_t k) {
   const auto &aux = _impl->tf_tensor->template tensor<T, 4>();
   return aux(x, y, z, k);
 }
 
 template <typename T>
-inline T Tensor<T>::operator()(size_t x, size_t y, size_t z, size_t k, size_t w) const {
+inline T &Tensor<T>::operator()(size_t x, size_t y, size_t z, size_t k, size_t w) {
   const auto &aux = _impl->tf_tensor->template tensor<T, 5>();
   return aux(x, y, z, k, w);
 }
 
 template <typename T>
-inline T Tensor<T>::at() const {
+inline T &Tensor<T>::at() {
   if (this->order() != 0)
     throw TensorError("This tensor is not a scalar.");
   return (*this)();
 }
 
 template <typename T>
-inline T Tensor<T>::at(size_t x) const {
+inline T &Tensor<T>::at(size_t x) {
   if (this->order() != 1)
     throw TensorError("This tensor is not a vector.");
   if (_impl->txeo_shape.axis_dim(0) >= (int64_t)x)
@@ -196,7 +196,7 @@ inline T Tensor<T>::at(size_t x) const {
 }
 
 template <typename T>
-inline T Tensor<T>::at(size_t x, size_t y) const {
+inline T &Tensor<T>::at(size_t x, size_t y) {
   if (this->order() != 2)
     throw TensorError("This tensor is not a matrix.");
   txeo::detail::tensor::check_indexes(_impl->txeo_shape, {x, y});
@@ -205,7 +205,7 @@ inline T Tensor<T>::at(size_t x, size_t y) const {
 }
 
 template <typename T>
-inline T Tensor<T>::at(size_t x, size_t y, size_t z) const {
+inline T &Tensor<T>::at(size_t x, size_t y, size_t z) {
   if (this->order() != 3)
     throw TensorError("This is not a tensor of order 3.");
   txeo::detail::tensor::check_indexes(_impl->txeo_shape, {x, y, z});
@@ -214,7 +214,7 @@ inline T Tensor<T>::at(size_t x, size_t y, size_t z) const {
 }
 
 template <typename T>
-inline T Tensor<T>::at(size_t x, size_t y, size_t z, size_t k) const {
+inline T &Tensor<T>::at(size_t x, size_t y, size_t z, size_t k) {
   if (this->order() != 4)
     throw TensorError("This is not a tensor of order 4.");
   txeo::detail::tensor::check_indexes(_impl->txeo_shape, {x, y, z, k});
@@ -223,12 +223,124 @@ inline T Tensor<T>::at(size_t x, size_t y, size_t z, size_t k) const {
 }
 
 template <typename T>
-inline T Tensor<T>::at(size_t x, size_t y, size_t z, size_t k, size_t w) const {
+inline T &Tensor<T>::at(size_t x, size_t y, size_t z, size_t k, size_t w) {
   if (this->order() != 5)
     throw TensorError("This is not a tensor of order 5.");
   txeo::detail::tensor::check_indexes(_impl->txeo_shape, {x, y, z, k, w});
 
   return (*this)(x, y, z, k, x);
+}
+
+template <typename T>
+inline const T &Tensor<T>::operator()() const {
+  const auto &aux = _impl->tf_tensor->template scalar<T>();
+  return aux();
+}
+
+template <typename T>
+inline const T &Tensor<T>::operator()(size_t x) const {
+  const auto &aux = _impl->tf_tensor->template tensor<T, 1>();
+  return aux(x);
+}
+
+template <typename T>
+inline const T &Tensor<T>::operator()(size_t x, size_t y) const {
+  const auto &aux = _impl->tf_tensor->template tensor<T, 2>();
+  return aux(x, y);
+}
+
+template <typename T>
+inline const T &Tensor<T>::operator()(size_t x, size_t y, size_t z) const {
+  const auto &aux = _impl->tf_tensor->template tensor<T, 3>();
+  return aux(x, y, z);
+}
+
+template <typename T>
+inline const T &Tensor<T>::operator()(size_t x, size_t y, size_t z, size_t k) const {
+  const auto &aux = _impl->tf_tensor->template tensor<T, 4>();
+  return aux(x, y, z, k);
+}
+
+template <typename T>
+inline const T &Tensor<T>::operator()(size_t x, size_t y, size_t z, size_t k, size_t w) const {
+  const auto &aux = _impl->tf_tensor->template tensor<T, 5>();
+  return aux(x, y, z, k, w);
+}
+
+template <typename T>
+inline const T &Tensor<T>::at() const {
+  if (this->order() != 0)
+    throw TensorError("This tensor is not a scalar.");
+  return (*this)();
+}
+
+template <typename T>
+inline const T &Tensor<T>::at(size_t x) const {
+  if (this->order() != 1)
+    throw TensorError("This tensor is not a vector.");
+  if (_impl->txeo_shape.axis_dim(0) >= (int64_t)x)
+    throw TensorError("Axis " + std::to_string(0) + " not in the range [0," +
+                      std::to_string(_impl->txeo_shape.axis_dim(0) - 1) + "]");
+
+  return (*this)(x);
+}
+
+template <typename T>
+inline const T &Tensor<T>::at(size_t x, size_t y) const {
+  if (this->order() != 2)
+    throw TensorError("This tensor is not a matrix.");
+  txeo::detail::tensor::check_indexes(_impl->txeo_shape, {x, y});
+
+  return (*this)(x, y);
+}
+
+template <typename T>
+inline const T &Tensor<T>::at(size_t x, size_t y, size_t z) const {
+  if (this->order() != 3)
+    throw TensorError("This is not a tensor of order 3.");
+  txeo::detail::tensor::check_indexes(_impl->txeo_shape, {x, y, z});
+
+  return (*this)(x, y, z);
+}
+
+template <typename T>
+inline const T &Tensor<T>::at(size_t x, size_t y, size_t z, size_t k) const {
+  if (this->order() != 4)
+    throw TensorError("This is not a tensor of order 4.");
+  txeo::detail::tensor::check_indexes(_impl->txeo_shape, {x, y, z, k});
+
+  return (*this)(x, y, z, k);
+}
+
+template <typename T>
+inline const T &Tensor<T>::at(size_t x, size_t y, size_t z, size_t k, size_t w) const {
+  if (this->order() != 5)
+    throw TensorError("This is not a tensor of order 5.");
+  txeo::detail::tensor::check_indexes(_impl->txeo_shape, {x, y, z, k, w});
+
+  return (*this)(x, y, z, k, x);
+}
+
+template <typename T>
+template <typename... Args>
+inline T &Tensor<T>::element_at(Args... args) {
+  tf::Tensor x;
+  auto aux = _impl->tf_tensor->template flat<T>();
+  auto flat_index =
+      txeo::detail::tensor::calc_flat_index({args...}, _impl->txeo_shape._impl->tf_shape);
+
+  return aux(flat_index);
+}
+
+template <typename T>
+template <typename... Args>
+inline const T &Tensor<T>::element_at(Args... args) const {
+  tf::Tensor x;
+  auto aux = _impl->tf_tensor->template flat<T>();
+  auto flat_index =
+      txeo::detail::tensor::calc_flat_index({args...}, _impl->txeo_shape._impl->tf_shape);
+
+  return aux(flat_index);
 }
 
 // Avoiding problems in linking

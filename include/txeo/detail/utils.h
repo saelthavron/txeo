@@ -41,6 +41,20 @@ inline void check_indexes(const auto &txeo_shape, std::vector<size_t> indexes) {
   }
 }
 
+size_t calc_flat_index(const std::vector<size_t> &indexes, const tf::TensorShape *sizes) {
+  size_t accum_sizes{1};
+  size_t resp{indexes.back()};
+
+  const size_t *idx_ptr = indexes.data();
+
+  for (size_t i = indexes.size() - 1; i > 0; --i) {
+    accum_sizes *= sizes->dim_size(i);
+    resp += idx_ptr[i - 1] * accum_sizes;
+  }
+
+  return resp;
+}
+
 } // namespace tensor
 } // namespace txeo::detail
 

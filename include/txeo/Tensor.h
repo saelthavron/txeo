@@ -51,22 +51,39 @@ class Tensor {
     [[nodiscard]] size_t size_in_bytes() const;
     [[nodiscard]] const std::type_identity_t<T> *data() const;
 
-    T operator()() const;
-    T operator()(size_t x) const;
-    T operator()(size_t x, size_t y) const;
-    T operator()(size_t x, size_t y, size_t z) const;
-    T operator()(size_t x, size_t y, size_t z, size_t k) const;
-    T operator()(size_t x, size_t y, size_t z, size_t k, size_t w) const;
+    T &operator()();
+    T &operator()(size_t x);
+    T &operator()(size_t x, size_t y);
+    T &operator()(size_t x, size_t y, size_t z);
+    T &operator()(size_t x, size_t y, size_t z, size_t k);
+    T &operator()(size_t x, size_t y, size_t z, size_t k, size_t w);
 
-    T at() const;
-    T at(size_t x) const;
-    T at(size_t x, size_t y) const;
-    T at(size_t x, size_t y, size_t z) const;
-    T at(size_t x, size_t y, size_t z, size_t k) const;
-    T at(size_t x, size_t y, size_t z, size_t k, size_t w) const;
+    T &at();
+    T &at(size_t x);
+    T &at(size_t x, size_t y);
+    T &at(size_t x, size_t y, size_t z);
+    T &at(size_t x, size_t y, size_t z, size_t k);
+    T &at(size_t x, size_t y, size_t z, size_t k, size_t w);
+
+    const T &operator()() const;
+    const T &operator()(size_t x) const;
+    const T &operator()(size_t x, size_t y) const;
+    const T &operator()(size_t x, size_t y, size_t z) const;
+    const T &operator()(size_t x, size_t y, size_t z, size_t k) const;
+    const T &operator()(size_t x, size_t y, size_t z, size_t k, size_t w) const;
+
+    const T &at() const;
+    const T &at(size_t x) const;
+    const T &at(size_t x, size_t y) const;
+    const T &at(size_t x, size_t y, size_t z) const;
+    const T &at(size_t x, size_t y, size_t z, size_t k) const;
+    const T &at(size_t x, size_t y, size_t z, size_t k, size_t w) const;
 
     template <typename... Args>
-    T element_at(Args... args);
+    T &element_at(Args... args);
+
+    template <typename... Args>
+    const T &element_at(Args... args) const;
 
     template <typename U>
     [[nodiscard]] bool is_equal_shape(const txeo::Tensor<U> &other) const;
