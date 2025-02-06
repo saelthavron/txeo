@@ -21,6 +21,7 @@ void Tensor<T>::create_from_shape(P &&shape) {
   _impl->tf_tensor =
       std::make_unique<tf::Tensor>(txeo::detail::get_tf_dtype<T>(), *aux._impl->tf_shape);
   _impl->txeo_shape._impl->ext_tf_shape = &_impl->tf_tensor->shape();
+  _impl->owns = true;
 }
 
 template <typename T>
@@ -30,6 +31,11 @@ void Tensor<T>::create_from_vector(P &&shape) {
   _impl->tf_tensor =
       std::make_unique<tf::Tensor>(txeo::detail::get_tf_dtype<T>(), *aux._impl->tf_shape);
   _impl->txeo_shape._impl->ext_tf_shape = &_impl->tf_tensor->shape();
+  _impl->owns = true;
+}
+
+template <typename T>
+inline Tensor<T>::Tensor() : _impl{std::make_unique<Impl>()} {
 }
 
 template <typename T>
@@ -37,6 +43,7 @@ inline Tensor<T>::Tensor(const Tensor &tensor) : _impl{std::make_unique<Impl>()}
   if (this != &tensor) {
     _impl->tf_tensor = std::make_unique<tf::Tensor>(*tensor._impl->tf_tensor);
     _impl->txeo_shape._impl->ext_tf_shape = &_impl->tf_tensor->shape();
+    _impl->owns = true;
   }
 }
 
@@ -45,6 +52,7 @@ inline Tensor<T>::Tensor(Tensor &&tensor) noexcept : _impl{std::make_unique<Impl
   if (this != &tensor) {
     _impl->tf_tensor = std::make_unique<tf::Tensor>(std::move(*tensor._impl->tf_tensor));
     _impl->txeo_shape._impl->ext_tf_shape = &_impl->tf_tensor->shape();
+    _impl->owns = true;
   }
 }
 
@@ -122,7 +130,7 @@ inline int Tensor<T>::order() const {
 
 template <typename T>
 template <typename U>
-inline bool Tensor<T>::is_equal_shape(const txeo::Tensor<U> &other) const {
+inline bool Tensor<T>::is_equal_shape(const Tensor<U> &other) const {
   return _impl->txeo_shape == other._impl->txeo_shape;
 }
 
@@ -133,12 +141,13 @@ inline int64_t Tensor<T>::dim() const {
 
 template <typename T>
 inline size_t Tensor<T>::size_in_bytes() const {
-  return _impl->tf_tensor->TotalBytes();
+  return _impl->owns ? _impl->tf_tensor->TotalBytes() : _impl->ext_tf_tensor->TotalBytes();
 }
 
 template <typename T>
 inline const std::type_identity_t<T> *Tensor<T>::data() const {
-  return static_cast<T *>(_impl->tf_tensor->data());
+  return _impl->owns ? static_cast<T *>(_impl->tf_tensor->data())
+                     : static_cast<T *>(_impl->ext_tf_tensor->data());
 }
 
 template <typename T>
@@ -233,38 +242,44 @@ inline T &Tensor<T>::at(size_t x, size_t y, size_t z, size_t k, size_t w) {
 
 template <typename T>
 inline const T &Tensor<T>::operator()() const {
-  const auto &aux = _impl->tf_tensor->template scalar<T>();
-  return aux();
+  if (_impl->owns)
+    return _impl->tf_tensor->template scalar<T>()();
+  return _impl->ext_tf_tensor->template scalar<T>()();
 }
 
 template <typename T>
 inline const T &Tensor<T>::operator()(size_t x) const {
-  const auto &aux = _impl->tf_tensor->template tensor<T, 1>();
-  return aux(x);
+  if (_impl->owns)
+    return _impl->tf_tensor->template tensor<T, 1>()(x);
+  return _impl->ext_tf_tensor->template tensor<T, 1>()(x);
 }
 
 template <typename T>
 inline const T &Tensor<T>::operator()(size_t x, size_t y) const {
-  const auto &aux = _impl->tf_tensor->template tensor<T, 2>();
-  return aux(x, y);
+  if (_impl->owns)
+    return _impl->tf_tensor->template tensor<T, 2>()(x, y);
+  return _impl->ext_tf_tensor->template tensor<T, 2>()(x, y);
 }
 
 template <typename T>
 inline const T &Tensor<T>::operator()(size_t x, size_t y, size_t z) const {
-  const auto &aux = _impl->tf_tensor->template tensor<T, 3>();
-  return aux(x, y, z);
+  if (_impl->owns)
+    return _impl->tf_tensor->template tensor<T, 3>()(x, y, z);
+  return _impl->ext_tf_tensor->template tensor<T, 3>()(x, y, z);
 }
 
 template <typename T>
 inline const T &Tensor<T>::operator()(size_t x, size_t y, size_t z, size_t k) const {
-  const auto &aux = _impl->tf_tensor->template tensor<T, 4>();
-  return aux(x, y, z, k);
+  if (_impl->owns)
+    return _impl->tf_tensor->template tensor<T, 4>()(x, y, z, k);
+  return _impl->ext_tf_tensor->template tensor<T, 4>()(x, y, z, k);
 }
 
 template <typename T>
 inline const T &Tensor<T>::operator()(size_t x, size_t y, size_t z, size_t k, size_t w) const {
-  const auto &aux = _impl->tf_tensor->template tensor<T, 5>();
-  return aux(x, y, z, k, w);
+  if (_impl->owns)
+    return _impl->tf_tensor->template tensor<T, 5>()(x, y, z, k, w);
+  return _impl->ext_tf_tensor->template tensor<T, 5>()(x, y, z, k, w);
 }
 
 template <typename T>
@@ -336,11 +351,41 @@ template <typename T>
 template <typename... Args>
 inline const T &Tensor<T>::element_at(Args... args) const {
   tf::Tensor x;
-  auto aux = _impl->tf_tensor->template flat<T>();
+  auto aux =
+      _impl->owns ? _impl->tf_tensor->template flat<T>() : _impl->ext_tf_tensor->template flat<T>();
   auto flat_index =
       txeo::detail::tensor::calc_flat_index({args...}, _impl->txeo_shape._impl->tf_shape);
 
   return aux(flat_index);
+}
+
+template <typename T>
+inline void Tensor<T>::reshape(const std::vector<int64_t> &shape) {
+  auto &old_tensor = _impl->tf_tensor;
+  create_from_vector(shape);
+  if (!_impl->tf_tensor->CopyFrom(*old_tensor, _impl->tf_tensor->shape()))
+    throw txeo::TensorError("The shape's number of axes do not match this tensor's dimension!");
+}
+
+template <typename T>
+inline void Tensor<T>::reshape(const txeo::TensorShape &shape) {
+  reshape(shape.axes_dims());
+}
+
+template <typename T>
+inline Tensor<T> Tensor<T>::slice(size_t first_axis_ini, size_t first_axis_end) const {
+  if (first_axis_end < first_axis_ini)
+    throw txeo::TensorError("The end index can not be less than the initial index!");
+  if (static_cast<int64_t>(first_axis_end) >= _impl->txeo_shape.axis_dim(0))
+    throw txeo::TensorError(
+        "The end index can not greater than or equal to the dimension of first axis!");
+
+  auto t_slice = _impl->tf_tensor->Slice(first_axis_ini, first_axis_end);
+  Tensor resp;
+  resp._impl->ext_tf_tensor = &t_slice;
+  _impl->txeo_shape._impl->ext_tf_shape = &resp._impl->tf_tensor->shape();
+
+  return resp;
 }
 
 // Avoiding problems in linking

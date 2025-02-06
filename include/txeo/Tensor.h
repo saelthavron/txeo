@@ -1,12 +1,13 @@
 #ifndef TENSOR_H
 #define TENSOR_H
-#include <cstddef>
-#include <cstdint>
-#include <type_traits>
 #pragma once
 
-#include "TensorShape.h"
+#include <cstddef>
+#include <cstdint>
 #include <memory>
+#include <type_traits>
+
+#include "TensorShape.h"
 
 namespace txeo {
 
@@ -28,8 +29,9 @@ class Tensor {
     template <typename P>
     void create_from_vector(P &&shape);
 
+    explicit Tensor();
+
   public:
-    explicit Tensor() = delete;
     Tensor(const Tensor &tensor);
     Tensor(Tensor &&tensor) noexcept;
     ~Tensor();
@@ -50,6 +52,9 @@ class Tensor {
     [[nodiscard]] int64_t dim() const;
     [[nodiscard]] size_t size_in_bytes() const;
     [[nodiscard]] const std::type_identity_t<T> *data() const;
+
+    template <typename U>
+    [[nodiscard]] bool is_equal_shape(const Tensor<U> &other) const;
 
     T &operator()();
     T &operator()(size_t x);
@@ -85,21 +90,21 @@ class Tensor {
     template <typename... Args>
     const T &element_at(Args... args) const;
 
-    template <typename U>
-    [[nodiscard]] bool is_equal_shape(const txeo::Tensor<U> &other) const;
+    void reshape(const std::vector<int64_t> &shape);
+    void reshape(const txeo::TensorShape &shape);
+    Tensor<T> slice(size_t first_axis_ini, size_t first_axis_end) const;
 };
-
-#endif // TENSOR_H
-}
 
 class TensorError : public std::runtime_error {
   public:
     using std::runtime_error::runtime_error;
 };
 
-// Slice(): Extracts a sub-tensor from the original tensor.
+} // namespace txeo
 
-// Reshape(): Changes the shape of the tensor without altering its data.
+#endif // TENSOR_H
+
+// Slice(): Extracts a sub-tensor from the original tensor.
 
 // Tensor::FromString(): Converts a string representation of a tensor into an actual tensor.
 
@@ -112,4 +117,3 @@ class TensorError : public std::runtime_error {
 // flat<T>()	Access tensor as a 1D array
 // matrix<T>()	Access tensor as a 2D matrix
 // IsInitialized()	Checks if the tensor has memory allocated
-// set_shape(new_shape)	Changes the tensor shape (if valid)
