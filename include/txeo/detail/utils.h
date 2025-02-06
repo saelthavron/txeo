@@ -1,8 +1,9 @@
 #ifndef TXEO_UTILS_H
 #define TXEO_UTILS_H
-#include <cstddef>
-#include <memory>
+
 #pragma once
+
+#include <cstddef>
 
 #include "tensorflow/core/framework/types.h"
 

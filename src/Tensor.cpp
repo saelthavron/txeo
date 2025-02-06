@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <memory>
 #include <tensorflow/core/framework/tensor.h>
+#include <tensorflow/core/framework/tensor_shape.h>
 #include <utility>
 #include <vector>
 
@@ -21,7 +22,7 @@ void Tensor<T>::create_from_shape(P &&shape) {
   _impl->tf_tensor =
       std::make_unique<tf::Tensor>(txeo::detail::get_tf_dtype<T>(), *aux._impl->tf_shape);
   _impl->txeo_shape._impl->ext_tf_shape = &_impl->tf_tensor->shape();
-  _impl->owns = true;
+  //  _impl->owns = true;
 }
 
 template <typename T>
@@ -31,7 +32,7 @@ void Tensor<T>::create_from_vector(P &&shape) {
   _impl->tf_tensor =
       std::make_unique<tf::Tensor>(txeo::detail::get_tf_dtype<T>(), *aux._impl->tf_shape);
   _impl->txeo_shape._impl->ext_tf_shape = &_impl->tf_tensor->shape();
-  _impl->owns = true;
+  // _impl->owns = true;
 }
 
 template <typename T>
@@ -43,7 +44,7 @@ inline Tensor<T>::Tensor(const Tensor &tensor) : _impl{std::make_unique<Impl>()}
   if (this != &tensor) {
     _impl->tf_tensor = std::make_unique<tf::Tensor>(*tensor._impl->tf_tensor);
     _impl->txeo_shape._impl->ext_tf_shape = &_impl->tf_tensor->shape();
-    _impl->owns = true;
+    //    _impl->owns = true;
   }
 }
 
@@ -52,7 +53,7 @@ inline Tensor<T>::Tensor(Tensor &&tensor) noexcept : _impl{std::make_unique<Impl
   if (this != &tensor) {
     _impl->tf_tensor = std::make_unique<tf::Tensor>(std::move(*tensor._impl->tf_tensor));
     _impl->txeo_shape._impl->ext_tf_shape = &_impl->tf_tensor->shape();
-    _impl->owns = true;
+    //  _impl->owns = true;
   }
 }
 
@@ -141,13 +142,16 @@ inline int64_t Tensor<T>::dim() const {
 
 template <typename T>
 inline size_t Tensor<T>::size_in_bytes() const {
-  return _impl->owns ? _impl->tf_tensor->TotalBytes() : _impl->ext_tf_tensor->TotalBytes();
+  return _impl->tf_tensor->TotalBytes();
+  //  return _impl->owns ? _impl->tf_tensor->TotalBytes() : _impl->ext_tf_tensor->TotalBytes();
 }
 
 template <typename T>
 inline const std::type_identity_t<T> *Tensor<T>::data() const {
-  return _impl->owns ? static_cast<T *>(_impl->tf_tensor->data())
-                     : static_cast<T *>(_impl->ext_tf_tensor->data());
+  return static_cast<T *>(_impl->tf_tensor->data());
+
+  // return _impl->owns ? static_cast<T *>(_impl->tf_tensor->data())
+  //                    : static_cast<T *>(_impl->ext_tf_tensor->data());
 }
 
 template <typename T>
@@ -242,44 +246,44 @@ inline T &Tensor<T>::at(size_t x, size_t y, size_t z, size_t k, size_t w) {
 
 template <typename T>
 inline const T &Tensor<T>::operator()() const {
-  if (_impl->owns)
-    return _impl->tf_tensor->template scalar<T>()();
-  return _impl->ext_tf_tensor->template scalar<T>()();
+  //  if (_impl->owns)
+  return _impl->tf_tensor->template scalar<T>()();
+  //  return _impl->ext_tf_tensor->template scalar<T>()();
 }
 
 template <typename T>
 inline const T &Tensor<T>::operator()(size_t x) const {
-  if (_impl->owns)
-    return _impl->tf_tensor->template tensor<T, 1>()(x);
-  return _impl->ext_tf_tensor->template tensor<T, 1>()(x);
+  // if (_impl->owns)
+  return _impl->tf_tensor->template tensor<T, 1>()(x);
+  // return _impl->ext_tf_tensor->template tensor<T, 1>()(x);
 }
 
 template <typename T>
 inline const T &Tensor<T>::operator()(size_t x, size_t y) const {
-  if (_impl->owns)
-    return _impl->tf_tensor->template tensor<T, 2>()(x, y);
-  return _impl->ext_tf_tensor->template tensor<T, 2>()(x, y);
+  //  if (_impl->owns)
+  return _impl->tf_tensor->template tensor<T, 2>()(x, y);
+  //  return _impl->ext_tf_tensor->template tensor<T, 2>()(x, y);
 }
 
 template <typename T>
 inline const T &Tensor<T>::operator()(size_t x, size_t y, size_t z) const {
-  if (_impl->owns)
-    return _impl->tf_tensor->template tensor<T, 3>()(x, y, z);
-  return _impl->ext_tf_tensor->template tensor<T, 3>()(x, y, z);
+  // if (_impl->owns)
+  return _impl->tf_tensor->template tensor<T, 3>()(x, y, z);
+  //  return _impl->ext_tf_tensor->template tensor<T, 3>()(x, y, z);
 }
 
 template <typename T>
 inline const T &Tensor<T>::operator()(size_t x, size_t y, size_t z, size_t k) const {
-  if (_impl->owns)
-    return _impl->tf_tensor->template tensor<T, 4>()(x, y, z, k);
-  return _impl->ext_tf_tensor->template tensor<T, 4>()(x, y, z, k);
+  //  if (_impl->owns)
+  return _impl->tf_tensor->template tensor<T, 4>()(x, y, z, k);
+  //  return _impl->ext_tf_tensor->template tensor<T, 4>()(x, y, z, k);
 }
 
 template <typename T>
 inline const T &Tensor<T>::operator()(size_t x, size_t y, size_t z, size_t k, size_t w) const {
-  if (_impl->owns)
-    return _impl->tf_tensor->template tensor<T, 5>()(x, y, z, k, w);
-  return _impl->ext_tf_tensor->template tensor<T, 5>()(x, y, z, k, w);
+  // if (_impl->owns)
+  return _impl->tf_tensor->template tensor<T, 5>()(x, y, z, k, w);
+  //  return _impl->ext_tf_tensor->template tensor<T, 5>()(x, y, z, k, w);
 }
 
 template <typename T>
@@ -351,8 +355,11 @@ template <typename T>
 template <typename... Args>
 inline const T &Tensor<T>::element_at(Args... args) const {
   tf::Tensor x;
-  auto aux =
-      _impl->owns ? _impl->tf_tensor->template flat<T>() : _impl->ext_tf_tensor->template flat<T>();
+  auto aux = _impl->tf_tensor->template flat<T>();
+
+  // auto aux =
+  //     _impl->owns ? _impl->tf_tensor->template flat<T>() : _impl->ext_tf_tensor->template
+  //     flat<T>();
   auto flat_index =
       txeo::detail::tensor::calc_flat_index({args...}, _impl->txeo_shape._impl->tf_shape);
 
@@ -364,7 +371,7 @@ inline void Tensor<T>::reshape(const std::vector<int64_t> &shape) {
   auto &old_tensor = _impl->tf_tensor;
   create_from_vector(shape);
   if (!_impl->tf_tensor->CopyFrom(*old_tensor, _impl->tf_tensor->shape()))
-    throw txeo::TensorError("The shape's number of axes do not match this tensor's dimension!");
+    throw txeo::TensorError("The number of axes do not match the dimension of this tensor!");
 }
 
 template <typename T>
@@ -373,19 +380,52 @@ inline void Tensor<T>::reshape(const txeo::TensorShape &shape) {
 }
 
 template <typename T>
-inline Tensor<T> Tensor<T>::slice(size_t first_axis_ini, size_t first_axis_end) const {
-  if (first_axis_end < first_axis_ini)
+inline Tensor<T> Tensor<T>::slice(size_t first_axis_begin, size_t first_axis_end) const {
+  if (first_axis_end < first_axis_begin)
     throw txeo::TensorError("The end index can not be less than the initial index!");
   if (static_cast<int64_t>(first_axis_end) >= _impl->txeo_shape.axis_dim(0))
     throw txeo::TensorError(
-        "The end index can not greater than or equal to the dimension of first axis!");
+        "The end index can not be greater than or equal to the dimension of first axis!");
 
-  auto t_slice = _impl->tf_tensor->Slice(first_axis_ini, first_axis_end);
+  auto t_slice = _impl->tf_tensor->Slice(first_axis_begin, first_axis_end);
   Tensor resp;
-  resp._impl->ext_tf_tensor = &t_slice;
-  _impl->txeo_shape._impl->ext_tf_shape = &resp._impl->tf_tensor->shape();
+  resp._impl->tf_tensor = std::make_unique<tf::Tensor>(t_slice.dtype(), t_slice.shape());
+  resp._impl->txeo_shape._impl->ext_tf_shape = &resp._impl->tf_tensor->shape();
+  if (!resp._impl->tf_tensor->CopyFrom(t_slice, t_slice.shape()))
+    throw txeo::TensorError("This tensor could not be sliced!");
+
+  // resp._impl->owns = true;
 
   return resp;
+}
+
+template <typename T>
+inline Tensor<T> Tensor<T>::flatten() const {
+  Tensor resp;
+  resp._impl->tf_tensor =
+      std::make_unique<tf::Tensor>(_impl->tf_tensor->dtype(), tf::TensorShape{this->dim()});
+  resp._impl->txeo_shape._impl->ext_tf_shape = &resp._impl->tf_tensor->shape();
+  if (!resp._impl->tf_tensor->CopyFrom(*_impl->tf_tensor, _impl->tf_tensor->shape()))
+    throw txeo::TensorError("This tensor could not be flatten!");
+
+  return resp;
+}
+
+template <typename T>
+inline void Tensor<T>::fill(const T &value) {
+  _impl->tf_tensor->template flat<T>().setConstant(value);
+}
+
+template <typename T>
+inline Tensor<T> &Tensor<T>::operator=(const T &value) {
+  this->fill(value);
+
+  return (*this);
+}
+
+template <typename T>
+inline T *Tensor<T>::data() {
+  return static_cast<T *>(_impl->tf_tensor->data());
 }
 
 // Avoiding problems in linking

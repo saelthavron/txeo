@@ -50,6 +50,7 @@ class Tensor {
     constexpr std::type_identity_t<T> type() const;
     [[nodiscard]] int order() const;
     [[nodiscard]] int64_t dim() const;
+    [[nodiscard]] int64_t number_of_elements() const { return this->dim(); };
     [[nodiscard]] size_t size_in_bytes() const;
     [[nodiscard]] const std::type_identity_t<T> *data() const;
 
@@ -92,7 +93,11 @@ class Tensor {
 
     void reshape(const std::vector<int64_t> &shape);
     void reshape(const txeo::TensorShape &shape);
-    Tensor<T> slice(size_t first_axis_ini, size_t first_axis_end) const;
+    Tensor<T> slice(size_t first_axis_begin, size_t first_axis_end) const;
+    Tensor<T> flatten() const;
+    void fill(const T &value);
+    Tensor<T> &operator=(const T &value);
+    T *data();
 };
 
 class TensorError : public std::runtime_error {
@@ -104,16 +109,10 @@ class TensorError : public std::runtime_error {
 
 #endif // TENSOR_H
 
-// Slice(): Extracts a sub-tensor from the original tensor.
-
-// Tensor::FromString(): Converts a string representation of a tensor into an actual tensor.
-
-// Tensor::FromStringWithDefault(): Similar to FromString, but with a default value if the string is
-// empty.
-
-// Tensor::FromStringWithDefaultAndType(): Converts a string representation of a tensor with a
-// specified data type.
-
-// flat<T>()	Access tensor as a 1D array
-// matrix<T>()	Access tensor as a 2D matrix
-// IsInitialized()	Checks if the tensor has memory allocated
+// create method for conversion from size_t to int64_t
+// gpt bool copy_from(const Tensor<T> &other, const TensorShape &shape);
+// gpt void map(std::function<T(T)> func);
+// gpt Tensor<T> transpose(const std::vector<size_t> &perm) const;
+// gpt friend std::ostream &operator<<(std::ostream &os, const Tensor<T> &tensor);
+// deep Iterators for STL Compatibility
+// deep Static Factory Methods: tensors with zeros, ones, random values, etc.
