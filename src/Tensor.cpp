@@ -1,9 +1,9 @@
-#include "txeo/Tensor.h"
 #include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <tensorflow/core/framework/tensor.h>
 #include <tensorflow/core/framework/tensor_shape.h>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -16,13 +16,21 @@ namespace txeo {
 namespace tf = tensorflow;
 
 template <typename T>
+inline void Tensor<T>::check_indexes(const std::vector<size_t> &indexes) {
+  for (size_t i{0}; i < indexes.size(); ++i) {
+    if (_impl->txeo_shape.axis_dim(i) >= txeo::detail::to_int64(indexes[i]))
+      throw TensorError("Axis " + std::to_string(i) + " not in the range [0," +
+                        std::to_string(_impl->txeo_shape.axis_dim(i) - 1) + "]");
+  }
+}
+
+template <typename T>
 template <typename P>
 void Tensor<T>::create_from_shape(P &&shape) {
   auto aux = std::forward<P>(shape);
   _impl->tf_tensor =
       std::make_unique<tf::Tensor>(txeo::detail::get_tf_dtype<T>(), *aux._impl->tf_shape);
   _impl->txeo_shape._impl->ext_tf_shape = &_impl->tf_tensor->shape();
-  //  _impl->owns = true;
 }
 
 template <typename T>
@@ -32,7 +40,6 @@ void Tensor<T>::create_from_vector(P &&shape) {
   _impl->tf_tensor =
       std::make_unique<tf::Tensor>(txeo::detail::get_tf_dtype<T>(), *aux._impl->tf_shape);
   _impl->txeo_shape._impl->ext_tf_shape = &_impl->tf_tensor->shape();
-  // _impl->owns = true;
 }
 
 template <typename T>
@@ -44,7 +51,6 @@ inline Tensor<T>::Tensor(const Tensor &tensor) : _impl{std::make_unique<Impl>()}
   if (this != &tensor) {
     _impl->tf_tensor = std::make_unique<tf::Tensor>(*tensor._impl->tf_tensor);
     _impl->txeo_shape._impl->ext_tf_shape = &_impl->tf_tensor->shape();
-    //    _impl->owns = true;
   }
 }
 
@@ -53,7 +59,6 @@ inline Tensor<T>::Tensor(Tensor &&tensor) noexcept : _impl{std::make_unique<Impl
   if (this != &tensor) {
     _impl->tf_tensor = std::make_unique<tf::Tensor>(std::move(*tensor._impl->tf_tensor));
     _impl->txeo_shape._impl->ext_tf_shape = &_impl->tf_tensor->shape();
-    //  _impl->owns = true;
   }
 }
 
@@ -145,51 +150,16 @@ inline int64_t Tensor<T>::dim() const {
 template <typename T>
 inline size_t Tensor<T>::memory_size() const {
   return _impl->tf_tensor->TotalBytes();
-  //  return _impl->owns ? _impl->tf_tensor->TotalBytes() : _impl->ext_tf_tensor->TotalBytes();
 }
 
 template <typename T>
-inline const std::type_identity_t<T> *Tensor<T>::data() const {
+inline const T *Tensor<T>::data() const {
   return static_cast<T *>(_impl->tf_tensor->data());
-
-  // return _impl->owns ? static_cast<T *>(_impl->tf_tensor->data())
-  //                    : static_cast<T *>(_impl->ext_tf_tensor->data());
 }
 
 template <typename T>
 inline T &Tensor<T>::operator()() {
-  const auto &aux = _impl->tf_tensor->template scalar<T>();
-  return aux();
-}
-
-template <typename T>
-inline T &Tensor<T>::operator()(size_t x) {
-  const auto &aux = _impl->tf_tensor->template tensor<T, 1>();
-  return aux(x);
-}
-
-template <typename T>
-inline T &Tensor<T>::operator()(size_t x, size_t y) {
-  const auto &aux = _impl->tf_tensor->template tensor<T, 2>();
-  return aux(x, y);
-}
-
-template <typename T>
-inline T &Tensor<T>::operator()(size_t x, size_t y, size_t z) {
-  const auto &aux = _impl->tf_tensor->template tensor<T, 3>();
-  return aux(x, y, z);
-}
-
-template <typename T>
-inline T &Tensor<T>::operator()(size_t x, size_t y, size_t z, size_t k) {
-  const auto &aux = _impl->tf_tensor->template tensor<T, 4>();
-  return aux(x, y, z, k);
-}
-
-template <typename T>
-inline T &Tensor<T>::operator()(size_t x, size_t y, size_t z, size_t k, size_t w) {
-  const auto &aux = _impl->tf_tensor->template tensor<T, 5>();
-  return aux(x, y, z, k, w);
+  return this->data()[0];
 }
 
 template <typename T>
@@ -200,96 +170,8 @@ inline T &Tensor<T>::at() {
 }
 
 template <typename T>
-inline T &Tensor<T>::at(size_t x) {
-  if (this->order() != 1)
-    throw TensorError("This tensor is not a vector.");
-  if (_impl->txeo_shape.axis_dim(0) >= (int64_t)x)
-    throw TensorError("Axis " + std::to_string(0) + " not in the range [0," +
-                      std::to_string(_impl->txeo_shape.axis_dim(0) - 1) + "]");
-
-  return (*this)(x);
-}
-
-template <typename T>
-inline T &Tensor<T>::at(size_t x, size_t y) {
-  if (this->order() != 2)
-    throw TensorError("This tensor is not a matrix.");
-  txeo::detail::tensor::check_indexes(_impl->txeo_shape, {x, y});
-
-  return (*this)(x, y);
-}
-
-template <typename T>
-inline T &Tensor<T>::at(size_t x, size_t y, size_t z) {
-  if (this->order() != 3)
-    throw TensorError("This is not a tensor of order 3.");
-  txeo::detail::tensor::check_indexes(_impl->txeo_shape, {x, y, z});
-
-  return (*this)(x, y, z);
-}
-
-template <typename T>
-inline T &Tensor<T>::at(size_t x, size_t y, size_t z, size_t k) {
-  if (this->order() != 4)
-    throw TensorError("This is not a tensor of order 4.");
-  txeo::detail::tensor::check_indexes(_impl->txeo_shape, {x, y, z, k});
-
-  return (*this)(x, y, z, k);
-}
-
-template <typename T>
-inline T &Tensor<T>::at(size_t x, size_t y, size_t z, size_t k, size_t w) {
-  if (this->order() != 5)
-    throw TensorError("This is not a tensor of order 5.");
-  txeo::detail::tensor::check_indexes(_impl->txeo_shape, {x, y, z, k, w});
-
-  return (*this)(x, y, z, k, x);
-}
-
-template <typename T>
 inline const T &Tensor<T>::operator()() const {
-  //  if (_impl->owns)
-  return _impl->tf_tensor->template scalar<T>()();
-  //  return _impl->ext_tf_tensor->template scalar<T>()();
-}
-
-template <typename T>
-inline const T &Tensor<T>::operator()(size_t x) const {
-  // if (_impl->owns)
-  return _impl->tf_tensor->template tensor<T, 1>()(x);
-  // return _impl->ext_tf_tensor->template tensor<T, 1>()(x);
-}
-
-template <typename T>
-inline const T &Tensor<T>::operator()(size_t x, size_t y) const {
-  //  if (_impl->owns)
-  return _impl->tf_tensor->template tensor<T, 2>()(x, y);
-  //  return _impl->ext_tf_tensor->template tensor<T, 2>()(x, y);
-}
-
-template <typename T>
-inline const T &Tensor<T>::operator()(size_t x, size_t y, size_t z) const {
-  // if (_impl->owns)
-  return _impl->tf_tensor->template tensor<T, 3>()(x, y, z);
-  //  return _impl->ext_tf_tensor->template tensor<T, 3>()(x, y, z);
-}
-
-template <typename T>
-inline const T &Tensor<T>::operator()(size_t x, size_t y, size_t z, size_t k) const {
-  //  if (_impl->owns)
-  return _impl->tf_tensor->template tensor<T, 4>()(x, y, z, k);
-  //  return _impl->ext_tf_tensor->template tensor<T, 4>()(x, y, z, k);
-}
-
-template <typename T>
-inline const T &Tensor<T>::operator()(size_t x, size_t y, size_t z, size_t k, size_t w) const {
-  // if (_impl->owns)
-  return _impl->tf_tensor->template tensor<T, 5>()(x, y, z, k, w);
-  //  return _impl->ext_tf_tensor->template tensor<T, 5>()(x, y, z, k, w);
-
-  auto flat_index = txeo::detail::tensor::calc_flat_index({x, y, z, k, w},
-                                                          _impl->txeo_shape._impl->tf_shape.get());
-  return this->data()[flat_index];
+  return this->data()[0];
 }
 
 template <typename T>
@@ -297,80 +179,6 @@ inline const T &Tensor<T>::at() const {
   if (this->order() != 0)
     throw TensorError("This tensor is not a scalar.");
   return (*this)();
-}
-
-template <typename T>
-inline const T &Tensor<T>::at(size_t x) const {
-  if (this->order() != 1)
-    throw TensorError("This tensor is not a vector.");
-  if (_impl->txeo_shape.axis_dim(0) >= (int64_t)x)
-    throw TensorError("Axis " + std::to_string(0) + " not in the range [0," +
-                      std::to_string(_impl->txeo_shape.axis_dim(0) - 1) + "]");
-
-  return (*this)(x);
-}
-
-template <typename T>
-inline const T &Tensor<T>::at(size_t x, size_t y) const {
-  if (this->order() != 2)
-    throw TensorError("This tensor is not a matrix.");
-  txeo::detail::tensor::check_indexes(_impl->txeo_shape, {x, y});
-
-  return (*this)(x, y);
-}
-
-template <typename T>
-inline const T &Tensor<T>::at(size_t x, size_t y, size_t z) const {
-  if (this->order() != 3)
-    throw TensorError("This is not a tensor of order 3.");
-  txeo::detail::tensor::check_indexes(_impl->txeo_shape, {x, y, z});
-
-  return (*this)(x, y, z);
-}
-
-template <typename T>
-inline const T &Tensor<T>::at(size_t x, size_t y, size_t z, size_t k) const {
-  if (this->order() != 4)
-    throw TensorError("This is not a tensor of order 4.");
-  txeo::detail::tensor::check_indexes(_impl->txeo_shape, {x, y, z, k});
-
-  return (*this)(x, y, z, k);
-}
-
-template <typename T>
-inline const T &Tensor<T>::at(size_t x, size_t y, size_t z, size_t k, size_t w) const {
-  if (this->order() != 5)
-    throw TensorError("This is not a tensor of order 5.");
-  txeo::detail::tensor::check_indexes(_impl->txeo_shape, {x, y, z, k, w});
-
-  return (*this)(x, y, z, k, x);
-}
-
-template <typename T>
-template <typename... Args>
-inline T &Tensor<T>::element_at(Args... args) {
-  auto flat_index =
-      txeo::detail::tensor::calc_flat_index({args...}, _impl->txeo_shape._impl->tf_shape);
-
-  //  auto aux = _impl->tf_tensor->template flat<T>();
-  // return aux(flat_index);
-
-  return this->data()[flat_index];
-}
-
-template <typename T>
-template <typename... Args>
-inline const T &Tensor<T>::element_at(Args... args) const {
-  //  auto aux = _impl->tf_tensor->template flat<T>();
-  // auto aux =
-  //     _impl->owns ? _impl->tf_tensor->template flat<T>() : _impl->ext_tf_tensor->template
-  //     flat<T>();
-  // return aux(flat_index);
-
-  auto flat_index =
-      txeo::detail::tensor::calc_flat_index({args...}, _impl->txeo_shape._impl->tf_shape);
-
-  return this->data()[flat_index];
 }
 
 template <typename T>
@@ -401,8 +209,6 @@ inline Tensor<T> Tensor<T>::slice(size_t first_axis_begin, size_t first_axis_end
   if (!resp._impl->tf_tensor->CopyFrom(t_slice, t_slice.shape()))
     throw txeo::TensorError("This tensor could not be sliced!");
 
-  // resp._impl->owns = true;
-
   return resp;
 }
 
@@ -412,7 +218,7 @@ inline void Tensor<T>::copy_from(const Tensor<T> &tensor, const txeo::TensorShap
     throw txeo::TensorError("Parameters do not match the dimension of this tensor!");
   this->reshape(shape);
   if (!_impl->tf_tensor->CopyFrom(*_impl->tf_tensor, _impl->tf_tensor->shape()))
-    throw txeo::TensorError("This tensor could not be sliced!");
+    throw txeo::TensorError("This tensor could not be copied!");
 }
 
 template <typename T>
@@ -445,18 +251,24 @@ inline T *Tensor<T>::data() {
 }
 
 template <typename T>
-template <numeric N>
+template <c_numeric N>
 inline void Tensor<T>::fill_with_uniform_random(const N &min, const N &max, size_t seed1,
                                                 size_t seed2) {
   if (max <= min)
-    throw txeo::TensorError("max value is not greater than min value");
+    throw txeo::TensorError("The max value is not greater than the min value");
 
   std::mt19937 engine{};
   std::seed_seq sseq{seed1, seed2};
   engine.seed(sseq);
-  std::uniform_int_distribution<int> scaler{0, 100};
-  for (int i{0}; i < 10; ++i)
-    std::cout << scaler(engine) << " ";
+  if (std::is_floating_point_v<N>) {
+    std::uniform_real_distribution<N> scaler{min, max};
+    for (int64_t i{0}; i < this->dim(); ++i)
+      (*this)(i) = scaler(engine);
+  } else {
+    std::uniform_int_distribution<N> scaler{min, max};
+    for (int64_t i{0}; i < this->dim(); ++i)
+      (*this)(i) = scaler(engine);
+  }
 }
 
 // Avoiding problems in linking

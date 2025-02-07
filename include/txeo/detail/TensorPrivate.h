@@ -11,8 +11,6 @@ template <typename T>
 struct txeo::Tensor<T>::Impl {
     std::unique_ptr<tensorflow::Tensor> tf_tensor{nullptr};
     txeo::TensorShape txeo_shape{};
-    // const tensorflow::Tensor *ext_tf_tensor{nullptr};
-    // bool owns{false};
 };
 
 #endif

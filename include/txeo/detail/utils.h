@@ -48,14 +48,6 @@ inline int to_int(const size_t &val) {
 
 namespace tensor {
 
-inline void check_indexes(const auto &txeo_shape, std::vector<size_t> indexes) {
-  for (size_t i{0}; i < indexes.size(); ++i) {
-    if (txeo_shape.axis_dim(i) >= txeo::detail::to_int64(indexes[i]))
-      throw TensorError("Axis " + std::to_string(i) + " not in the range [0," +
-                        std::to_string(txeo_shape.axis_dim(i) - 1) + "]");
-  }
-}
-
 size_t calc_flat_index(const std::vector<size_t> &indexes, const tf::TensorShape *sizes) {
   size_t accum_sizes{1};
   size_t resp{indexes.back()};
