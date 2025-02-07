@@ -11,6 +11,9 @@
 
 namespace txeo {
 
+template <typename T>
+concept numeric = std::is_arithmetic_v<T>;
+
 /**
  * @brief Implements the mathematical concept of tensor, which is a magnitude of multiple order. A
  * tensor of order zero is defined to be a scalar, of order one a vector, of order two a matrix.
@@ -46,13 +49,15 @@ class Tensor {
     explicit Tensor(const std::vector<int64_t> &shape);
     explicit Tensor(std::vector<int64_t> &&shape);
 
-    [[nodiscard]] const txeo::TensorShape &shape();
+    [[nodiscard]] const txeo::TensorShape &shape() const;
     constexpr std::type_identity_t<T> type() const;
     [[nodiscard]] int order() const;
     [[nodiscard]] int64_t dim() const;
     [[nodiscard]] int64_t number_of_elements() const { return this->dim(); };
-    [[nodiscard]] size_t size_in_bytes() const;
+    [[nodiscard]] size_t memory_size() const;
     [[nodiscard]] const std::type_identity_t<T> *data() const;
+    Tensor<T> slice(size_t first_axis_begin, size_t first_axis_end) const;
+    void copy_from(const Tensor<T> &tensor, const txeo::TensorShape &shape);
 
     template <typename U>
     [[nodiscard]] bool is_equal_shape(const Tensor<U> &other) const;
@@ -93,9 +98,12 @@ class Tensor {
 
     void reshape(const std::vector<int64_t> &shape);
     void reshape(const txeo::TensorShape &shape);
-    Tensor<T> slice(size_t first_axis_begin, size_t first_axis_end) const;
     Tensor<T> flatten() const;
     void fill(const T &value);
+
+    template <numeric N>
+    void fill_with_uniform_random(const N &min, const N &max, size_t seed1, size_t seed2);
+
     Tensor<T> &operator=(const T &value);
     T *data();
 };
@@ -109,8 +117,6 @@ class TensorError : public std::runtime_error {
 
 #endif // TENSOR_H
 
-// create method for conversion from size_t to int64_t
-// gpt bool copy_from(const Tensor<T> &other, const TensorShape &shape);
 // gpt void map(std::function<T(T)> func);
 // gpt Tensor<T> transpose(const std::vector<size_t> &perm) const;
 // gpt friend std::ostream &operator<<(std::ostream &os, const Tensor<T> &tensor);
