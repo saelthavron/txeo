@@ -93,7 +93,7 @@ int TensorShape::number_of_axes() const noexcept {
   return _impl->owns ? _impl->tf_shape->dims() : _impl->ext_tf_shape->dims();
 }
 
-int64_t TensorShape::calculate_capacity() const noexcept {
+size_t TensorShape::calculate_capacity() const noexcept {
   return _impl->owns ? _impl->tf_shape->num_elements() : _impl->ext_tf_shape->num_elements();
 }
 

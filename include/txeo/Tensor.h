@@ -51,15 +51,20 @@ class Tensor {
     explicit Tensor(const std::vector<int64_t> &shape);
     explicit Tensor(std::vector<int64_t> &&shape);
 
+    explicit Tensor(const txeo::TensorShape &shape, const T &fill_value);
+    explicit Tensor(txeo::TensorShape &&shape, const T &fill_value);
+    explicit Tensor(const std::vector<int64_t> &shape, const T &fill_value);
+    explicit Tensor(std::vector<int64_t> &&shape, const T &fill_value);
+
     [[nodiscard]] const txeo::TensorShape &shape() const;
     constexpr std::type_identity_t<T> type() const;
     [[nodiscard]] int order() const;
-    [[nodiscard]] int64_t dim() const;
-    [[nodiscard]] int64_t number_of_elements() const { return this->dim(); };
+    [[nodiscard]] size_t dim() const;
+    [[nodiscard]] size_t number_of_elements() const { return this->dim(); };
     [[nodiscard]] size_t memory_size() const;
     [[nodiscard]] const T *data() const;
     Tensor<T> slice(size_t first_axis_begin, size_t first_axis_end) const;
-    void copy_from(const Tensor<T> &tensor, const txeo::TensorShape &shape);
+    void share_from(const Tensor<T> &tensor, const txeo::TensorShape &shape);
 
     template <typename U>
     [[nodiscard]] bool is_equal_shape(const Tensor<U> &other) const;
@@ -99,6 +104,8 @@ class Tensor {
 
     Tensor<T> &operator=(const T &value);
     T *data();
+
+    Tensor<T> clone() const;
 };
 
 class TensorError : public std::runtime_error {
@@ -160,7 +167,7 @@ inline const T &Tensor<T>::at(Args... args) const {
 
 #endif // TENSOR_H
 
-// deep Static Factory Methods: tensors with zeros, ones, random values, etc.
+// construir um identity factory
 // gpt void map(std::function<T(T)> func);
 // gpt Tensor<T> transpose(const std::vector<size_t> &perm) const;
 // gpt friend std::ostream &operator<<(std::ostream &os, const Tensor<T> &tensor);

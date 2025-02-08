@@ -90,9 +90,36 @@ inline Tensor<T>::Tensor(std::vector<int64_t> &&shape) : _impl{std::make_unique<
 }
 
 template <typename T>
+inline Tensor<T>::Tensor(const txeo::TensorShape &shape, const T &fill_value)
+    : _impl{std::make_unique<Impl>()} {
+  this->create_from_shape(shape);
+  this->fill(fill_value);
+}
+
+template <typename T>
+inline Tensor<T>::Tensor(txeo::TensorShape &&shape, const T &fill_value)
+    : _impl{std::make_unique<Impl>()} {
+  this->create_from_shape(std::move(shape));
+  this->fill(fill_value);
+}
+
+template <typename T>
+inline Tensor<T>::Tensor(const std::vector<int64_t> &shape, const T &fill_value) {
+  this->create_from_vector(shape);
+  this->fill(fill_value);
+}
+
+template <typename T>
+inline Tensor<T>::Tensor(std::vector<int64_t> &&shape, const T &fill_value) {
+  this->create_from_vector(std::move(shape));
+  this->fill(fill_value);
+}
+
+template <typename T>
 Tensor<T> &Tensor<T>::operator=(const Tensor &tensor) {
-  *_impl->tf_tensor = *tensor._impl->tf_tensor;
-  _impl->txeo_shape = tensor._impl->txeo_shape;
+  this->create_from_shape(tensor._impl->txeo_shape);
+  for (size_t i{0}; i < this->dim(); ++i)
+    this->data()[i] = tensor.data()[i];
 
   return (*this);
 }
@@ -151,7 +178,7 @@ inline bool Tensor<T>::is_equal_shape(const Tensor<U> &other) const {
 }
 
 template <typename T>
-inline int64_t Tensor<T>::dim() const {
+inline size_t Tensor<T>::dim() const {
   return _impl->txeo_shape.calculate_capacity();
 }
 
@@ -219,7 +246,7 @@ inline Tensor<T> Tensor<T>::slice(size_t first_axis_begin, size_t first_axis_end
 }
 
 template <typename T>
-inline void Tensor<T>::copy_from(const Tensor<T> &tensor, const txeo::TensorShape &shape) {
+inline void Tensor<T>::share_from(const Tensor<T> &tensor, const txeo::TensorShape &shape) {
   if (this->dim() != tensor.dim() || this->dim() != shape.calculate_capacity())
     throw txeo::TensorError("Parameters do not match the dimension of this tensor!");
   this->reshape(shape);
@@ -229,7 +256,7 @@ inline void Tensor<T>::copy_from(const Tensor<T> &tensor, const txeo::TensorShap
 
 template <typename T>
 inline Tensor<T> Tensor<T>::flatten() const {
-  Tensor<T> resp({this->dim()});
+  Tensor<T> resp({txeo::detail::to_int64(this->dim())});
   if (!resp._impl->tf_tensor->CopyFrom(*_impl->tf_tensor, _impl->tf_tensor->shape()))
     throw txeo::TensorError("This tensor could not be flatten!");
 
@@ -238,7 +265,8 @@ inline Tensor<T> Tensor<T>::flatten() const {
 
 template <typename T>
 inline void Tensor<T>::fill(const T &value) {
-  _impl->tf_tensor->template flat<T>().setConstant(value);
+  for (size_t i{0}; i < this->dim(); ++i)
+    this->data()[i] = value;
 }
 
 template <typename T>
@@ -290,6 +318,15 @@ inline void Tensor<T>::fill_with_normal_random(const N &min, const N &max, size_
   std::normal_distribution scaler{min, max};
   for (int64_t i{0}; i < this->dim(); ++i)
     (*this)(i) = scaler(engine);
+}
+
+template <typename T>
+inline Tensor<T> Tensor<T>::clone() const {
+  Tensor<T> resp{_impl->txeo_shape};
+  for (size_t i{0}; i < this->dim(); ++i)
+    resp.data()[i] = this->data()[i];
+
+  return resp;
 }
 
 // Avoiding problems in linking

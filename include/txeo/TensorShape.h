@@ -146,7 +146,7 @@ class TensorShape {
      *
      * @return int64_t
      */
-    [[nodiscard]] int64_t calculate_capacity() const noexcept;
+    [[nodiscard]] size_t calculate_capacity() const noexcept;
 };
 
 /**
