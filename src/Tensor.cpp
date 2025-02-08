@@ -31,6 +31,8 @@ void Tensor<T>::create_from_shape(P &&shape) {
   _impl->tf_tensor =
       std::make_unique<tf::Tensor>(txeo::detail::get_tf_dtype<T>(), *aux._impl->tf_shape);
   _impl->txeo_shape._impl->ext_tf_shape = &_impl->tf_tensor->shape();
+  _impl->txeo_shape._impl->stride =
+      txeo::detail::calc_stride(*_impl->txeo_shape._impl->ext_tf_shape);
 }
 
 template <typename T>
@@ -40,6 +42,8 @@ void Tensor<T>::create_from_vector(P &&shape) {
   _impl->tf_tensor =
       std::make_unique<tf::Tensor>(txeo::detail::get_tf_dtype<T>(), *aux._impl->tf_shape);
   _impl->txeo_shape._impl->ext_tf_shape = &_impl->tf_tensor->shape();
+  _impl->txeo_shape._impl->stride =
+      txeo::detail::calc_stride(*_impl->txeo_shape._impl->ext_tf_shape);
 }
 
 template <typename T>
@@ -51,6 +55,8 @@ inline Tensor<T>::Tensor(const Tensor &tensor) : _impl{std::make_unique<Impl>()}
   if (this != &tensor) {
     _impl->tf_tensor = std::make_unique<tf::Tensor>(*tensor._impl->tf_tensor);
     _impl->txeo_shape._impl->ext_tf_shape = &_impl->tf_tensor->shape();
+    _impl->txeo_shape._impl->stride =
+        txeo::detail::calc_stride(*_impl->txeo_shape._impl->ext_tf_shape);
   }
 }
 
@@ -59,6 +65,8 @@ inline Tensor<T>::Tensor(Tensor &&tensor) noexcept : _impl{std::make_unique<Impl
   if (this != &tensor) {
     _impl->tf_tensor = std::make_unique<tf::Tensor>(std::move(*tensor._impl->tf_tensor));
     _impl->txeo_shape._impl->ext_tf_shape = &_impl->tf_tensor->shape();
+    _impl->txeo_shape._impl->stride =
+        txeo::detail::calc_stride(*_impl->txeo_shape._impl->ext_tf_shape);
   }
 }
 
@@ -203,9 +211,7 @@ inline Tensor<T> Tensor<T>::slice(size_t first_axis_begin, size_t first_axis_end
         "The end index can not be greater than or equal to the dimension of first axis!");
 
   auto t_slice = _impl->tf_tensor->Slice(first_axis_begin, first_axis_end);
-  Tensor resp;
-  resp._impl->tf_tensor = std::make_unique<tf::Tensor>(t_slice.dtype(), t_slice.shape());
-  resp._impl->txeo_shape._impl->ext_tf_shape = &resp._impl->tf_tensor->shape();
+  Tensor<T> resp{txeo::detail::to_txeo_tensor_shape(t_slice.shape())};
   if (!resp._impl->tf_tensor->CopyFrom(t_slice, t_slice.shape()))
     throw txeo::TensorError("This tensor could not be sliced!");
 
@@ -223,10 +229,7 @@ inline void Tensor<T>::copy_from(const Tensor<T> &tensor, const txeo::TensorShap
 
 template <typename T>
 inline Tensor<T> Tensor<T>::flatten() const {
-  Tensor resp;
-  resp._impl->tf_tensor =
-      std::make_unique<tf::Tensor>(_impl->tf_tensor->dtype(), tf::TensorShape{this->dim()});
-  resp._impl->txeo_shape._impl->ext_tf_shape = &resp._impl->tf_tensor->shape();
+  Tensor<T> resp({this->dim()});
   if (!resp._impl->tf_tensor->CopyFrom(*_impl->tf_tensor, _impl->tf_tensor->shape()))
     throw txeo::TensorError("This tensor could not be flatten!");
 
@@ -269,6 +272,24 @@ inline void Tensor<T>::fill_with_uniform_random(const N &min, const N &max, size
     for (int64_t i{0}; i < this->dim(); ++i)
       (*this)(i) = scaler(engine);
   }
+}
+
+template <typename T>
+template <c_numeric N>
+inline void Tensor<T>::fill_with_normal_random(const N &min, const N &max, size_t seed1,
+                                               size_t seed2) {
+  if (max <= min)
+    throw txeo::TensorError("The max value is not greater than the min value!");
+
+  static_assert(std::is_floating_point_v<N>,
+                "The min and max values are not floating point numbers!");
+
+  std::mt19937 engine{};
+  std::seed_seq sseq{seed1, seed2};
+  engine.seed(sseq);
+  std::normal_distribution scaler{min, max};
+  for (int64_t i{0}; i < this->dim(); ++i)
+    (*this)(i) = scaler(engine);
 }
 
 // Avoiding problems in linking

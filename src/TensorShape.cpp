@@ -1,4 +1,6 @@
+
 #include "txeo/detail/TensorShapePrivate.h"
+#include "txeo/detail/utils.h"
 
 #include <algorithm>
 #include <cstdint>
@@ -23,6 +25,7 @@ void TensorShape::create_from_vector(P &&shape) {
   }
 
   _impl->tf_shape = std::make_unique<tf::TensorShape>(aux);
+  _impl->stride = txeo::detail::calc_stride(*_impl->tf_shape);
   _impl->owns = true;
 }
 
@@ -41,29 +44,44 @@ TensorShape::TensorShape(int number_of_axes, int64_t dim) : _impl{std::make_uniq
   if (dim < 0 || number_of_axes < 0)
     throw TensorShapeError("Negative number_of_axes or dimension is not allowed.");
   _impl->tf_shape = std::make_unique<tf::TensorShape>(std::vector<int64_t>(number_of_axes, dim));
+  _impl->stride = txeo::detail::calc_stride(*_impl->tf_shape);
   _impl->owns = true;
 }
 
 TensorShape::TensorShape(const TensorShape &shape) : _impl{std::make_unique<Impl>()} {
-  if (this != &shape)
+  if (this != &shape) {
     _impl->tf_shape = std::make_unique<tf::TensorShape>(*shape._impl->tf_shape);
-  _impl->owns = true;
+    _impl->stride = txeo::detail::calc_stride(*_impl->tf_shape);
+    _impl->owns = true;
+  }
 }
 
 TensorShape::TensorShape(TensorShape &&shape) noexcept : _impl{std::make_unique<Impl>()} {
-  if (this != &shape)
+  if (this != &shape) {
     _impl->tf_shape = std::make_unique<tf::TensorShape>(std::move(*shape._impl->tf_shape));
-  _impl->owns = true;
+    _impl->stride = txeo::detail::calc_stride(*_impl->tf_shape);
+    _impl->owns = true;
+  }
 }
 
 TensorShape &TensorShape::operator=(const TensorShape &shape) {
-  *_impl->tf_shape = *shape._impl->tf_shape;
+  if (shape._impl->owns)
+    *_impl->tf_shape = *shape._impl->tf_shape;
+  else
+    _impl->ext_tf_shape = shape._impl->ext_tf_shape;
+
+  _impl->stride = shape._impl->stride;
 
   return *this;
 }
 
 TensorShape &TensorShape::operator=(TensorShape &&shape) noexcept {
-  *_impl->tf_shape = std::move(*shape._impl->tf_shape);
+  if (shape._impl->owns)
+    *_impl->tf_shape = std::move(*shape._impl->tf_shape);
+  else
+    _impl->ext_tf_shape = std::move(shape._impl->ext_tf_shape);
+
+  _impl->stride = std::move(shape._impl->stride);
 
   return *this;
 }
@@ -86,6 +104,10 @@ int64_t TensorShape::axis_dim(int axis) const {
   return _impl->owns ? _impl->tf_shape->dim_size(axis) : _impl->ext_tf_shape->dim_size(axis);
 }
 
+const std::vector<int64_t> &TensorShape::stride() const {
+  return _impl->stride;
+}
+
 std::vector<int64_t> TensorShape::axes_dims() const noexcept {
   const auto &aux = _impl->owns ? _impl->tf_shape->dim_sizes() : _impl->ext_tf_shape->dim_sizes();
   std::vector<int64_t> res;
@@ -104,6 +126,7 @@ void TensorShape::push_axis_back(int64_t dim) {
   std::cout << "NMumero de elementos: " << this->calculate_capacity() << std::endl;
 
   _impl->tf_shape->AddDim(dim);
+  _impl->stride = txeo::detail::calc_stride(*_impl->tf_shape);
 }
 
 void TensorShape::insert_axis(int axis, int64_t dim) {
@@ -114,6 +137,7 @@ void TensorShape::insert_axis(int axis, int64_t dim) {
     throw TensorShapeError("Negative dimension is not allowed.");
 
   _impl->tf_shape->InsertDim(axis, dim);
+  _impl->stride = txeo::detail::calc_stride(*_impl->tf_shape);
 }
 
 void TensorShape::remove_axis(int axis) {
@@ -122,6 +146,7 @@ void TensorShape::remove_axis(int axis) {
                            std::to_string(this->number_of_axes() - 1) + "]");
 
   _impl->tf_shape->RemoveDim(axis);
+  _impl->stride = txeo::detail::calc_stride(*_impl->tf_shape);
 }
 
 void TensorShape::remove_all_axes() {
@@ -134,6 +159,7 @@ void TensorShape::set_dim(int axis, int64_t dim) {
                            std::to_string(this->number_of_axes() - 1) + "]");
 
   _impl->tf_shape->set_dim(axis, dim);
+  _impl->stride = txeo::detail::calc_stride(*_impl->tf_shape);
 }
 
 bool TensorShape::operator==(const TensorShape &shape) const {

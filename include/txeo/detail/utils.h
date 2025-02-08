@@ -4,8 +4,11 @@
 #pragma once
 
 #include <cstddef>
+#include <cstdint>
+#include <tensorflow/core/framework/tensor_shape.h>
 
 #include "tensorflow/core/framework/types.h"
+#include "txeo/TensorShape.h"
 
 namespace tf = tensorflow;
 
@@ -32,49 +35,16 @@ constexpr tf::DataType get_tf_dtype() {
 template <tf::DataType T>
 using cpp_type = typename tf::EnumToDataType<T>::Type;
 
-inline int64_t to_int64(const size_t &val) {
-  if (val > static_cast<size_t>(std::numeric_limits<int64_t>::max()))
-    throw std::overflow_error("size_t value exceeds int64_t maximum");
+int64_t to_int64(const size_t &val);
 
-  return static_cast<int64_t>(val);
-}
+int to_int(const size_t &val);
 
-inline int to_int(const size_t &val) {
-  if (val > static_cast<size_t>(std::numeric_limits<int>::max()))
-    throw std::overflow_error("size_t value exceeds int maximum");
+int to_int(const int64_t &val);
 
-  return static_cast<int>(val);
-}
+txeo::TensorShape to_txeo_tensor_shape(const tf::TensorShape &shape);
 
-namespace tensor {
+std::vector<int64_t> calc_stride(const tf::TensorShape &shape);
 
-size_t calc_flat_index(const std::vector<size_t> &indexes, const tf::TensorShape *sizes) {
-  size_t accum_sizes{1};
-  size_t resp{indexes.back()};
-
-  const size_t *idx_ptr = indexes.data();
-
-  for (size_t i = indexes.size() - 1; i > 0; --i) {
-    accum_sizes *= sizes->dim_size(txeo::detail::to_int(i));
-    resp += idx_ptr[i - 1] * accum_sizes;
-  }
-
-  return resp;
-}
-
-size_t calc_flat_index2(const size_t *indexes, const size_t &size, const tf::TensorShape *shape) {
-  size_t accum_sizes{1};
-  size_t resp{indexes[size - 1]};
-
-  for (size_t i = size - 1; i > 0; --i) {
-    accum_sizes *= shape->dim_size(txeo::detail::to_int(i));
-    resp += indexes[i - 1] * accum_sizes;
-  }
-
-  return resp;
-}
-
-} // namespace tensor
 } // namespace txeo::detail
 
 #endif

@@ -14,15 +14,6 @@ namespace txeo {
 template <typename T>
 concept c_numeric = std::is_arithmetic_v<T> && !std::is_same_v<T, bool>;
 
-// std::is_arithmetic_v<bool>            == true  and
-// std::is_arithmetic_v<char>            == true  and
-// std::is_arithmetic_v<char const>      == true  and
-// std::is_arithmetic_v<int>             == true  and
-// std::is_arithmetic_v<int const>       == true  and
-// std::is_arithmetic_v<float>           == true  and
-// std::is_arithmetic_v<float const>     == true  and
-// std::is_arithmetic_v<std::size_t>     == true  and
-
 /**
  * @brief Implements the mathematical concept of tensor, which is a magnitude of multiple order. A
  * tensor of order zero is defined to be a scalar, of order one a vector, of order two a matrix.
@@ -103,6 +94,9 @@ class Tensor {
     template <c_numeric N>
     void fill_with_uniform_random(const N &min, const N &max, size_t seed1, size_t seed2);
 
+    template <c_numeric N>
+    void fill_with_normal_random(const N &min, const N &max, size_t seed1, size_t seed2);
+
     Tensor<T> &operator=(const T &value);
     T *data();
 };
@@ -117,14 +111,13 @@ template <typename... Args>
   requires(std::convertible_to<Args, size_t> && ...)
 inline T &Tensor<T>::operator()(Args... args) {
   size_t indexes[] = {static_cast<size_t>(args)...};
-  int size = this->order();
-  size_t accum_sizes{1};
+  size_t size = this->order();
+  auto *stride = this->shape().stride().data();
   size_t flat_index{indexes[size - 1]};
 
-  for (size_t i = size - 1; i > 0; --i) {
-    accum_sizes *= this->shape().axis_dim(i);
-    flat_index += indexes[i - 1] * accum_sizes;
-  }
+  for (size_t i = 0; i < size - 1; ++i)
+    flat_index += indexes[i] * stride[i];
+
   return this->data()[flat_index];
 }
 
@@ -133,14 +126,13 @@ template <typename... Args>
   requires(std::convertible_to<Args, size_t> && ...)
 inline const T &Tensor<T>::operator()(Args... args) const {
   size_t indexes[] = {static_cast<size_t>(args)...};
-  int size = this->order();
-  size_t accum_sizes{1};
+  size_t size = this->order();
+  auto *stride = this->shape().stride().data();
   size_t flat_index{indexes[size - 1]};
 
-  for (size_t i = size - 1; i > 0; --i) {
-    accum_sizes *= this->shape().axis_dim(i);
-    flat_index += indexes[i - 1] * accum_sizes;
-  }
+  for (size_t i = 0; i < size - 1; ++i)
+    flat_index += indexes[i] * stride[i];
+
   return this->data()[flat_index];
 }
 
@@ -168,8 +160,6 @@ inline const T &Tensor<T>::at(Args... args) const {
 
 #endif // TENSOR_H
 
-// Implementar o esquema que ele sugeriu: int_64 por dentro e size_t por fora
-// Tentar colocar os strides como variável da classe Tensor [criar stride em TensorShape]
 // deep Static Factory Methods: tensors with zeros, ones, random values, etc.
 // gpt void map(std::function<T(T)> func);
 // gpt Tensor<T> transpose(const std::vector<size_t> &perm) const;

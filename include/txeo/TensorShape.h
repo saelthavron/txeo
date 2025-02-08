@@ -88,6 +88,8 @@ class TensorShape {
      */
     [[nodiscard]] int64_t axis_dim(int axis) const;
 
+    [[nodiscard]] const std::vector<int64_t> &stride() const;
+
     /**
      * @brief Returns the collection of tensor shape dimensions
      *

@@ -1,6 +1,8 @@
 #include "txeo/TensorShape.h"
+#include <cstdint>
 #include <gtest/gtest.h>
 #include <sstream>
+#include <vector>
 
 namespace txeo {
 
@@ -21,6 +23,7 @@ TEST(TensorShapeTest, ConstructorVector) {
   EXPECT_EQ(shape.axis_dim(0), 1);
   EXPECT_EQ(shape.axis_dim(1), 3);
   EXPECT_EQ(shape.axis_dim(2), 5);
+  EXPECT_EQ(shape.stride(), std::vector<int64_t>({15, 5}));
 
   EXPECT_THROW(TensorShape({2, -3}), TensorShapeError);
 }
@@ -87,6 +90,7 @@ TEST(TensorShapeTest, ShapeModifications) {
   EXPECT_EQ(shape.axis_dim(1), 5);
 
   TensorShape empty_shape(0, 0);
+  EXPECT_EQ(empty_shape.stride(), std::vector<int64_t>({}));
   EXPECT_THROW(empty_shape.push_axis_back(-1), TensorShapeError);
   EXPECT_THROW(shape.insert_axis(5, 2), TensorShapeError);
   EXPECT_THROW(shape.remove_axis(5), TensorShapeError);
@@ -121,9 +125,10 @@ TEST(TensorShapeTest, StreamOperator) {
 }
 
 TEST(TensorShapeTest, NumberOfElements) {
-  TensorShape shape({2, 3, 5});
+  TensorShape shape({2, 3, 5, 6});
 
-  EXPECT_EQ(shape.calculate_capacity(), 2 * 3 * 5);
+  EXPECT_EQ(shape.stride(), std::vector<int64_t>({90, 30, 6}));
+  EXPECT_EQ(shape.calculate_capacity(), 2 * 3 * 5 * 6);
 }
 
 TEST(TensorShapeTest, EmptyShape) {
