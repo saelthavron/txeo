@@ -1,6 +1,7 @@
 #ifndef TENSOR_SHAPE_H
 #define TENSOR_SHAPE_H
 #include <cstddef>
+#include <initializer_list>
 #pragma once
 
 #include <cstdint>
@@ -66,6 +67,13 @@ class TensorShape {
      * @param shape vector of dimensions
      */
     explicit TensorShape(std::vector<size_t> &&shape);
+
+    /**
+     * @brief Construct a tensor shape from an initializer list
+     *
+     * @param shape initializer list
+     */
+    explicit TensorShape(const std::initializer_list<size_t> &shape);
 
     /**
      * @brief Returns the size of the tensor shape

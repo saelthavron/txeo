@@ -33,6 +33,11 @@ TensorShape::TensorShape(const std::vector<size_t> &shape) : _impl{std::make_uni
   this->create_from_vector(txeo::detail::to_int64(shape));
 }
 
+TensorShape::TensorShape(const std::initializer_list<size_t> &shape)
+    : _impl{std::make_unique<Impl>()} {
+  this->create_from_vector(txeo::detail::to_int64(shape));
+}
+
 TensorShape::TensorShape(std::vector<size_t> &&shape) : _impl{std::make_unique<Impl>()} {
   auto shp = std::move(shape);
   this->create_from_vector(txeo::detail::to_int64(shp));
@@ -170,9 +175,9 @@ bool TensorShape::operator!=(const TensorShape &shape) const {
 
 std::ostream &operator<<(std::ostream &os, const TensorShape &shape) {
   if (shape._impl->owns)
-    os << shape._impl->tf_shape;
+    os << *shape._impl->tf_shape;
   else
-    os << shape._impl->ext_tf_shape;
+    os << *shape._impl->ext_tf_shape;
   return os;
 }
 

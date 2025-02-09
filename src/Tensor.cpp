@@ -10,6 +10,7 @@
 #include <utility>
 #include <vector>
 
+#include "txeo/TensorShape.h"
 #include "txeo/detail/TensorPrivate.h"
 #include "txeo/detail/TensorShapePrivate.h"
 #include "txeo/detail/utils.h"
@@ -31,17 +32,6 @@ template <typename T>
 template <typename P>
 void Tensor<T>::create_from_shape(P &&shape) {
   auto aux = std::forward<P>(shape);
-  _impl->tf_tensor =
-      std::make_unique<tf::Tensor>(txeo::detail::get_tf_dtype<T>(), *aux._impl->tf_shape);
-  _impl->txeo_shape._impl->ext_tf_shape = &_impl->tf_tensor->shape();
-  _impl->txeo_shape._impl->stride =
-      txeo::detail::calc_stride(*_impl->txeo_shape._impl->ext_tf_shape);
-}
-
-template <typename T>
-template <typename P>
-void Tensor<T>::create_from_vector(P &&shape) {
-  txeo::TensorShape aux{std::forward<P>(shape)};
   _impl->tf_tensor =
       std::make_unique<tf::Tensor>(txeo::detail::get_tf_dtype<T>(), *aux._impl->tf_shape);
   _impl->txeo_shape._impl->ext_tf_shape = &_impl->tf_tensor->shape();
@@ -83,11 +73,6 @@ Tensor<T>::Tensor(const txeo::TensorShape &shape) : _impl{std::make_unique<Impl>
 }
 
 template <typename T>
-Tensor<T>::Tensor(std::initializer_list<size_t> shape) : _impl{std::make_unique<Impl>()} {
-  this->create_from_vector(shape);
-}
-
-template <typename T>
 inline Tensor<T>::Tensor(const txeo::TensorShape &shape, const T &fill_value)
     : _impl{std::make_unique<Impl>()} {
   this->create_from_shape(shape);
@@ -102,28 +87,16 @@ inline Tensor<T>::Tensor(txeo::TensorShape &&shape, const T &fill_value)
 }
 
 template <typename T>
-inline Tensor<T>::Tensor(std::initializer_list<size_t> shape, const T &fill_value) {
-  this->create_from_vector(shape);
-  this->fill(fill_value);
+inline Tensor<T>::Tensor(const std::initializer_list<std::initializer_list<T>> &values)
+    : _impl{std::make_unique<Impl>()} {
+
+  std::vector<T> flat_data;
+  std::vector<size_t> shape;
+  this->fill_data_shape(values, flat_data, shape);
+  create_from_shape(txeo::TensorShape({shape}));
+  for (size_t i{0}; i < this->dim(); ++i)
+    this->data()[i] = flat_data[i];
 }
-
-// template <typename T>
-// inline Tensor<T>::Tensor(std::initializer_list<size_t> shape, std::initializer_list<T> values)
-//     : _impl{std::make_unique<Impl>()} {
-//   size_t aux = 1;
-//   for (auto &item : shape)
-//     aux *= item;
-//   if (aux != values.size())
-//     throw txeo::TensorError(
-//         "The shape defines a number of elements different from the number of values");
-
-//   this->create_from_vector(shape);
-//   size_t i{0};
-//   for (auto &item : values) {
-//     this->data()[i] = item;
-//     ++i;
-//   }
-// }
 
 template <typename T>
 Tensor<T> &Tensor<T>::operator=(const Tensor &tensor) {
@@ -227,16 +200,16 @@ inline const T &Tensor<T>::at() const {
 }
 
 template <typename T>
-inline void Tensor<T>::reshape(const std::vector<size_t> &shape) {
+inline void Tensor<T>::reshape(const txeo::TensorShape &shape) {
   auto &old_tensor = _impl->tf_tensor;
-  create_from_vector(shape);
+  create_from_shape(shape);
   if (!_impl->tf_tensor->CopyFrom(*old_tensor, _impl->tf_tensor->shape()))
     throw txeo::TensorError("The number of axes do not match the dimension of this tensor!");
 }
 
 template <typename T>
-inline void Tensor<T>::reshape(const txeo::TensorShape &shape) {
-  reshape(txeo::detail::to_size_t(shape.axes_dims()));
+inline void Tensor<T>::reshape(const std::initializer_list<size_t> &shape) {
+  reshape(txeo::TensorShape(shape));
 }
 
 template <typename T>
@@ -269,7 +242,7 @@ inline void Tensor<T>::share_from(const Tensor<T> &tensor, const txeo::TensorSha
 
 template <typename T>
 inline Tensor<T> Tensor<T>::flatten() const {
-  Tensor<T> resp({this->dim()});
+  Tensor<T> resp(txeo::TensorShape({this->dim()}));
   if (this->dim() != 0)
     if (!resp._impl->tf_tensor->CopyFrom(*_impl->tf_tensor, _impl->tf_tensor->shape()))
       throw txeo::TensorError("This tensor could not be flatten!");
@@ -356,7 +329,7 @@ inline void Tensor<T>::squeeze() {
     if (item != 1)
       new_shape.emplace_back(txeo::detail::to_size_t(item));
 
-  this->reshape(new_shape);
+  this->reshape(txeo::TensorShape(new_shape));
 }
 
 template <typename T>
