@@ -1,6 +1,9 @@
+#include "txeo/Tensor.h"
 #include <cstddef>
 #include <cstdint>
+#include <initializer_list>
 #include <memory>
+#include <random>
 #include <tensorflow/core/framework/tensor.h>
 #include <tensorflow/core/framework/tensor_shape.h>
 #include <type_traits>
@@ -80,13 +83,8 @@ Tensor<T>::Tensor(const txeo::TensorShape &shape) : _impl{std::make_unique<Impl>
 }
 
 template <typename T>
-inline Tensor<T>::Tensor(const std::vector<int64_t> &shape) : _impl{std::make_unique<Impl>()} {
+Tensor<T>::Tensor(std::initializer_list<size_t> shape) : _impl{std::make_unique<Impl>()} {
   this->create_from_vector(shape);
-}
-
-template <typename T>
-inline Tensor<T>::Tensor(std::vector<int64_t> &&shape) : _impl{std::make_unique<Impl>()} {
-  this->create_from_vector(std::move(shape));
 }
 
 template <typename T>
@@ -104,16 +102,28 @@ inline Tensor<T>::Tensor(txeo::TensorShape &&shape, const T &fill_value)
 }
 
 template <typename T>
-inline Tensor<T>::Tensor(const std::vector<int64_t> &shape, const T &fill_value) {
+inline Tensor<T>::Tensor(std::initializer_list<size_t> shape, const T &fill_value) {
   this->create_from_vector(shape);
   this->fill(fill_value);
 }
 
-template <typename T>
-inline Tensor<T>::Tensor(std::vector<int64_t> &&shape, const T &fill_value) {
-  this->create_from_vector(std::move(shape));
-  this->fill(fill_value);
-}
+// template <typename T>
+// inline Tensor<T>::Tensor(std::initializer_list<size_t> shape, std::initializer_list<T> values)
+//     : _impl{std::make_unique<Impl>()} {
+//   size_t aux = 1;
+//   for (auto &item : shape)
+//     aux *= item;
+//   if (aux != values.size())
+//     throw txeo::TensorError(
+//         "The shape defines a number of elements different from the number of values");
+
+//   this->create_from_vector(shape);
+//   size_t i{0};
+//   for (auto &item : values) {
+//     this->data()[i] = item;
+//     ++i;
+//   }
+// }
 
 template <typename T>
 Tensor<T> &Tensor<T>::operator=(const Tensor &tensor) {
@@ -217,7 +227,7 @@ inline const T &Tensor<T>::at() const {
 }
 
 template <typename T>
-inline void Tensor<T>::reshape(const std::vector<int64_t> &shape) {
+inline void Tensor<T>::reshape(const std::vector<size_t> &shape) {
   auto &old_tensor = _impl->tf_tensor;
   create_from_vector(shape);
   if (!_impl->tf_tensor->CopyFrom(*old_tensor, _impl->tf_tensor->shape()))
@@ -226,7 +236,7 @@ inline void Tensor<T>::reshape(const std::vector<int64_t> &shape) {
 
 template <typename T>
 inline void Tensor<T>::reshape(const txeo::TensorShape &shape) {
-  reshape(shape.axes_dims());
+  reshape(txeo::detail::to_size_t(shape.axes_dims()));
 }
 
 template <typename T>
@@ -247,18 +257,22 @@ inline Tensor<T> Tensor<T>::slice(size_t first_axis_begin, size_t first_axis_end
 
 template <typename T>
 inline void Tensor<T>::share_from(const Tensor<T> &tensor, const txeo::TensorShape &shape) {
+  if (this->dim() == 0)
+    return;
   if (this->dim() != tensor.dim() || this->dim() != shape.calculate_capacity())
     throw txeo::TensorError("Parameters do not match the dimension of this tensor!");
   this->reshape(shape);
+
   if (!_impl->tf_tensor->CopyFrom(*_impl->tf_tensor, _impl->tf_tensor->shape()))
     throw txeo::TensorError("This tensor could not be copied!");
 }
 
 template <typename T>
 inline Tensor<T> Tensor<T>::flatten() const {
-  Tensor<T> resp({txeo::detail::to_int64(this->dim())});
-  if (!resp._impl->tf_tensor->CopyFrom(*_impl->tf_tensor, _impl->tf_tensor->shape()))
-    throw txeo::TensorError("This tensor could not be flatten!");
+  Tensor<T> resp({this->dim()});
+  if (this->dim() != 0)
+    if (!resp._impl->tf_tensor->CopyFrom(*_impl->tf_tensor, _impl->tf_tensor->shape()))
+      throw txeo::TensorError("This tensor could not be flatten!");
 
   return resp;
 }
@@ -285,6 +299,8 @@ template <typename T>
 template <c_numeric N>
 inline void Tensor<T>::fill_with_uniform_random(const N &min, const N &max, size_t seed1,
                                                 size_t seed2) {
+  if (this->dim() == 0)
+    return;
   if (max <= min)
     throw txeo::TensorError("The max value is not greater than the min value");
 
@@ -306,18 +322,41 @@ template <typename T>
 template <c_numeric N>
 inline void Tensor<T>::fill_with_normal_random(const N &min, const N &max, size_t seed1,
                                                size_t seed2) {
+  if (this->dim() == 0)
+    return;
   if (max <= min)
     throw txeo::TensorError("The max value is not greater than the min value!");
 
   static_assert(std::is_floating_point_v<N>,
                 "The min and max values are not floating point numbers!");
 
-  std::mt19937 engine{};
+  std::mt19937_64 engine{};
   std::seed_seq sseq{seed1, seed2};
   engine.seed(sseq);
   std::normal_distribution scaler{min, max};
   for (int64_t i{0}; i < this->dim(); ++i)
     (*this)(i) = scaler(engine);
+}
+
+template <typename T>
+inline void Tensor<T>::shuffle() {
+  if (this->dim() == 0)
+    return;
+  std::mt19937_64 engine{std::random_device{}()};
+
+  auto *data = this->data();
+  std::shuffle(data, data + this->dim(), engine);
+}
+
+template <typename T>
+inline void Tensor<T>::squeeze() {
+  std::vector<size_t> new_shape;
+  const auto &aux = this->shape().axes_dims();
+  for (auto &item : aux)
+    if (item != 1)
+      new_shape.emplace_back(txeo::detail::to_size_t(item));
+
+  this->reshape(new_shape);
 }
 
 template <typename T>
@@ -327,6 +366,12 @@ inline Tensor<T> Tensor<T>::clone() const {
     resp.data()[i] = this->data()[i];
 
   return resp;
+}
+
+template <typename T>
+std::ostream &operator<<(std::ostream &os, const Tensor<T> &tensor) {
+  os << tensor._impl->tf_tensor;
+  return os;
 }
 
 // Avoiding problems in linking

@@ -37,13 +37,19 @@ using cpp_type = typename tf::EnumToDataType<T>::Type;
 
 int64_t to_int64(const size_t &val);
 
+size_t to_size_t(const int64_t &val);
+
+std::vector<size_t> to_size_t(const std::vector<int64_t> &vec);
+
+std::vector<int64_t> to_int64(const std::vector<size_t> &vec);
+
 int to_int(const size_t &val);
 
 int to_int(const int64_t &val);
 
 txeo::TensorShape to_txeo_tensor_shape(const tf::TensorShape &shape);
 
-std::vector<int64_t> calc_stride(const tf::TensorShape &shape);
+std::vector<size_t> calc_stride(const tf::TensorShape &shape);
 
 } // namespace txeo::detail
 

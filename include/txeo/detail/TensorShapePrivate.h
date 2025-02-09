@@ -8,7 +8,7 @@
 struct txeo::TensorShape::Impl {
     std::unique_ptr<tensorflow::TensorShape> tf_shape{nullptr};
     const tensorflow::TensorShape *ext_tf_shape{nullptr};
-    std::vector<int64_t> stride;
+    std::vector<size_t> stride;
     bool owns{false};
 };
 

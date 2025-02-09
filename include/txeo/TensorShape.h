@@ -1,5 +1,6 @@
 #ifndef TENSOR_SHAPE_H
 #define TENSOR_SHAPE_H
+#include <cstddef>
 #pragma once
 
 #include <cstdint>
@@ -50,21 +51,21 @@ class TensorShape {
      * @param number_of_axes Specifies the number of axes
      * @param dim Specifies the dimension in each axis
      */
-    explicit TensorShape(int number_of_axes, int64_t dim);
+    explicit TensorShape(int number_of_axes, size_t dim);
 
     /**
      * @brief Constructs a tensor shape from a std::vector
      *
      * @param shape vector of dimensions
      */
-    explicit TensorShape(const std::vector<int64_t> &shape);
+    explicit TensorShape(const std::vector<size_t> &shape);
 
     /**
      * @brief Constructs a tensor shape from a std::vector
      *
      * @param shape vector of dimensions
      */
-    explicit TensorShape(std::vector<int64_t> &&shape);
+    explicit TensorShape(std::vector<size_t> &&shape);
 
     /**
      * @brief Returns the size of the tensor shape
@@ -88,7 +89,7 @@ class TensorShape {
      */
     [[nodiscard]] int64_t axis_dim(int axis) const;
 
-    [[nodiscard]] const std::vector<int64_t> &stride() const;
+    [[nodiscard]] const std::vector<size_t> &stride() const;
 
     /**
      * @brief Returns the collection of tensor shape dimensions
@@ -110,7 +111,7 @@ class TensorShape {
      *
      * @param dim Specified dimension
      */
-    void push_axis_back(int64_t dim);
+    void push_axis_back(size_t dim);
 
     /**
      * @brief Inserts a dimension at the specified axis
@@ -118,7 +119,7 @@ class TensorShape {
      * @param axis Specified axis
      * @param dim Specified dimension
      */
-    void insert_axis(int axis, int64_t dim);
+    void insert_axis(int axis, size_t dim);
 
     /**
      * @brief Removes a specified axis
@@ -139,7 +140,7 @@ class TensorShape {
      * @param axis Specified axis
      * @param dim Specified dimension
      */
-    void set_dim(int axis, int64_t dim);
+    void set_dim(int axis, size_t dim);
 
     /**
      * @brief Calculates the number of available tensor elements specified by the tensor shape

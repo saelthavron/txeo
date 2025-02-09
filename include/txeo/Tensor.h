@@ -1,9 +1,10 @@
 #ifndef TENSOR_H
 #define TENSOR_H
+#include <initializer_list>
+#include <span>
 #pragma once
 
 #include <cstddef>
-#include <cstdint>
 #include <memory>
 #include <type_traits>
 
@@ -48,13 +49,13 @@ class Tensor {
 
     explicit Tensor(const txeo::TensorShape &shape);
     explicit Tensor(txeo::TensorShape &&shape);
-    explicit Tensor(const std::vector<int64_t> &shape);
-    explicit Tensor(std::vector<int64_t> &&shape);
+    explicit Tensor(std::initializer_list<size_t> shape);
 
     explicit Tensor(const txeo::TensorShape &shape, const T &fill_value);
     explicit Tensor(txeo::TensorShape &&shape, const T &fill_value);
-    explicit Tensor(const std::vector<int64_t> &shape, const T &fill_value);
-    explicit Tensor(std::vector<int64_t> &&shape, const T &fill_value);
+    explicit Tensor(std::initializer_list<size_t> shape, const T &fill_value);
+
+    // /explicit Tensor(std::initializer_list<size_t> shape, std::initializer_list<T> values);
 
     [[nodiscard]] const txeo::TensorShape &shape() const;
     constexpr std::type_identity_t<T> type() const;
@@ -91,7 +92,7 @@ class Tensor {
     template <typename... Args>
     const T &at(Args... args) const;
 
-    void reshape(const std::vector<int64_t> &shape);
+    void reshape(const std::vector<size_t> &shape);
     void reshape(const txeo::TensorShape &shape);
     Tensor<T> flatten() const;
     void fill(const T &value);
@@ -102,10 +103,16 @@ class Tensor {
     template <c_numeric N>
     void fill_with_normal_random(const N &min, const N &max, size_t seed1, size_t seed2);
 
+    void shuffle();
+
+    void squeeze();
+
     Tensor<T> &operator=(const T &value);
     T *data();
 
     Tensor<T> clone() const;
+
+    friend std::ostream &operator<<(std::ostream &os, const Tensor<T> &tensor);
 };
 
 class TensorError : public std::runtime_error {
@@ -170,5 +177,4 @@ inline const T &Tensor<T>::at(Args... args) const {
 // construir um identity factory
 // gpt void map(std::function<T(T)> func);
 // gpt Tensor<T> transpose(const std::vector<size_t> &perm) const;
-// gpt friend std::ostream &operator<<(std::ostream &os, const Tensor<T> &tensor);
 // deep Iterators for STL Compatibility
