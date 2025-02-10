@@ -13,9 +13,11 @@ add_executable(
 
 target_link_libraries(
   txeo_tests  
-  GTest::GTest GTest::Main txeo_static 
+  GTest::gtest GTest::gtest_main txeo_shared 
 )
 
 include(GoogleTest)
 gtest_discover_tests(txeo_tests)
+
+
 

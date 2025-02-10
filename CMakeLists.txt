@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.20)
+cmake_minimum_required (VERSION 3.25)
 
 
 project(txeo LANGUAGES CXX VERSION 0.1 DESCRIPTION "TXEO - A DEVELOPER-FRIENDLY TENSORFLOW C++ WRAPPER")
@@ -9,6 +9,8 @@ set(CMAKE_CXX_EXTENSIONS OFF) #Turns off compiler non-standard features
 
 
 #################################################### Source Directories ####################################################
+
+
 
 include_directories(include) 
 add_subdirectory(src)

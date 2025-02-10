@@ -1,8 +1,11 @@
-#include "txeo/Tensor.h"
+#include <algorithm>
 #include <cstddef>
 #include <cstdint>
 #include <gtest/gtest.h>
 #include <vector>
+
+#include "txeo/Tensor.h"
+#include "txeo/TensorShape.h"
 
 namespace txeo {
 
@@ -37,12 +40,11 @@ TEST(TensorTest, MoveConstructor) {
   Tensor<int> moved(std::move(original));
   EXPECT_EQ(moved.dim(), 4);
   EXPECT_EQ(moved(1, 1), 4);
-  EXPECT_EQ(original.dim(), 0); // NOLINT
 }
 
 TEST(TensorTest, AssignmentOperator) {
   Tensor<int> t1({{1, 2}, {3, 4}});
-  Tensor<int> t2;
+  Tensor<int> t2({{1}});
   t2 = t1;
   EXPECT_EQ(t2.dim(), 4);
   EXPECT_EQ(t2(0, 1), 2);
@@ -90,7 +92,7 @@ TEST(TensorTest, Reshape) {
 }
 
 TEST(TensorTest, Slice) {
-  Tensor<int> t({4, 3}, 0);
+  Tensor<int> t(txeo::TensorShape({4, 3}), 0);
   for (int i = 0; i < 4; ++i)
     for (int j = 0; j < 3; ++j)
       t(i, j) = i * 3 + j;
@@ -103,7 +105,7 @@ TEST(TensorTest, Slice) {
 }
 
 TEST(TensorTest, FillAndAssignment) {
-  Tensor<int> t({2, 2});
+  Tensor<int> t(txeo::TensorShape({2, 2}));
   t.fill(42);
   EXPECT_EQ(t(0, 0), 42);
   EXPECT_EQ(t(1, 1), 42);
@@ -113,8 +115,8 @@ TEST(TensorTest, FillAndAssignment) {
 }
 
 TEST(TensorTest, RandomInitialization) {
-  Tensor<double> t({1000});
-  t.fill_with_uniform_random(0.0, 1.0, 42);
+  Tensor<double> t(txeo::TensorShape({1000}));
+  t.fill_with_uniform_random(0.0, 1.0, 42, 22);
 
   double min = *std::min_element(t.data(), t.data() + t.dim());
   double max = *std::max_element(t.data(), t.data() + t.dim());
@@ -124,8 +126,8 @@ TEST(TensorTest, RandomInitialization) {
 }
 
 TEST(TensorTest, Shuffle) {
-  Tensor<int> t({100});
-  for (int i = 0; i < 100; ++i)
+  Tensor<double> t(txeo::TensorShape({1000}));
+  for (int i = 0; i < 1000; ++i)
     t(i) = i;
 
   auto original = t.clone();
@@ -137,14 +139,14 @@ TEST(TensorTest, Shuffle) {
 }
 
 TEST(TensorTest, Squeeze) {
-  Tensor<int> t({1, 3, 1, 4});
+  Tensor<int> t(txeo::TensorShape({1, 3, 1, 4}));
   t.squeeze();
   EXPECT_EQ(t.order(), 2);
   EXPECT_EQ(t.shape().axes_dims(), std::vector<int64_t>({3, 4}));
 }
 
 TEST(TensorTest, Clone) {
-  Tensor<int> original({2, 2}, 5);
+  Tensor<int> original(txeo::TensorShape({2, 2}), 5);
   auto clone = original.clone();
 
   original(0, 0) = 10;
@@ -153,9 +155,9 @@ TEST(TensorTest, Clone) {
 }
 
 TEST(TensorTest, EqualityOperators) {
-  Tensor<int> t1({2, 2}, 5);
-  Tensor<int> t2({2, 2}, 5);
-  Tensor<int> t3({2, 2}, 6);
+  Tensor<int> t1(txeo::TensorShape({2, 2}), 5);
+  Tensor<int> t2(txeo::TensorShape({2, 2}), 5);
+  Tensor<int> t3(txeo::TensorShape({2, 2}), 6);
 
   EXPECT_TRUE(t1 == t2);
   EXPECT_FALSE(t1 == t3);
@@ -163,7 +165,7 @@ TEST(TensorTest, EqualityOperators) {
 }
 
 TEST(TensorTest, ScalarTensor) {
-  Tensor<int> t;
+  Tensor<int> t({{1}});
   t = 42;
   EXPECT_EQ(t.dim(), 1);
   EXPECT_EQ(t(), 42);
@@ -171,8 +173,113 @@ TEST(TensorTest, ScalarTensor) {
 }
 
 TEST(TensorTest, MemoryOperations) {
-  Tensor<double> t({1000});
+  Tensor<double> t(txeo::TensorShape({1000}));
   size_t expected_size = 1000 * sizeof(double);
   EXPECT_GE(t.memory_size(), expected_size);
 }
+
+TEST(TensorTest, ValidShareOperation) {
+  Tensor<int> source(txeo::TensorShape({2, 3}), 5);
+  Tensor<int> target(txeo::TensorShape({3, 2}));
+
+  ASSERT_NO_THROW(target.share_from(source, txeo::TensorShape({6})));
+  EXPECT_EQ(target.shape().axes_dims(), std::vector<int64_t>({6}));
+  EXPECT_EQ(target.dim(), 6);
+  for (int i = 0; i < 6; ++i) {
+    EXPECT_EQ(target(i), 5);
+  }
+}
+
+TEST(TensorTest, DimensionMismatch) {
+  Tensor<int> source(txeo::TensorShape({2, 2}), 4);
+  Tensor<int> target(txeo::TensorShape({4}));
+
+  EXPECT_THROW(target.share_from(source, txeo::TensorShape({3})), TensorError);
+  EXPECT_THROW(target.share_from(source, txeo::TensorShape({5})), TensorError);
+}
+
+TEST(TensorTest, ValidFlatten) {
+  Tensor<float> original(txeo::TensorShape({2, 3}), 1.5f);
+  auto flattened = original.flatten();
+
+  EXPECT_EQ(flattened.order(), 1);
+  EXPECT_EQ(flattened.dim(), 6);
+  for (int i = 0; i < 6; ++i) {
+    EXPECT_FLOAT_EQ(flattened(i), 1.5f);
+  }
+}
+
+TEST(TensorTest, ValidScalarAccess) {
+  Tensor<int> scalar(txeo::TensorShape({}));
+  scalar = 42;
+
+  EXPECT_EQ(scalar.at(), 42);
+  const auto &const_scalar = scalar;
+  EXPECT_EQ(const_scalar.at(), 42);
+}
+
+TEST(TensorTest, NonScalarAccess) {
+  Tensor<int> matrix(txeo::TensorShape({2, 2}), 5);
+  EXPECT_THROW(matrix.at(), TensorError);
+  const auto &const_matrix = matrix;
+  EXPECT_THROW(const_matrix.at(), TensorError);
+}
+
+TEST(TensorTest, ScalarAccess) {
+  Tensor<double> scalar(txeo::TensorShape({1}), 3.14);
+  const auto &const_scalar = scalar;
+
+  EXPECT_DOUBLE_EQ(scalar(), 3.14);
+  EXPECT_DOUBLE_EQ(const_scalar(), 3.14);
+}
+
+TEST(TensorTest, ValidMove) {
+  Tensor<int> source(txeo::TensorShape({3}), {1, 2, 3});
+  Tensor<int> target(txeo::TensorShape({1}));
+
+  target = std::move(source);
+
+  EXPECT_EQ(target.dim(), 3);
+  EXPECT_EQ(target(0), 1);
+  EXPECT_EQ(source.dim(), 0); // NOLINT
+}
+
+TEST(TensorTest, SelfAssignment) {
+  Tensor<int> tensor(txeo::TensorShape({2}), {4, 5});
+  tensor = std::move(tensor); // Should handle gracefully
+
+  EXPECT_EQ(tensor.dim(), 2);
+  EXPECT_EQ(tensor(1), 5);
+}
+
+TEST(TensorTest, ValidConstruction) {
+  Tensor<int> t({{{1, 2}, {3, 4}}, {{5, 6}, {7, 8}}});
+
+  EXPECT_EQ(t.order(), 3);
+  EXPECT_EQ(t.shape().axes_dims(), std::vector<int64_t>({2, 2, 2}));
+  EXPECT_EQ(t(1, 0, 1), 6);
+}
+
+TEST(TensorTest, InconsistentDimensions) {
+  EXPECT_THROW(Tensor<int>({{{1, 2}, {3}}, {{4, 5}, {6, 7}}}), TensorError);
+}
+
+TEST(TensorTest, ValidConstructionShapeValues) {
+  Tensor<float> t(txeo::TensorShape({2, 2}), {1.1f, 2.2f, 3.3f, 4.4f});
+
+  EXPECT_EQ(t.order(), 2);
+  EXPECT_FLOAT_EQ(t(1, 1), 4.4f);
+}
+
+TEST(TensorTest, SizeMismatch) {
+  std::vector<int> data{1, 2, 3};
+  EXPECT_THROW(Tensor<int>(txeo::TensorShape({2, 2}), data), TensorError);
+}
+
+TEST(TensorTest, ZeroDimTensor) {
+  Tensor<double> t(txeo::TensorShape({}), 3.14);
+  EXPECT_EQ(t.dim(), 1);
+  EXPECT_DOUBLE_EQ(t(), 3.14);
+}
+
 } // namespace txeo

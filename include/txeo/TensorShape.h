@@ -69,13 +69,6 @@ class TensorShape {
     explicit TensorShape(std::vector<size_t> &&shape);
 
     /**
-     * @brief Construct a tensor shape from an initializer list
-     *
-     * @param shape initializer list
-     */
-    explicit TensorShape(const std::initializer_list<size_t> &shape);
-
-    /**
      * @brief Returns the size of the tensor shape
      *
      * @return int
@@ -156,6 +149,8 @@ class TensorShape {
      * @return int64_t
      */
     [[nodiscard]] size_t calculate_capacity() const noexcept;
+
+    [[nodiscard]] TensorShape clone() const;
 };
 
 /**

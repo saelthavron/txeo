@@ -1,5 +1,6 @@
 #ifndef TENSOR_H
 #define TENSOR_H
+#include <random>
 #pragma once
 
 #include <cstddef>
@@ -58,7 +59,7 @@ class Tensor {
 
     explicit Tensor(const txeo::TensorShape &shape, const T &fill_value);
     explicit Tensor(txeo::TensorShape &&shape, const T &fill_value);
-    explicit Tensor(const txeo::TensorShape &shape, const std::initializer_list<T> &values);
+    explicit Tensor(const txeo::TensorShape &shape, const std::vector<T> &values);
 
     explicit Tensor(const std::initializer_list<std::initializer_list<T>> &values);
 
@@ -101,15 +102,11 @@ class Tensor {
     const T &at(Args... args) const;
 
     void reshape(const txeo::TensorShape &shape);
-    void reshape(const std::initializer_list<size_t> &shape);
+    void reshape(const std::vector<size_t> &shape);
     Tensor<T> flatten() const;
     void fill(const T &value);
 
-    template <c_numeric N>
-    void fill_with_uniform_random(const N &min, const N &max, size_t seed1, size_t seed2);
-
-    template <c_numeric N>
-    void fill_with_normal_random(const N &min, const N &max, size_t seed1, size_t seed2);
+    void fill_with_uniform_random(const T &min, const T &max, size_t seed1, size_t seed2);
 
     void shuffle();
 

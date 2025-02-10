@@ -1,9 +1,10 @@
-#include "txeo/TensorShape.h"
 #include <cstddef>
 #include <cstdint>
 #include <gtest/gtest.h>
 #include <sstream>
 #include <vector>
+
+#include "txeo/TensorShape.h"
 
 namespace txeo {
 
@@ -22,14 +23,6 @@ TEST(TensorShapeTest, ConstructorVector) {
   EXPECT_EQ(shape.axis_dim(1), 3);
   EXPECT_EQ(shape.axis_dim(2), 5);
   EXPECT_EQ(shape.stride(), std::vector<size_t>({15, 5}));
-}
-
-TEST(TensorShapeTest, ConstructorInitializerList) {
-  TensorShape shape{1, 3};
-  EXPECT_EQ(shape.number_of_axes(), 2);
-  EXPECT_EQ(shape.axis_dim(0), 1);
-  EXPECT_EQ(shape.axis_dim(1), 3);
-  EXPECT_EQ(shape.stride(), std::vector<size_t>({3}));
 }
 
 TEST(TensorShapeTest, CopySemantics) {
