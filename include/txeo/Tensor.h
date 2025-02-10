@@ -1,10 +1,9 @@
 #ifndef TENSOR_H
 #define TENSOR_H
-#include <initializer_list>
-#include <span>
 #pragma once
 
 #include <cstddef>
+#include <initializer_list>
 #include <memory>
 #include <type_traits>
 
@@ -30,11 +29,12 @@ class Tensor {
     template <typename P>
     void create_from_shape(P &&shape);
 
-    void fill_data_shape(const std::initializer_list<T> &list, std::vector<T> &flat_data,
-                         [[maybe_unused]] std::vector<size_t> &shape);
-
     void fill_data_shape(const std::initializer_list<std::initializer_list<T>> &list,
-                         std::vector<T> &flat_data, [[maybe_unused]] std::vector<size_t> &shape);
+                         std::vector<T> &flat_data, std::vector<size_t> &shape);
+
+    void fill_data_shape(
+        const std::initializer_list<std::initializer_list<std::initializer_list<T>>> &list,
+        std::vector<T> &flat_data, std::vector<size_t> &shape);
 
     void check_indexes(const std::vector<size_t> &indexes);
 
@@ -50,12 +50,20 @@ class Tensor {
     bool operator==(const Tensor &tensor);
     bool operator!=(const Tensor &tensor);
 
+    template <typename U>
+    friend std::ostream &operator<<(std::ostream &os, const Tensor<U> &tensor);
+
     explicit Tensor(const txeo::TensorShape &shape);
     explicit Tensor(txeo::TensorShape &&shape);
 
     explicit Tensor(const txeo::TensorShape &shape, const T &fill_value);
     explicit Tensor(txeo::TensorShape &&shape, const T &fill_value);
+    explicit Tensor(const txeo::TensorShape &shape, const std::initializer_list<T> &values);
+
     explicit Tensor(const std::initializer_list<std::initializer_list<T>> &values);
+
+    explicit Tensor(
+        const std::initializer_list<std::initializer_list<std::initializer_list<T>>> &values);
 
     [[nodiscard]] const txeo::TensorShape &shape() const;
     constexpr std::type_identity_t<T> type() const;
@@ -111,8 +119,6 @@ class Tensor {
     T *data();
 
     Tensor<T> clone() const;
-
-    friend std::ostream &operator<<(std::ostream &os, const Tensor<T> &tensor);
 };
 
 class TensorError : public std::runtime_error {
@@ -171,27 +177,46 @@ inline const T &Tensor<T>::at(Args... args) const {
 }
 
 template <typename T>
-inline void Tensor<T>::fill_data_shape(const std::initializer_list<T> &list,
-                                       std::vector<T> &flat_data,
-                                       [[maybe_unused]] std::vector<size_t> &shape) {
-  for (auto &item : list)
-    flat_data.emplace_back(item);
+void Tensor<T>::fill_data_shape(const std::initializer_list<std::initializer_list<T>> &list,
+                                std::vector<T> &flat_data, std::vector<size_t> &shape) {
+
+  shape.emplace_back(list.size());
+  std::vector<std::initializer_list<T>> v_list(list);
+  for (size_t i{1}; i < v_list.size(); ++i)
+    if (v_list[i].size() != v_list[i - 1].size())
+      throw txeo::TensorError("Tensor initialization is inconsistent!");
+
+  shape.emplace_back(v_list[0].size());
+  for (auto &item : v_list)
+    for (auto &subitem : item)
+      flat_data.emplace_back(subitem);
 }
 
 template <typename T>
-inline void Tensor<T>::fill_data_shape(const std::initializer_list<std::initializer_list<T>> &list,
-                                       std::vector<T> &flat_data,
-                                       [[maybe_unused]] std::vector<size_t> &shape) {
+void Tensor<T>::fill_data_shape(
+    const std::initializer_list<std::initializer_list<std::initializer_list<T>>> &list,
+    std::vector<T> &flat_data, std::vector<size_t> &shape) {
   shape.emplace_back(list.size());
-  bool size_emplaced{false};
-  for (auto &item : list) {
-    if (shape.back() != item.size() && !shape.empty())
+  std::vector<std::initializer_list<std::initializer_list<T>>> v_list(list);
+  for (size_t i{1}; i < v_list.size(); ++i)
+    if (v_list[i].size() != v_list[i - 1].size())
       throw txeo::TensorError("Tensor initialization is inconsistent!");
-    fill_data_shape(item, flat_data, shape);
-    if (!size_emplaced) {
-      shape.emplace_back(item.size());
-      size_emplaced = true;
+
+  shape.emplace_back(v_list[0].size());
+  bool emplaced{false};
+  for (size_t i{0}; i < v_list.size(); ++i) {
+    std::vector<std::initializer_list<T>> v_sublist(v_list[i]);
+    for (size_t i{1}; i < v_sublist.size(); ++i)
+      if (v_sublist[i].size() != v_sublist[i - 1].size())
+        throw txeo::TensorError("Tensor initialization is inconsistent!");
+
+    if (!emplaced) {
+      shape.emplace_back(v_sublist[0].size());
+      emplaced = true;
     }
+    for (auto &item : v_sublist)
+      for (auto &subitem : item)
+        flat_data.emplace_back(subitem);
   }
 }
 

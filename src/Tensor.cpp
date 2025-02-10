@@ -1,7 +1,9 @@
 #include "txeo/Tensor.h"
+#include <algorithm>
 #include <cstddef>
 #include <cstdint>
 #include <initializer_list>
+#include <iterator>
 #include <memory>
 #include <random>
 #include <tensorflow/core/framework/tensor.h>
@@ -87,15 +89,33 @@ inline Tensor<T>::Tensor(txeo::TensorShape &&shape, const T &fill_value)
 }
 
 template <typename T>
+inline Tensor<T>::Tensor(const txeo::TensorShape &shape, const std::initializer_list<T> &values)
+    : _impl{std::make_unique<Impl>()} {
+  if (values.size() != shape.calculate_capacity())
+    throw txeo::TensorError("Shape and number of values are incompatible!");
+  create_from_shape(shape);
+  std::copy(std::begin(values), std::end(values), this->data());
+}
+
+template <typename T>
 inline Tensor<T>::Tensor(const std::initializer_list<std::initializer_list<T>> &values)
     : _impl{std::make_unique<Impl>()} {
-
   std::vector<T> flat_data;
   std::vector<size_t> shape;
   this->fill_data_shape(values, flat_data, shape);
   create_from_shape(txeo::TensorShape({shape}));
-  for (size_t i{0}; i < this->dim(); ++i)
-    this->data()[i] = flat_data[i];
+  std::copy(std::begin(flat_data), std::end(flat_data), this->data());
+}
+
+template <typename T>
+inline Tensor<T>::Tensor(
+    const std::initializer_list<std::initializer_list<std::initializer_list<T>>> &values)
+    : _impl{std::make_unique<Impl>()} {
+  std::vector<T> flat_data;
+  std::vector<size_t> shape;
+  this->fill_data_shape(values, flat_data, shape);
+  create_from_shape(txeo::TensorShape({shape}));
+  std::copy(std::begin(flat_data), std::end(flat_data), this->data());
 }
 
 template <typename T>
@@ -343,11 +363,12 @@ inline Tensor<T> Tensor<T>::clone() const {
 
 template <typename T>
 std::ostream &operator<<(std::ostream &os, const Tensor<T> &tensor) {
-  os << tensor._impl->tf_tensor;
+  os << *tensor._impl->tf_tensor;
   return os;
 }
 
 // Avoiding problems in linking
+
 template class Tensor<short>;
 template class Tensor<int>;
 template class Tensor<bool>;
@@ -355,5 +376,13 @@ template class Tensor<long>;
 template class Tensor<long long>;
 template class Tensor<float>;
 template class Tensor<double>;
+
+template std::ostream &operator<<(std::ostream &, const Tensor<short> &);
+template std::ostream &operator<<(std::ostream &, const Tensor<int> &);
+template std::ostream &operator<<(std::ostream &, const Tensor<bool> &);
+template std::ostream &operator<<(std::ostream &, const Tensor<long> &);
+template std::ostream &operator<<(std::ostream &, const Tensor<long long> &);
+template std::ostream &operator<<(std::ostream &, const Tensor<float> &);
+template std::ostream &operator<<(std::ostream &, const Tensor<double> &);
 
 } // namespace txeo

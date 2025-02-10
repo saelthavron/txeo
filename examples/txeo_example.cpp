@@ -1,12 +1,11 @@
 #include "txeo/Tensor.h"
 #include "txeo/TensorShape.h"
+#include "txeo/detail/utils.h"
 #include <cstddef>
-#include <cstdint>
-#include <ios>
+#include <initializer_list>
 #include <tensorflow/core/framework/tensor.h>
 #include <tensorflow/core/framework/tensor_shape.h>
 #include <tensorflow/core/framework/types.pb.h>
-#include <type_traits>
 #include <vector>
 
 namespace tf = tensorflow;
@@ -68,37 +67,77 @@ namespace tf = tensorflow;
 //     }
 // };
 
-size_t calc_flat_index(const std::vector<size_t> &indexes, const tf::TensorShape &sizes) {
-  size_t accum_sizes{1};
-  size_t resp{indexes.back()};
+template <typename T>
+void fill_data_shape(const std::initializer_list<std::initializer_list<T>> &list,
+                     std::vector<T> &flat_data, std::vector<size_t> &shape) {
 
-  const size_t *idx_ptr = indexes.data();
+  shape.emplace_back(list.size());
+  std::vector<std::initializer_list<T>> v_list(list);
+  for (size_t i{1}; i < v_list.size(); ++i)
+    if (v_list[i].size() != v_list[i - 1].size())
+      throw txeo::TensorError("Tensor initialization is inconsistent!");
 
-  for (size_t i = indexes.size() - 1; i > 0; --i) {
-    accum_sizes *= sizes.dim_size(i);
-    resp += idx_ptr[i - 1] * accum_sizes;
+  shape.emplace_back(v_list[0].size());
+  for (auto &item : v_list)
+    for (auto &subitem : item)
+      flat_data.emplace_back(subitem);
+}
+
+template <typename T>
+void fill_data_shape(
+    const std::initializer_list<std::initializer_list<std::initializer_list<T>>> &list,
+    std::vector<T> &flat_data, std::vector<size_t> &shape) {
+
+  shape.emplace_back(list.size());
+  std::vector<std::initializer_list<std::initializer_list<T>>> v_list(list);
+  for (size_t i{1}; i < v_list.size(); ++i)
+    if (v_list[i].size() != v_list[i - 1].size())
+      throw txeo::TensorError("Tensor initialization is inconsistent!");
+
+  shape.emplace_back(v_list[0].size());
+  bool emplaced{false};
+  for (size_t i{0}; i < v_list.size(); ++i) {
+    std::vector<std::initializer_list<T>> v_sublist(v_list[i]);
+    for (size_t i{1}; i < v_sublist.size(); ++i)
+      if (v_sublist[i].size() != v_sublist[i - 1].size())
+        throw txeo::TensorError("Tensor initialization is inconsistent!");
+
+    if (!emplaced) {
+      shape.emplace_back(v_sublist[0].size());
+      emplaced = true;
+    }
+    for (auto &item : v_sublist)
+      for (auto &subitem : item)
+        flat_data.emplace_back(subitem);
   }
-
-  return resp;
 }
 
 int main() {
 
-  tf::Tensor V(tensorflow::DT_DOUBLE, {125});
-  auto aux = V.vec<double>();
-  aux.setConstant(25.6);
+  // std::vector<double> flat_data;
+  // std::vector<size_t> shape;
 
-  aux(124) = 10;
+  // fill_data_shape<double>({{{1, 2, 3}, {4, 5, 6}},
+  //                          {{7, 8, 9}, {10, 11, 12}},
+  //                          {{13, 14, 15}, {16, 17, 18}},
+  //                          {{19, 20, 21}, {22, 23, 24}}},
+  //                         flat_data, shape);
 
-  // tf::Tensor M(tf::DT_DOUBLE, tf::TensorShape({5, 5, 5}));
+  // for (auto &item : flat_data) {
+  //   std::cout << item << " ";
+  // }
+  // std::cout << std::endl;
 
-  // if (!M.CopyFrom(V, M.shape()))
-  //   std::cout << "Deu pau!\n";
+  // for (auto &item : shape) {
+  //   std::cout << item << " ";
+  // }
+  // std::cout << std::endl;
 
-  // auto aux2 = M.tensor<double, 3>();
-  // //  M.Slice(int64_t dim0_start, int64_t dim0_limit)
+  txeo::Tensor<double> a(
+      txeo::TensorShape({4, 2, 3}),
+      {1, 2, 3, 4, 5, 6, 7, 8, 9, 444, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24});
 
-  std::cout << aux(-1) << std::endl;
+  std::cout << a << std::endl;
 
   return 0;
 }
