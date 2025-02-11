@@ -1,9 +1,8 @@
 #ifndef TENSOR_SHAPE_H
 #define TENSOR_SHAPE_H
-#include <cstddef>
-#include <initializer_list>
 #pragma once
 
+#include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <ostream>
@@ -49,8 +48,23 @@ class TensorShape {
     /**
      * @brief Constructs a tensor shape with axes having the same dimension
      *
-     * @param number_of_axes
+     * @param number_of_axes Number of axes of the tensor
      * @param dim  dimension in each axis
+     *
+     * @throw txeo::TensorShapeError
+     *
+     * **Example Usage:**
+     * @code
+     * #include <iostream>
+     * #include "txeo/TensorShape.h"
+     *
+     * int main() {
+     *     txeo::TensorShape shape(3, 5); // A tensor shape with 3 dimensions, each of size 5
+     *
+     *     std::cout << "TensorShape created: " << shape << std::endl;
+     *     return 0;
+     * }
+     * @endcode
      */
     explicit TensorShape(int number_of_axes, size_t dim);
 
@@ -58,6 +72,20 @@ class TensorShape {
      * @brief Constructs a tensor shape from a std::vector
      *
      * @param shape vector of dimensions
+     *
+     * **Example Usage:**
+     * @code
+     * #include <iostream>
+     * #include "txeo/TensorShape.h"
+     *
+     * int main() {
+     *     std::vector<size_t> dims = {3, 4, 5};
+     *     txeo::TensorShape shape(dims); // Creates a 3D shape with dimensions 3x4x5
+     *
+     *     std::cout << "TensorShape created: " << shape << std::endl;
+     *     return 0;
+     * }
+     * @endcode
      */
     explicit TensorShape(const std::vector<size_t> &shape);
 
@@ -65,31 +93,72 @@ class TensorShape {
      * @brief Constructs a tensor shape from a std::vector
      *
      * @param shape vector of dimensions
+     * * **Example Usage:**
+     * @code
+     * #include <iostream>
+     * #include "txeo/TensorShape.h"
+     *
+     * int main() {
+     *     txeo::TensorShape shape({3, 4, 5}); // Creates a 3D shape with dimensions 3x4x5
+     *
+     *     std::cout << "TensorShape created: " << shape << std::endl;
+     *     return 0;
+     * }
+     * @endcode
      */
     explicit TensorShape(std::vector<size_t> &&shape);
 
     /**
      * @brief Returns the size of the tensor shape
      *
-     * @return int
+     * @return int Number of axes
      */
     [[nodiscard]] int number_of_axes() const noexcept;
 
     /**
      * @brief Synonym for @ref txeo::TensorShape::number_of_axes()
      *
-     * @return int
+     * @return int Size of this shape
      */
     [[nodiscard]] int size() const noexcept { return this->number_of_axes(); };
 
     /**
      * @brief Returns the dimension of the specified axis
      *
-     * @param axis
+     * @param axis Axis whose dimension is to be returned
      * @return int64_t Dimension
+     *
+     * @throw txeo::TensorShapeError
+     *
      */
     [[nodiscard]] int64_t axis_dim(int axis) const;
 
+    /**
+     * @brief Returns the stride of each dimension in the tensor.
+     *
+     * @details The stride represents the step size needed to move along each dimension of the
+     * tensor in memory layout. It is useful for operations requiring efficient indexing.
+     *
+     * @return The stride for each dimension.
+     *
+     * **Example Usage:**
+     * @code
+     * #include <iostream>
+     * #include "txeo/Tensor.h"
+     *
+     * int main() {
+     *     txeo::Tensor<int> tensor({3, 4, 5}); // Create a 3x4x5 tensor
+     *     const std::vector<size_t>& strides = tensor.stride();
+     *
+     *     std::cout << "Tensor strides: ";
+     *     for (size_t s : strides) {
+     *         std::cout << s << " ";
+     *     }
+     *     std::cout << std::endl;
+     *     return 0;
+     * }
+     * @endcode
+     */
     [[nodiscard]] const std::vector<size_t> &stride() const;
 
     /**
@@ -111,6 +180,20 @@ class TensorShape {
      * @brief Inserts a dimension after the last axis
      *
      * @param dim Specified dimension
+     *
+     * **Example Usage:**
+     * @code
+     * #include <iostream>
+     * #include "txeo/TensorShape.h"
+     *
+     * int main() {
+     *     txeo::TensorShape shape({2, 3}); // Initial shape (2,3)
+     *     shape.push_axis_back(4); // Adds a new axis, resulting in shape (2,3,4)
+     *
+     *     std::cout << "Updated TensorShape: " << shape << std::endl;
+     *     return 0;
+     * }
+     * @endcode
      */
     void push_axis_back(size_t dim);
 
@@ -119,6 +202,22 @@ class TensorShape {
      *
      * @param axis Specified axis
      * @param dim Specified dimension
+     *
+     * @throw txeo::TensorShapeError
+     *
+     * **Example Usage:**
+     * @code
+     * #include <iostream>
+     * #include "txeo/TensorShape.h"
+     *
+     * int main() {
+     *     txeo::TensorShape shape({2, 3}); // Initial shape (2,3)
+     *     shape.insert_axis(1, 4); // Inserts a new axis at index 1, resulting in shape (2,4,3)
+     *
+     *     std::cout << "Updated TensorShape: " << shape << std::endl;
+     *     return 0;
+     * }
+     * @endcode
      */
     void insert_axis(int axis, size_t dim);
 
@@ -126,11 +225,27 @@ class TensorShape {
      * @brief Removes a specified axis
      *
      * @param axis Specified axis
+     *
+     * @throw txeo::TensorShapeError
+     *
+     * **Example Usage:**
+     * @code
+     * #include <iostream>
+     * #include "txeo/TensorShape.h"
+     *
+     * int main() {
+     *     txeo::TensorShape shape({2, 3, 4}); // Initial shape (2,3,4)
+     *     shape.remove_axis(1); // Removes the axis at index 1, resulting in shape (2,4)
+     *
+     *     std::cout << "Updated TensorShape: " << shape << std::endl;
+     *     return 0;
+     * }
+     * @endcode
      */
     void remove_axis(int axis);
 
     /**
-     * @brief Removes all axes
+     * @brief Removes all axes from this shape, resulting an empty shape
      *
      */
     void remove_all_axes();
@@ -138,8 +253,24 @@ class TensorShape {
     /**
      * @brief Sets a dimension in a specified axis
      *
-     * @param axis
-     * @param dim
+     * @param axis Axis whose dimension will be changed
+     * @param dim New dimension
+     *
+     * @throw txeo::TensorShapeError
+     *
+     * **Example Usage:**
+     * @code
+     * #include <iostream>
+     * #include "txeo/TensorShape.h"
+     *
+     * int main() {
+     *     txeo::TensorShape shape({2, 3, 4}); // Initial shape (2,3,4)
+     *     shape.set_dim(1, 5); // Changes the second axis size from 3 to 5
+     *
+     *     std::cout << "Updated TensorShape: " << shape << std::endl;
+     *     return 0;
+     * }
+     * @endcode
      */
     void set_dim(int axis, size_t dim);
 
@@ -150,6 +281,11 @@ class TensorShape {
      */
     [[nodiscard]] size_t calculate_capacity() const noexcept;
 
+    /**
+     * @brief Returns a clone of this tensor
+     *
+     * @return TensorShape Clone of this tensor
+     */
     [[nodiscard]] TensorShape clone() const;
 };
 

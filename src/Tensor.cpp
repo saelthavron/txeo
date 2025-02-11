@@ -261,7 +261,7 @@ inline Tensor<T> Tensor<T>::slice(size_t first_axis_begin, size_t first_axis_end
 }
 
 template <typename T>
-inline void Tensor<T>::share_from(const Tensor<T> &tensor, const txeo::TensorShape &shape) {
+inline void Tensor<T>::view_of(const Tensor<T> &tensor, const txeo::TensorShape &shape) {
   if (this->dim() == 0)
     return;
   if (this->dim() != tensor.dim() || this->dim() != shape.calculate_capacity())

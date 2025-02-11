@@ -221,7 +221,7 @@ TEST(TensorTest, ValidShareOperation) {
   Tensor<int> source(txeo::TensorShape({2, 3}), 5);
   Tensor<int> target(txeo::TensorShape({3, 2}));
 
-  ASSERT_NO_THROW(target.share_from(source, txeo::TensorShape({6})));
+  ASSERT_NO_THROW(target.view_of(source, txeo::TensorShape({6})));
   EXPECT_EQ(target.shape().axes_dims(), std::vector<int64_t>({6}));
   EXPECT_EQ(target.dim(), 6);
   for (int i = 0; i < 6; ++i) {
@@ -229,7 +229,7 @@ TEST(TensorTest, ValidShareOperation) {
   }
 
   Tensor<int> target1(txeo::TensorShape({0}), 5);
-  target1.share_from(source, txeo::TensorShape({0}));
+  target1.view_of(source, txeo::TensorShape({0}));
   EXPECT_EQ(target1.dim(), 0);
 }
 
@@ -237,8 +237,8 @@ TEST(TensorTest, DimensionMismatch) {
   Tensor<int> source(txeo::TensorShape({2, 2}), 4);
   Tensor<int> target(txeo::TensorShape({4}));
 
-  EXPECT_THROW(target.share_from(source, txeo::TensorShape({3})), TensorError);
-  EXPECT_THROW(target.share_from(source, txeo::TensorShape({5})), TensorError);
+  EXPECT_THROW(target.view_of(source, txeo::TensorShape({3})), TensorError);
+  EXPECT_THROW(target.view_of(source, txeo::TensorShape({5})), TensorError);
 }
 
 TEST(TensorTest, ValidFlatten) {

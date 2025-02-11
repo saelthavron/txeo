@@ -1,12 +1,12 @@
 #ifndef TENSOR_H
 #define TENSOR_H
-#include <vector>
 #pragma once
 
 #include <cstddef>
 #include <initializer_list>
 #include <memory>
 #include <type_traits>
+#include <vector>
 
 #include "TensorShape.h"
 
@@ -42,10 +42,17 @@ class Tensor {
 
   public:
     explicit Tensor() = delete;
+
+    /**
+     * @note This copy constructor performs a deep copy, behaving differently from TensorFlow C++.
+     */
     Tensor(const Tensor &tensor);
     Tensor(Tensor &&tensor) noexcept;
     ~Tensor();
 
+    /**
+     * @note This copy assignment performs a deep copy, behaving differently from TensorFlow C++.
+     */
     Tensor &operator=(const Tensor &tensor);
     Tensor &operator=(Tensor &&tensor) noexcept;
     bool operator==(const Tensor &tensor);
@@ -55,9 +62,9 @@ class Tensor {
     friend std::ostream &operator<<(std::ostream &os, const Tensor<U> &tensor);
 
     /**
-     * @brief Constructs a Tensor from a specified @ref txeo::TensorShape
+     * @brief Constructs a tensor from a specified @ref txeo::TensorShape
      *
-     * @param shape
+     * @param shape Shape of the constructed tensor
      *
      * **Example Usage:**
      * @code
@@ -79,7 +86,7 @@ class Tensor {
     /**
      * @brief Constructs a Tensor from a specified @ref txeo::TensorShape
      *
-     * @param shape
+     * @param shape Shape of the constructed tensor
      *
      * **Example Usage:**
      * @code
@@ -101,7 +108,7 @@ class Tensor {
     /**
      * @brief Constructs a Tensor from a specified shape std::vector
      *
-     * @param shape vector of dimensions
+     * @param shape Vector of dimensions
      *
      * **Example Usage:**
      * @code
@@ -122,7 +129,7 @@ class Tensor {
     /**
      * @brief Constructs a Tensor from a specified shape std::vector
      *
-     * @param shape vector of dimensions
+     * @param shape Vector of dimensions
      *
      * **Example Usage:**
      * @code
@@ -142,8 +149,8 @@ class Tensor {
     /**
      * @brief Constructs a Tensor from a specified @ref txeo::TensorShape and fills it with a value
      *
-     * @param shape
-     * @param fill_value
+     * @param shape Shape of the constructed tensor
+     * @param fill_value Value of the elements of the constructed tensor
      *
      * **Example Usage:**
      * @code
@@ -165,8 +172,8 @@ class Tensor {
     /**
      * @brief Constructs a Tensor from a specified @ref txeo::TensorShape and fills it with a value
      *
-     * @param shape
-     * @param fill_value
+     * @param shape Shape of the constructed tensor
+     * @param fill_value Value of the elements of the constructed tensor
      *
      * **Example Usage:**
      * @code
@@ -187,8 +194,8 @@ class Tensor {
     /**
      * @brief Constructs a Tensor from a specified shape std::vector and fills it with a value
      *
-     * @param shape
-     * @param fill_value
+     * @param shape Shape of the constructed tensor
+     * @param fill_value Value of the elements of the constructed tensor
      *
      * **Example Usage:**
      * @code
@@ -209,8 +216,8 @@ class Tensor {
     /**
      * @brief Constructs a Tensor from a specified shape std::vector and fills it with a value
      *
-     * @param shape
-     * @param fill_value
+     * @param shape Shape of the constructed tensor
+     * @param fill_value Value of the elements of the constructed tensor
      *
      * **Example Usage:**
      * @code
@@ -231,8 +238,10 @@ class Tensor {
      * @brief Constructs a Tensor object from a specified @ref txeo::TensorShape and fills it with a
      * std::vector of values in a row-major scheme
      *
-     * @param shape
-     * @param values
+     * @param shape Shape of the constructed tensor
+     * @param values Elements of the constructed tensor
+     *
+     * @throw  txeo::TensorError
      *
      * **Example Usage:**
      * @code
@@ -254,8 +263,9 @@ class Tensor {
     /**
      * @brief Constructs a second order Tensor from a nested std::initializer_list.
      *
+     * @param values Nested initializer list
      *
-     * @param values nested initializer list
+     * @throw txeo::TensorError
      *
      * **Example Usage:**
      * @code
@@ -274,8 +284,9 @@ class Tensor {
     /**
      * @brief Constructs a third order Tensor from a nested std::initializer_list.
      *
+     * @param values Nested initializer list
      *
-     * @param values nested initializer list
+     * @throw txeo::TensorError
      *
      * **Example Usage:**
      * @code
@@ -344,7 +355,7 @@ class Tensor {
     [[nodiscard]] size_t memory_size() const;
 
     /**
-     * @brief Returns the raw data of this tensor for reading
+     * @brief Reads the raw data of this tensor
      *
      * @return const T*
      */
@@ -353,11 +364,11 @@ class Tensor {
     /**
      * @brief Returns a view ot this tensor from a specified range of dimensions of the first axis
      *
-     * @details This function creates a new tensor that shares the content of this tensor according
-     * to the specified parameters.
+     * @details This function creates a new tensor that views the content of this tensor according
+     * to the specified parameters. There is no element copying.
      *
-     * @param first_axis_begin begin index along the first axis (inclusive).
-     * @param first_axis_end end index along the first axis (exclusive).
+     * @param first_axis_begin Initial index along the first axis (inclusive).
+     * @param first_axis_end Final index along the first axis (exclusive).
      * @return Tensor<T>
      *
      * **Example Usage:**
@@ -375,48 +386,379 @@ class Tensor {
      * @endcode
      */
     Tensor<T> slice(size_t first_axis_begin, size_t first_axis_end) const;
-    void share_from(const Tensor<T> &tensor, const txeo::TensorShape &shape);
 
+    /**
+     * @brief Views the content of the specified tensor according to the specified shape. There is
+     * no element copying.
+     *
+     * @param tensor Viewed tensor
+     * @param shape  New shape of this tensor
+     */
+    void view_of(const Tensor<T> &tensor, const txeo::TensorShape &shape);
+
+    /**
+     * @brief Compares the shape of this tensor with the shape of the specified tensor
+     *
+     * @tparam U Data type of the specfied tensor
+     * @param other The tensor to compare
+     * @return true if both this tensor and the other have the same shape
+     * @return false otherwise
+     *
+     ** **Example Usage:**
+     * @code
+     * #include <iostream>
+     * #include "txeo/Tensor.h"
+     *
+     * int main() {
+     *     txeo::Tensor<int> tensor1{{1, 2, 3}, {4, 5, 6}};
+     *     txeo::Tensor<double> tensor2{{7.0, 8.0, 9.0}, {10.0, 11.0, 12.0}};
+     *
+     *     if (tensor1.is_equal_shape(tensor2)) {
+     *         std::cout << "Tensors have the same shape." << std::endl;
+     *     } else {
+     *         std::cout << "Tensors have different shapes." << std::endl;
+     *     }
+     *     return 0;
+     * }
+     * @endcode
+     *
+     */
     template <typename U>
     [[nodiscard]] bool is_equal_shape(const Tensor<U> &other) const;
 
+    /**
+     * @brief Accesses the value of this tensor if it is a scalar (order zero).
+     *
+     * @details Since this function does not perform any checking, it accesses the first value of
+     * this tensor if it has order greater than zero.
+     *
+     * @return T& Value of the zeroth order tensor
+     */
     T &operator()();
 
+    /**
+     * @brief Accesses an element of this tensor according to the specified indexes.
+     *
+     * @tparam Args A variadic list of indices that must be convertible to `size_t`.
+     * @param args The indices specifying the position of the element.
+     * @return Element at the specified indices.
+     *
+     * @note No checking is performed.
+     *
+     * **Example Usage:**
+     * @code
+     * #include <iostream>
+     * #include "txeo/Tensor.h"
+     *
+     * int main() {
+     *     txeo::Tensor<int> tensor{{1, 2, 3}, {4, 5, 6}};
+     *     tensor(1, 2) = 42; // Modify an element at row 1, column 2
+     *
+     *     std::cout << "Updated value: " << tensor(1, 2) << std::endl;
+     *     return 0;
+     * }
+     * @endcode
+     */
     template <typename... Args>
       requires(std::convertible_to<Args, size_t> && ...)
     T &operator()(Args... args);
 
+    /**
+     * @brief Accesses the value of this tensor if it is a scalar (order zero).
+     *
+     * @return T& Value of the zeroth order tensor
+     *
+     * @throw  txeo::TensorError
+     *
+     * @note Order checking is performed.
+     *
+     */
     T &at();
 
+    /**
+     * @brief Accesses an element of this tensor according to the specified indexes.
+     *
+     * @tparam Args A variadic list of indices that must be convertible to `size_t`.
+     * @param args The indices specifying the position of the element.
+     * @return Element at the specified indices.
+     *
+     * @throw  txeo::TensorError
+     *
+     * @note Bound and order checkings are performed.
+     *
+     * **Example Usage:**
+     * @code
+     * #include <iostream>
+     * #include "txeo/Tensor.h"
+     *
+     * int main() {
+     *     txeo::Tensor<int> tensor{{1, 2, 3}, {4, 5, 6}};
+     *     tensor(1, 2) = 42; // Modify an element at row 1, column 2
+     *
+     *     std::cout << "Updated value: " << tensor(1, 2) << std::endl;
+     *     return 0;
+     * }
+     * @endcode
+     */
     template <typename... Args>
+      requires(std::convertible_to<Args, size_t> && ...)
     T &at(Args... args);
 
+    /**
+     * @brief Reads the value of this tensor if it is a scalar (order zero).
+     *
+     * @return T& Value of the zeroth order tensor
+     *
+     * @note Since this function does not perform any checking, it accesses the first value of
+     * this tensor if it has order greater than zero.
+     */
     const T &operator()() const;
 
+    /**
+     * @brief Reads an element of this tensor according to the specified indexes.
+     *
+     * @tparam Args A variadic list of indices that must be convertible to `size_t`.
+     * @param args The indices specifying the position of the element.
+     * @return Element at the specified indices.
+     *
+     * @note No checking is performed.
+     *
+     * **Example Usage:**
+     * @code
+     * #include <iostream>
+     * #include "txeo/Tensor.h"
+     *
+     * int main() {
+     *     txeo::Tensor<int> tensor{{1, 2, 3}, {4, 5, 6}};
+     *     tensor(1, 2) = 42; // Modify an element at row 1, column 2
+     *
+     *     std::cout << "Updated value: " << tensor(1, 2) << std::endl;
+     *     return 0;
+     * }
+     * @endcode
+     */
     template <typename... Args>
       requires(std::convertible_to<Args, size_t> && ...)
     const T &operator()(Args... args) const;
 
+    /**
+     * @brief Reads the value of this tensor if it is a scalar (order zero). Order checking is
+     * performed.
+     *
+     * @throw  txeo::TensorError
+     *
+     * @return T& Value of the zeroth order tensor
+     */
     const T &at() const;
 
+    /**
+     * @brief Reads an element of this tensor according to the specified indexes.
+     *
+     * @tparam Args A variadic list of indices that must be convertible to `size_t`.
+     * @param args The indices specifying the position of the element.
+     * @return Element at the specified indices.
+     *
+     * @throw  txeo::TensorError
+     *
+     * @note Bound and order checkings are performed.
+     *
+     * **Example Usage:**
+     * @code
+     * #include <iostream>
+     * #include "txeo/Tensor.h"
+     *
+     * int main() {
+     *     txeo::Tensor<int> tensor{{1, 2, 3}, {4, 5, 6}};
+     *     tensor(1, 2) = 42; // Modify an element at row 1, column 2
+     *
+     *     std::cout << "Updated value: " << tensor(1, 2) << std::endl;
+     *     return 0;
+     * }
+     * @endcode
+     */
     template <typename... Args>
+      requires(std::convertible_to<Args, size_t> && ...)
     const T &at(Args... args) const;
 
+    /**
+     * @brief Reshapes this tensor if the specified shape defines a number of elements equal to
+     * this tensor order.
+     *
+     * @param shape New shape for this tensor
+     *
+     * @throw  txeo::TensorError
+     *
+     * @note No copy is performed.
+     *
+     * **Example Usage:**
+     * @code
+     * #include <iostream>
+     * #include "txeo/Tensor.h"
+     * #include "txeo/TensorShape.h"
+     *
+     * int main() {
+     *     txeo::Tensor<int> tensor{{1, 2, 3, 4}}; // Shape (1, 4)
+     *     tensor.reshape(txeo::TensorShape({2, 2})); // Change shape to (2, 2)
+     *
+     *     std::cout << "Reshaped Tensor: " << tensor << std::endl;
+     *     return 0;
+     * }
+     * @endcode
+     */
     void reshape(const txeo::TensorShape &shape);
+
+    /**
+     * @brief Reshapes this tensor if the specified shape vector defines a number of elements equal
+     * to this tensor order.
+     *
+     * @param shape New shape vector for this tensor
+     *
+     * @throw  txeo::TensorError
+     *
+     * @note No copy is performed.
+     *
+     * **Example Usage:**
+     * @code
+     * #include <iostream>
+     * #include "txeo/Tensor.h"
+     * #include "txeo/TensorShape.h"
+     *
+     * int main() {
+     *     txeo::Tensor<int> tensor{{1, 2, 3, 4}}; // Shape (1, 4)
+     *     tensor.reshape(std::vector<size_t>{2, 2}); // Change shape to (2, 2)
+     *
+     *     std::cout << "Reshaped Tensor: " << tensor << std::endl;
+     *     return 0;
+     * }
+     * @endcode
+     */
     void reshape(const std::vector<size_t> &shape);
+
+    /**
+     * @brief Returns a first order reshaped view of this tensor.
+     *
+     * @return Tensor<T> First order tensor that views this tensor.
+     *
+     * @throw  txeo::TensorError
+     *
+     * @note No copy is performed.
+     */
     Tensor<T> flatten() const;
+
+    /**
+     * @brief Fills this tensor with the specified value
+     *
+     * @param value Value to fill this tensor
+     */
     void fill(const T &value);
 
-    void fill_with_uniform_random(const T &min, const T &max, size_t seed1, size_t seed2);
+    /**
+     * @brief Fills the tensor with uniformly distributed random values ranging according to the
+     * specified interval.
+     *
+     *
+     * @tparam T The data type of the tensor elements.
+     * @param min The minimum possible random value.
+     * @param max The maximum possible random value.
+     *
+     * @throw txeo::TensorError
+     *
+     * **Example Usage:**
+     * @code
+     * #include <iostream>
+     * #include "txeo/Tensor.h"
+     *
+     * int main() {
+     *     txeo::Tensor<float> tensor{3, 3}; // Create a 3x3 tensor
+     *     tensor.fill_with_uniform_random(0.0f, 1.0f);
+     *
+     *     std::cout << "Tensor filled with random values: " << tensor << std::endl;
+     *     return 0;
+     * }
+     * @endcode
+     */
     void fill_with_uniform_random(const T &min, const T &max);
 
+    /**
+     * @brief Fills the tensor with uniformly distributed random values ranging according to the
+     * specified interval.
+     *
+     *
+     * @tparam T The data type of the tensor elements.
+     * @param min The minimum possible random value.
+     * @param max The maximum possible random value.
+     * @param seed1 The first seed for random number generation (in order to enable
+     * reproducibility).
+     * @param seed2 The second seed for random number generation (in order to enable
+     * reproducibility).
+     *
+     * @throw txeo::TensorError
+     *
+     * **Example Usage:**
+     * @code
+     * #include <iostream>
+     * #include "txeo/Tensor.h"
+     *
+     * int main() {
+     *     txeo::Tensor<float> tensor{3, 3}; // Create a 3x3 tensor
+     *     tensor.fill_with_uniform_random(0.0f, 1.0f, 42, 123);
+     *
+     *     std::cout << "Tensor filled with random values: " << tensor << std::endl;
+     *     return 0;
+     * }
+     * @endcode
+     */
+    void fill_with_uniform_random(const T &min, const T &max, size_t seed1, size_t seed2);
+
+    /**
+     * @brief Shuffles the elements of this tensor
+     *
+     */
     void shuffle();
 
+    /**
+     * @brief Reshapes this tensor by removing all the axes of dimension one
+     *
+     * @note If the tensor has no axes of order one, its shape remains unchanged.
+     *
+     * **Example Usage:**
+     * @code
+     * #include <iostream>
+     * #include "txeo/Tensor.h"
+     *
+     * int main() {
+     *     txeo::Tensor<int> tensor{{1}, {2}, {3}}; // Shape (3,1)
+     *     tensor.squeeze(); // Removes singleton dimension
+     *
+     *     std::cout << "Squeezed Tensor: " << tensor << std::endl;
+     *     return 0;
+     * }
+     * @endcode
+     */
     void squeeze();
 
+    /**
+     * @brief Assigns a specified value to this tensor elements
+     *
+     * @param value Value to be assigned
+     * @return Tensor<T>&
+     */
     Tensor<T> &operator=(const T &value);
+
+    /**
+     * @brief Acesses the raw data of this tensor
+     *
+     * @return const T*
+     */
     T *data();
 
+    /**
+     * @brief Returns a clone of this tensor
+     *
+     * @return Tensor<T> A clone of this tensor
+     *
+     * @note A copy is performed
+     */
     Tensor<T> clone() const;
 };
 
@@ -457,6 +799,7 @@ inline const T &Tensor<T>::operator()(Args... args) const {
 
 template <typename T>
 template <typename... Args>
+  requires(std::convertible_to<Args, size_t> && ...)
 inline T &Tensor<T>::at(Args... args) {
   if (this->order() != sizeof...(Args))
     throw TensorError("The number of axes specified and the order of this tensor do no match.");
@@ -467,6 +810,7 @@ inline T &Tensor<T>::at(Args... args) {
 
 template <typename T>
 template <typename... Args>
+  requires(std::convertible_to<Args, size_t> && ...)
 inline const T &Tensor<T>::at(Args... args) const {
   if (this->order() != sizeof...(Args))
     throw TensorError("The number of axes specified and the order of this tensor do no match.");
@@ -523,9 +867,6 @@ void Tensor<T>::fill_data_shape(
 
 #endif // TENSOR_H
 
-// Colocar usage na doc do TensorShape
-// Colocar throws na doc do TensorShape
-// Colocar throws na doc do Tensor
 // construir um identity factory
 // gpt void map(std::function<T(T)> func);
 // gpt Tensor<T> transpose(const std::vector<size_t> &perm) const;
