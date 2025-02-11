@@ -369,6 +369,26 @@ inline void Tensor<T>::fill_with_uniform_random(const T &min, const T &max) {
     this->data()[i] = static_cast<T>(scaler(engine));
 }
 
+template <typename T>
+inline txeo::TensorIterator<T> Tensor<T>::begin() {
+  return txeo::TensorIterator<T>{this->data()};
+}
+
+template <typename T>
+inline txeo::TensorIterator<T> Tensor<T>::end() {
+  return txeo::TensorIterator<T>{this->data() + this->dim()};
+}
+
+template <typename T>
+inline txeo::TensorIterator<const T> Tensor<T>::begin() const {
+  return txeo::TensorIterator<const T>{this->data()};
+}
+
+template <typename T>
+inline txeo::TensorIterator<const T> Tensor<T>::end() const {
+  return txeo::TensorIterator<const T>{this->data() + this->dim()};
+}
+
 // Avoiding problems in linking
 
 template class Tensor<short>;

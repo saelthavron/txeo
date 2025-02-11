@@ -3,6 +3,9 @@
 #pragma once
 
 #include <cstddef>
+#include <iterator>
+
+namespace txeo {
 
 template <typename T>
 class TensorIterator {
@@ -11,17 +14,23 @@ class TensorIterator {
     std::ptrdiff_t _step;
 
   public:
+    using value_type = T;
+    using pointer = T *;
+    using reference = T &;
+    using difference_type = std::ptrdiff_t;
+    using iterator_category = std::random_access_iterator_tag;
+
     TensorIterator(T *elements, std::ptrdiff_t step = 1) : _elements(elements), _step(step) {}
 
-    T &operator*() const { return *_elements; }
-    T *operator->() const { return _elements; }
+    reference operator*() const { return *_elements; }
+    pointer operator->() const { return _elements; }
 
     TensorIterator &operator++() {
       _elements += _step;
-      return (*this);
+      return *this;
     }
 
-    TensorIterator &operator++(int) {
+    TensorIterator operator++(int) {
       auto aux = *this;
       ++(*this);
       return aux;
@@ -32,38 +41,38 @@ class TensorIterator {
       return *this;
     }
 
-    TensorIterator &operator--(int) {
+    TensorIterator operator--(int) {
       auto aux = *this;
       --(*this);
-      return *this;
+      return aux;
     }
 
-    TensorIterator &operator+=(const std::ptrdiff_t &val) {
+    TensorIterator &operator+=(const difference_type &val) {
       _elements += val * _step;
       return *this;
     }
 
-    TensorIterator &operator-=(const std::ptrdiff_t &val) {
+    TensorIterator &operator-=(const difference_type &val) {
       _elements -= val * _step;
       return *this;
     }
 
-    friend TensorIterator &operator+(TensorIterator &iterator, const std::ptrdiff_t &val) {
+    friend TensorIterator operator+(TensorIterator iterator, const difference_type &val) {
       iterator += val;
       return iterator;
     }
 
-    friend TensorIterator &operator+(const std::ptrdiff_t &val, TensorIterator &iterator) {
+    friend TensorIterator operator+(const difference_type &val, TensorIterator iterator) {
       iterator += val;
       return iterator;
     }
 
-    friend TensorIterator &operator-(TensorIterator &iterator, const std::ptrdiff_t &val) {
+    friend TensorIterator operator-(TensorIterator iterator, const difference_type &val) {
       iterator -= val;
       return iterator;
     }
 
-    std::ptrdiff_t operator-(const TensorIterator &other) const {
+    difference_type operator-(const TensorIterator &other) const {
       return (_elements - other._elements) / _step;
     }
 
@@ -74,5 +83,7 @@ class TensorIterator {
     bool operator<=(const TensorIterator &other) const { return _elements <= other._elements; }
     bool operator>=(const TensorIterator &other) const { return _elements >= other._elements; }
 };
+
+} // namespace txeo
 
 #endif

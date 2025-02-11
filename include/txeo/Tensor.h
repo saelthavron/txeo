@@ -1,5 +1,6 @@
 #ifndef TENSOR_H
 #define TENSOR_H
+#include "txeo/TensorIterator.h"
 #pragma once
 
 #include <cstddef>
@@ -353,13 +354,6 @@ class Tensor {
      * @return size_t
      */
     [[nodiscard]] size_t memory_size() const;
-
-    /**
-     * @brief Reads the raw data of this tensor
-     *
-     * @return const T*
-     */
-    [[nodiscard]] const T *data() const;
 
     /**
      * @brief Returns a view ot this tensor from a specified range of dimensions of the first axis
@@ -753,6 +747,13 @@ class Tensor {
     T *data();
 
     /**
+     * @brief Reads the raw data of this tensor
+     *
+     * @return const T*
+     */
+    [[nodiscard]] const T *data() const;
+
+    /**
      * @brief Returns a clone of this tensor
      *
      * @return Tensor<T> A clone of this tensor
@@ -760,6 +761,11 @@ class Tensor {
      * @note A copy is performed
      */
     Tensor<T> clone() const;
+
+    txeo::TensorIterator<T> begin();
+    txeo::TensorIterator<T> end();
+    txeo::TensorIterator<const T> begin() const;
+    txeo::TensorIterator<const T> end() const;
 };
 
 class TensorError : public std::runtime_error {

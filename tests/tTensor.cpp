@@ -324,4 +324,61 @@ TEST(TensorTest, ZeroDimTensor) {
   EXPECT_DOUBLE_EQ(t(), 3.14);
 }
 
+TEST(TensorTest, MutableIteration) {
+  txeo::Tensor<int> tensor(TensorShape({5}), {1, 2, 3, 4, 5});
+
+  auto it = std::begin(tensor);
+  EXPECT_EQ(*it, 1);
+  ++it;
+  EXPECT_EQ(*it, 2);
+
+  it += 2;
+  EXPECT_EQ(*it, 4);
+
+  it--;
+  EXPECT_EQ(*it, 3);
+
+  it -= 2;
+  EXPECT_EQ(*it, 1);
+}
+
+TEST(TensorTest, ConstIteration) {
+  const txeo::Tensor<int> tensor(TensorShape({5}), {10, 20, 30, 40, 50});
+
+  auto it = std::cbegin(tensor);
+  EXPECT_EQ(*it, 10);
+  ++it;
+  EXPECT_EQ(*it, 20);
+
+  it += 2;
+  EXPECT_EQ(*it, 40);
+
+  it--;
+  EXPECT_EQ(*it, 30);
+
+  it -= 2;
+  EXPECT_EQ(*it, 10);
+}
+
+TEST(TensorTest, IteratorComparison) {
+  txeo::Tensor<int> tensor(TensorShape({5}), {1, 2, 3, 4, 5});
+
+  auto it1 = std::begin(tensor);
+  auto it2 = std::begin(tensor);
+  auto it3 = std::end(tensor);
+
+  EXPECT_TRUE(it1 == it2);
+  EXPECT_FALSE(it1 == it3);
+
+  ++it1;
+  EXPECT_TRUE(it1 != it2);
+
+  EXPECT_TRUE(it1 > it2);
+  EXPECT_TRUE(it2 < it1);
+
+  it1 += 3;
+  EXPECT_TRUE(it1 >= it2);
+  EXPECT_TRUE(it2 <= it1);
+}
+
 } // namespace txeo
