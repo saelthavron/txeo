@@ -49,8 +49,8 @@ class TensorShape {
     /**
      * @brief Constructs a tensor shape with axes having the same dimension
      *
-     * @param number_of_axes Specifies the number of axes
-     * @param dim Specifies the dimension in each axis
+     * @param number_of_axes
+     * @param dim  dimension in each axis
      */
     explicit TensorShape(int number_of_axes, size_t dim);
 
@@ -85,7 +85,7 @@ class TensorShape {
     /**
      * @brief Returns the dimension of the specified axis
      *
-     * @param axis Specifies axis
+     * @param axis
      * @return int64_t Dimension
      */
     [[nodiscard]] int64_t axis_dim(int axis) const;
@@ -138,15 +138,15 @@ class TensorShape {
     /**
      * @brief Sets a dimension in a specified axis
      *
-     * @param axis Specified axis
-     * @param dim Specified dimension
+     * @param axis
+     * @param dim
      */
     void set_dim(int axis, size_t dim);
 
     /**
      * @brief Calculates the number of available tensor elements specified by the tensor shape
      *
-     * @return int64_t
+     * @return int64_t Number of tensor elements
      */
     [[nodiscard]] size_t calculate_capacity() const noexcept;
 

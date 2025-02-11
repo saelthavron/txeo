@@ -1,6 +1,5 @@
 #include <algorithm>
 #include <cstddef>
-#include <cstdint>
 #include <initializer_list>
 #include <iterator>
 #include <memory>
@@ -39,10 +38,6 @@ void Tensor<T>::create_from_shape(P &&shape) {
 }
 
 template <typename T>
-inline Tensor<T>::Tensor() : _impl{std::make_unique<Impl>()} {
-}
-
-template <typename T>
 inline Tensor<T>::Tensor(const Tensor &tensor) : _impl{std::make_unique<Impl>()} {
   create_from_shape(tensor.shape().clone());
   for (size_t i{0}; i < this->dim(); ++i)
@@ -72,6 +67,16 @@ Tensor<T>::Tensor(txeo::TensorShape &&shape) : _impl{std::make_unique<Impl>()} {
 }
 
 template <typename T>
+inline Tensor<T>::Tensor(const std::vector<size_t> &shape) : _impl{std::make_unique<Impl>()} {
+  this->create_from_shape(txeo::TensorShape(shape));
+}
+
+template <typename T>
+inline Tensor<T>::Tensor(std::vector<size_t> &&shape) : _impl{std::make_unique<Impl>()} {
+  this->create_from_shape(txeo::TensorShape(std::move(shape)));
+}
+
+template <typename T>
 inline Tensor<T>::Tensor(const txeo::TensorShape &shape, const T &fill_value)
     : _impl{std::make_unique<Impl>()} {
   this->create_from_shape(shape);
@@ -82,6 +87,20 @@ template <typename T>
 inline Tensor<T>::Tensor(txeo::TensorShape &&shape, const T &fill_value)
     : _impl{std::make_unique<Impl>()} {
   this->create_from_shape(std::move(shape));
+  this->fill(fill_value);
+}
+
+template <typename T>
+inline Tensor<T>::Tensor(const std::vector<size_t> &shape, const T &fill_value)
+    : _impl{std::make_unique<Impl>()} {
+  this->create_from_shape(txeo::TensorShape(shape));
+  this->fill(fill_value);
+}
+
+template <typename T>
+inline Tensor<T>::Tensor(std::vector<size_t> &&shape, const T &fill_value)
+    : _impl{std::make_unique<Impl>()} {
+  this->create_from_shape(txeo::TensorShape(std::move(shape)));
   this->fill(fill_value);
 }
 
@@ -135,8 +154,6 @@ Tensor<T> &Tensor<T>::operator=(Tensor &&tensor) noexcept {
 
 template <typename T>
 bool Tensor<T>::operator==(const Tensor &tensor) {
-  if (_impl->tf_tensor->dtype() != tensor._impl->tf_tensor->dtype())
-    return false;
   if (_impl->tf_tensor->shape() != tensor._impl->tf_tensor->shape())
     return false;
   for (size_t i{0}; i < this->dim(); ++i) {
@@ -149,8 +166,6 @@ bool Tensor<T>::operator==(const Tensor &tensor) {
 
 template <typename T>
 bool Tensor<T>::operator!=(const Tensor &tensor) {
-  if (_impl->tf_tensor->dtype() != tensor._impl->tf_tensor->dtype())
-    return true;
   if (_impl->tf_tensor->shape() != tensor._impl->tf_tensor->shape())
     return true;
   for (size_t i{0}; i < this->dim(); ++i) {
@@ -252,16 +267,15 @@ inline void Tensor<T>::share_from(const Tensor<T> &tensor, const txeo::TensorSha
   if (this->dim() != tensor.dim() || this->dim() != shape.calculate_capacity())
     throw txeo::TensorError("Parameters do not match the dimension of this tensor!");
   this->reshape(shape);
-
-  if (!_impl->tf_tensor->CopyFrom(*_impl->tf_tensor, _impl->tf_tensor->shape()))
-    throw txeo::TensorError("This tensor could not be copied!");
+  if (!_impl->tf_tensor->CopyFrom(*tensor._impl->tf_tensor, *shape._impl->tf_shape))
+    throw txeo::TensorError("This tensor could not be shared!");
 }
 
 template <typename T>
 inline Tensor<T> Tensor<T>::flatten() const {
   Tensor<T> resp(txeo::TensorShape({this->dim()}));
   if (this->dim() != 0)
-    if (!resp._impl->tf_tensor->CopyFrom(*_impl->tf_tensor, _impl->tf_tensor->shape()))
+    if (!resp._impl->tf_tensor->CopyFrom(*_impl->tf_tensor, resp._impl->tf_tensor->shape()))
       throw txeo::TensorError("This tensor could not be flatten!");
 
   return resp;
@@ -335,7 +349,24 @@ inline void Tensor<T>::fill_with_uniform_random(const T &min, const T &max, size
 
   std::uniform_real_distribution<double> scaler{aux_min, aux_max};
   for (size_t i{0}; i < this->dim(); ++i)
-    (*this)(i) = static_cast<T>(scaler(engine));
+    this->data()[i] = static_cast<T>(scaler(engine));
+}
+
+template <typename T>
+inline void Tensor<T>::fill_with_uniform_random(const T &min, const T &max) {
+  if (this->dim() == 0)
+    return;
+  if (max <= min)
+    throw txeo::TensorError("The max value is not greater than the min value");
+
+  auto aux_min = static_cast<double>(min);
+  auto aux_max = static_cast<double>(max);
+
+  std::mt19937 engine{std::random_device{}()};
+
+  std::uniform_real_distribution<double> scaler{aux_min, aux_max};
+  for (size_t i{0}; i < this->dim(); ++i)
+    this->data()[i] = static_cast<T>(scaler(engine));
 }
 
 // Avoiding problems in linking

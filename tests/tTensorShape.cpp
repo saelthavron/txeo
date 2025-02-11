@@ -32,6 +32,10 @@ TEST(TensorShapeTest, CopySemantics) {
 
   TensorShape copy_assigned = original;
   EXPECT_EQ(copy_assigned, original);
+
+  TensorShape original2({22, 33, 55});
+  copy = original2;
+  EXPECT_EQ(copy, original2);
 }
 
 TEST(TensorShapeTest, MoveSemantics) {

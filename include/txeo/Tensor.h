@@ -1,6 +1,6 @@
 #ifndef TENSOR_H
 #define TENSOR_H
-#include <random>
+#include <vector>
 #pragma once
 
 #include <cstddef>
@@ -17,8 +17,9 @@ concept c_numeric = std::is_arithmetic_v<T> && !std::is_same_v<T, bool>;
 
 /**
  * @brief Implements the mathematical concept of tensor, which is a magnitude of multiple order. A
- * tensor of order zero is defined to be a scalar, of order one a vector, of order two a matrix.
- * Each order of the tensor has a dimension.
+ * tensor of order zero is defined to be a scalar, of order one a vector, of order two a matrix and
+ * so on. Each order of the tensor has a dimension. Elements are addressed via multidimensional
+ * indexing.
  *
  */
 template <typename T>
@@ -39,9 +40,8 @@ class Tensor {
 
     void check_indexes(const std::vector<size_t> &indexes);
 
-    explicit Tensor();
-
   public:
+    explicit Tensor() = delete;
     Tensor(const Tensor &tensor);
     Tensor(Tensor &&tensor) noexcept;
     ~Tensor();
@@ -54,25 +54,326 @@ class Tensor {
     template <typename U>
     friend std::ostream &operator<<(std::ostream &os, const Tensor<U> &tensor);
 
+    /**
+     * @brief Constructs a Tensor from a specified @ref txeo::TensorShape
+     *
+     * @param shape
+     *
+     * **Example Usage:**
+     * @code
+     * #include <iostream>
+     * #include "txeo/Tensor.h"
+     * #include "txeo/TensorShape.h"
+     *
+     * int main() {
+     *     txeo::TensorShape shape({3, 4}); // Define a 3x4 tensor shape
+     *     txeo::Tensor<int> tensor(shape); // Create a tensor with the given shape
+     *
+     *     std::cout << "Tensor created with shape: " << tensor.shape() << std::endl;
+     *     return 0;
+     * }
+     * @endcode
+     */
     explicit Tensor(const txeo::TensorShape &shape);
+
+    /**
+     * @brief Constructs a Tensor from a specified @ref txeo::TensorShape
+     *
+     * @param shape
+     *
+     * **Example Usage:**
+     * @code
+     * #include <iostream>
+     * #include "txeo/Tensor.h"
+     * #include "txeo/TensorShape.h"
+     *
+     * int main() {
+     *     txeo::Tensor<int> tensor(txeo::TensorShape({3, 4})); // Move-construct a tensor with
+     * shape 3x4
+     *
+     *     std::cout << "Tensor created with shape: " << tensor.shape() << std::endl;
+     *     return 0;
+     * }
+     * @endcode
+     */
     explicit Tensor(txeo::TensorShape &&shape);
 
+    /**
+     * @brief Constructs a Tensor from a specified shape std::vector
+     *
+     * @param shape vector of dimensions
+     *
+     * **Example Usage:**
+     * @code
+     * #include <iostream>
+     * #include "txeo/Tensor.h"
+     *
+     * int main() {
+     *     std::vector<size_t> shape = {3, 4};
+     *     txeo::Tensor<int> tensor(shape); // Create a tensor with shape 3x4
+     *
+     *     std::cout << "Tensor created with shape: " << tensor.shape() << std::endl;
+     *     return 0;
+     * }
+     * @endcode
+     */
+    explicit Tensor(const std::vector<size_t> &shape);
+
+    /**
+     * @brief Constructs a Tensor from a specified shape std::vector
+     *
+     * @param shape vector of dimensions
+     *
+     * **Example Usage:**
+     * @code
+     * #include <iostream>
+     * #include "txeo/Tensor.h"
+     *
+     * int main() {
+     *     txeo::Tensor<int> tensor({3, 4});
+     *
+     *     std::cout << "Tensor created with shape: " << tensor.shape() << std::endl;
+     *     return 0;
+     * }
+     * @endcode
+     */
+    explicit Tensor(std::vector<size_t> &&shape);
+
+    /**
+     * @brief Constructs a Tensor from a specified @ref txeo::TensorShape and fills it with a value
+     *
+     * @param shape
+     * @param fill_value
+     *
+     * **Example Usage:**
+     * @code
+     * #include <iostream>
+     * #include "txeo/Tensor.h"
+     * #include "txeo/TensorShape.h"
+     *
+     * int main() {
+     *     txeo::TensorShape shape({3, 4});
+     *     txeo::Tensor<int> tensor(shape, 5); // Create a 3x4 tensor filled with 5
+     *
+     *     std::cout << "Tensor initialized with: " << tensor << std::endl;
+     *     return 0;
+     * }
+     * @endcode
+     */
     explicit Tensor(const txeo::TensorShape &shape, const T &fill_value);
+
+    /**
+     * @brief Constructs a Tensor from a specified @ref txeo::TensorShape and fills it with a value
+     *
+     * @param shape
+     * @param fill_value
+     *
+     * **Example Usage:**
+     * @code
+     * #include <iostream>
+     * #include "txeo/Tensor.h"
+     * #include "txeo/TensorShape.h"
+     *
+     * int main() {
+     *     txeo::Tensor<int> tensor(txeo::TensorShape({3, 4}), 7);
+     *
+     *     std::cout << "Tensor initialized with: " << tensor << std::endl;
+     *     return 0;
+     * }
+     * @endcode
+     */
     explicit Tensor(txeo::TensorShape &&shape, const T &fill_value);
+
+    /**
+     * @brief Constructs a Tensor from a specified shape std::vector and fills it with a value
+     *
+     * @param shape
+     * @param fill_value
+     *
+     * **Example Usage:**
+     * @code
+     * #include <iostream>
+     * #include "txeo/Tensor.h"
+     *
+     * int main() {
+     *     std::vector<size_t> shape = {3, 4};
+     *     txeo::Tensor<int> tensor(shape, 5); // Create a 3x4 tensor filled with 5
+     *
+     *     std::cout << "Tensor initialized with: " << tensor << std::endl;
+     *     return 0;
+     * }
+     * @endcode
+     */
+    explicit Tensor(const std::vector<size_t> &shape, const T &fill_value);
+
+    /**
+     * @brief Constructs a Tensor from a specified shape std::vector and fills it with a value
+     *
+     * @param shape
+     * @param fill_value
+     *
+     * **Example Usage:**
+     * @code
+     * #include <iostream>
+     * #include "txeo/Tensor.h"
+     *
+     * int main() {
+     *     txeo::Tensor<int> tensor({3, 4}, 7);
+     *
+     *     std::cout << "Tensor initialized with: " << tensor << std::endl;
+     *     return 0;
+     * }
+     * @endcode
+     */
+    explicit Tensor(std::vector<size_t> &&shape, const T &fill_value);
+
+    /**
+     * @brief Constructs a Tensor object from a specified @ref txeo::TensorShape and fills it with a
+     * std::vector of values in a row-major scheme
+     *
+     * @param shape
+     * @param values
+     *
+     * **Example Usage:**
+     * @code
+     * #include <iostream>
+     * #include "txeo/Tensor.h"
+     * #include "txeo/TensorShape.h"
+     *
+     * int main() {
+     *     txeo::Tensor<int> tensor(txeo::TensorShape({2, 3}), {1, 2, 3, 4, 5, 6}); // Create a 2x3
+     * tensor initialized with given values
+     *
+     *     std::cout << "Tensor initialized with: " << tensor << std::endl;
+     *     return 0;
+     * }
+     * @endcode
+     */
     explicit Tensor(const txeo::TensorShape &shape, const std::vector<T> &values);
 
+    /**
+     * @brief Constructs a second order Tensor from a nested std::initializer_list.
+     *
+     *
+     * @param values nested initializer list
+     *
+     * **Example Usage:**
+     * @code
+     * #include <iostream>
+     * #include "txeo/Tensor.h"
+     *
+     * int main() {
+     *     txeo::Tensor<int> tensor{{1, 2, 3}, {4, 5, 6}};
+     *     std::cout << tensor << std::endl; // Print the tensor
+     *     return 0;
+     * }
+     * @endcode
+     */
     explicit Tensor(const std::initializer_list<std::initializer_list<T>> &values);
 
+    /**
+     * @brief Constructs a third order Tensor from a nested std::initializer_list.
+     *
+     *
+     * @param values nested initializer list
+     *
+     * **Example Usage:**
+     * @code
+     * #include <iostream>
+     * #include "txeo/Tensor.h"
+     *
+     * int main() {
+     *     // Creating a 3D tensor with shape (4,2,3)
+     *     txeo::Tensor<int> tensor{
+     *         {{1, 2, 3}, {4, 5, 6}},
+     *         {{7, 8, 9}, {10, 11, 12}},
+     *         {{-1, -2, -3}, {-4, -5, -6}},
+     *         {{-7, -8, -9}, {-10, -11, -12}}
+     *     };
+     *
+     *     std::cout << tensor << std::endl; // Print the tensor
+     *     return 0;
+     * }
+     * @endcode
+     *
+     */
     explicit Tensor(
         const std::initializer_list<std::initializer_list<std::initializer_list<T>>> &values);
 
+    /**
+     * @brief Returns the shape of this tensor
+     *
+     * @return const txeo::TensorShape&
+     */
     [[nodiscard]] const txeo::TensorShape &shape() const;
+
+    /**
+     * @brief Returns the data type of this tensor
+     *
+     * @return constexpr std::type_identity_t<T>
+     */
     constexpr std::type_identity_t<T> type() const;
+
+    /**
+     * @brief Returns the order of this tensor
+     *
+     * @return int
+     */
     [[nodiscard]] int order() const;
+
+    /**
+     * @brief Returns the dimension of this tensor
+     *
+     * @return size_t
+     */
     [[nodiscard]] size_t dim() const;
+
+    /**
+     * @brief Returns the number of elements of this tensor, which corresponds to the dimension of
+     * this tensor
+     *
+     * @return size_t
+     */
     [[nodiscard]] size_t number_of_elements() const { return this->dim(); };
+
+    /**
+     * @brief Returns the number of bytes occupied by this tensor
+     *
+     * @return size_t
+     */
     [[nodiscard]] size_t memory_size() const;
+
+    /**
+     * @brief Returns the raw data of this tensor for reading
+     *
+     * @return const T*
+     */
     [[nodiscard]] const T *data() const;
+
+    /**
+     * @brief Returns a view ot this tensor from a specified range of dimensions of the first axis
+     *
+     * @details This function creates a new tensor that shares the content of this tensor according
+     * to the specified parameters.
+     *
+     * @param first_axis_begin begin index along the first axis (inclusive).
+     * @param first_axis_end end index along the first axis (exclusive).
+     * @return Tensor<T>
+     *
+     * **Example Usage:**
+     * @code
+     * #include <iostream>
+     * #include "txeo/Tensor.h"
+     *
+     * int main() {
+     *     txeo::Tensor<int> tensor{{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
+     *     txeo::Tensor<int> sliced_tensor = tensor.slice(0, 2); // Extract rows 0 and 1
+     *
+     *     std::cout << "Sliced Tensor: " << sliced_tensor << std::endl;
+     *     return 0;
+     * }
+     * @endcode
+     */
     Tensor<T> slice(size_t first_axis_begin, size_t first_axis_end) const;
     void share_from(const Tensor<T> &tensor, const txeo::TensorShape &shape);
 
@@ -107,6 +408,7 @@ class Tensor {
     void fill(const T &value);
 
     void fill_with_uniform_random(const T &min, const T &max, size_t seed1, size_t seed2);
+    void fill_with_uniform_random(const T &min, const T &max);
 
     void shuffle();
 
@@ -221,6 +523,9 @@ void Tensor<T>::fill_data_shape(
 
 #endif // TENSOR_H
 
+// Colocar usage na doc do TensorShape
+// Colocar throws na doc do TensorShape
+// Colocar throws na doc do Tensor
 // construir um identity factory
 // gpt void map(std::function<T(T)> func);
 // gpt Tensor<T> transpose(const std::vector<size_t> &perm) const;
