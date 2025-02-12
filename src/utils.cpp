@@ -50,12 +50,21 @@ int to_int(const int64_t &val) {
   return static_cast<int>(val);
 }
 
+std::string format(const double &a, int precision) {
+  std::stringstream stream;
+  stream.setf(std::ios::fixed);
+  stream.precision(precision + 1);
+  stream << a;
+
+  return stream.str();
+}
+
 txeo::TensorShape to_txeo_tensor_shape(const tf::TensorShape &shape) {
   std::vector<size_t> aux;
   auto dim_sizes = shape.dim_sizes();
   std::ranges::copy(std::begin(dim_sizes), std::end(dim_sizes), std::back_inserter(aux));
 
-  txeo::TensorShape res{aux};
+  txeo::TensorShape res(aux);
 
   return res;
 }

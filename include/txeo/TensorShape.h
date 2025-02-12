@@ -109,6 +109,26 @@ class TensorShape {
     explicit TensorShape(std::vector<size_t> &&shape);
 
     /**
+     * @brief Constructs a tensor shape from an initializer list
+     *
+     * @param shape vector of dimensions
+     * * **Example Usage:**
+     * @code
+     * #include <iostream>
+     * #include "txeo/TensorShape.h"
+     *
+     * int main() {
+     *     txeo::TensorShape shape({3, 4, 5}); // Creates a 3D shape with dimensions 3x4x5
+     *
+     *     std::cout << "TensorShape created: " << shape << std::endl;
+     *     return 0;
+     * }
+     * @endcode
+     */
+    explicit TensorShape(std::initializer_list<size_t> shape)
+        : TensorShape(std::vector<size_t>(shape)) {}
+
+    /**
      * @brief Returns the size of the tensor shape
      *
      * @return int Number of axes

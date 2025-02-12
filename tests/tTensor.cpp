@@ -21,8 +21,7 @@ TEST(TensorTest, ShapeConstructor) {
   EXPECT_EQ(tt.order(), 4);
   EXPECT_EQ(tt.shape().axes_dims(), std::vector<int64_t>({2, 3, 4, 5}));
 
-  std::vector<size_t> shp{4, 5, 6};
-  Tensor<int> ttt(shp);
+  Tensor<int> ttt({4, 5, 6});
   EXPECT_EQ(ttt.dim(), 120);
   EXPECT_EQ(ttt.order(), 3);
   EXPECT_EQ(ttt.shape().axes_dims(), std::vector<int64_t>({4, 5, 6}));

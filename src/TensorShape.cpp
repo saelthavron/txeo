@@ -160,15 +160,24 @@ void TensorShape::set_dim(int axis, size_t dim) {
 }
 
 bool TensorShape::operator==(const TensorShape &shape) const {
-  if (_impl->tf_shape != nullptr)
-    return *this->_impl->tf_shape == *shape._impl->tf_shape;
-
+  if (_impl->tf_shape != nullptr) {
+    if (shape._impl->tf_shape != nullptr)
+      return *this->_impl->tf_shape == *shape._impl->tf_shape;
+    return *this->_impl->tf_shape == *shape._impl->ext_tf_shape;
+  }
+  if (shape._impl->tf_shape != nullptr)
+    return *this->_impl->ext_tf_shape == *shape._impl->tf_shape;
   return *this->_impl->ext_tf_shape == *shape._impl->ext_tf_shape;
 }
 
 bool TensorShape::operator!=(const TensorShape &shape) const {
-  if (_impl->tf_shape != nullptr)
-    return *this->_impl->tf_shape != *shape._impl->tf_shape;
+  if (_impl->tf_shape != nullptr) {
+    if (shape._impl->tf_shape != nullptr)
+      return *this->_impl->tf_shape != *shape._impl->tf_shape;
+    return *this->_impl->tf_shape != *shape._impl->ext_tf_shape;
+  }
+  if (shape._impl->tf_shape != nullptr)
+    return *this->_impl->ext_tf_shape != *shape._impl->tf_shape;
   return *this->_impl->ext_tf_shape != *shape._impl->ext_tf_shape;
 }
 

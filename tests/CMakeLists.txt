@@ -9,6 +9,7 @@ add_executable(
   tUtils.cpp
   tTensorShape.cpp
   tTensor.cpp
+  tTensorIO.cpp
 )  
 
 target_link_libraries(

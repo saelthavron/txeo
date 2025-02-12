@@ -138,7 +138,8 @@ class Tensor {
      * #include "txeo/Tensor.h"
      *
      * int main() {
-     *     txeo::Tensor<int> tensor({3, 4});
+     *     txeo::vector<int> aux({3,4})
+     *     txeo::Tensor<int> tensor(aux);
      *
      *     std::cout << "Tensor created with shape: " << tensor.shape() << std::endl;
      *     return 0;
@@ -146,6 +147,26 @@ class Tensor {
      * @endcode
      */
     explicit Tensor(std::vector<size_t> &&shape);
+
+    /**
+     * @brief Constructs a Tensor from a specified shape std::vector
+     *
+     * @param shape Vector of dimensions
+     *
+     * **Example Usage:**
+     * @code
+     * #include <iostream>
+     * #include "txeo/Tensor.h"
+     *
+     * int main() {
+     *     txeo::Tensor<int> tensor({3,4});
+     *
+     *     std::cout << "Tensor created with shape: " << tensor.shape() << std::endl;
+     *     return 0;
+     * }
+     * @endcode
+     */
+    explicit Tensor(std::initializer_list<size_t> shape) : Tensor(std::vector<size_t>(shape)) {}
 
     /**
      * @brief Constructs a Tensor from a specified @ref txeo::TensorShape and fills it with a value
@@ -226,7 +247,7 @@ class Tensor {
      * #include "txeo/Tensor.h"
      *
      * int main() {
-     *     txeo::Tensor<int> tensor({3, 4}, 7);
+     *     txeo::Tensor<int> tensor(std::vector<size_t>({3, 4}), 7);
      *
      *     std::cout << "Tensor initialized with: " << tensor << std::endl;
      *     return 0;
@@ -234,6 +255,28 @@ class Tensor {
      * @endcode
      */
     explicit Tensor(std::vector<size_t> &&shape, const T &fill_value);
+
+    /**
+     * @brief Constructs a Tensor from a specified initializer list and fills it with a value
+     *
+     * @param shape Shape of the constructed tensor
+     * @param fill_value Value of the elements of the constructed tensor
+     *
+     * **Example Usage:**
+     * @code
+     * #include <iostream>
+     * #include "txeo/Tensor.h"
+     *
+     * int main() {
+     *     txeo::Tensor<int> tensor({3, 4}, 7);
+     *
+     *     std::cout << "Tensor initialized with: " << tensor << std::endl;
+     *     return 0;
+     * }
+     * @endcode
+     */
+    explicit Tensor(std::initializer_list<size_t> shape, const T &fill_value)
+        : Tensor(std::vector<size_t>(shape), fill_value) {}
 
     /**
      * @brief Constructs a Tensor object from a specified @ref txeo::TensorShape and fills it with a
@@ -627,6 +670,35 @@ class Tensor {
      * @endcode
      */
     void reshape(const std::vector<size_t> &shape);
+
+    /**
+     * @brief Reshapes this tensor if the specified shape vector defines a number of elements equal
+     * to this tensor order.
+     *
+     * @param shape New shape vector for this tensor
+     *
+     * @throw  txeo::TensorError
+     *
+     * @note No copy is performed.
+     *
+     * **Example Usage:**
+     * @code
+     * #include <iostream>
+     * #include "txeo/Tensor.h"
+     * #include "txeo/TensorShape.h"
+     *
+     * int main() {
+     *     txeo::Tensor<int> tensor{{1, 2, 3, 4}}; // Shape (1, 4)
+     *     tensor.reshape({2, 2}); // Change shape to (2, 2)
+     *
+     *     std::cout << "Reshaped Tensor: " << tensor << std::endl;
+     *     return 0;
+     * }
+     * @endcode
+     */
+    void reshape(const std::initializer_list<size_t> &shape) {
+      this->reshape(std::vector<size_t>(shape));
+    };
 
     /**
      * @brief Returns a first order reshaped view of this tensor.

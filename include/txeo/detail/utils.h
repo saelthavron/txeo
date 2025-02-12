@@ -47,6 +47,8 @@ int to_int(const size_t &val);
 
 int to_int(const int64_t &val);
 
+std::string format(const double &a, int precision);
+
 txeo::TensorShape to_txeo_tensor_shape(const tf::TensorShape &shape);
 
 std::vector<size_t> calc_stride(const tf::TensorShape &shape);
