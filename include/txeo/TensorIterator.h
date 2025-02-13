@@ -22,37 +22,37 @@ class TensorIterator {
 
     TensorIterator(T *elements, std::ptrdiff_t step = 1) : _elements(elements), _step(step) {}
 
-    reference operator*() const { return *_elements; }
-    pointer operator->() const { return _elements; }
+    inline reference operator*() const { return *_elements; }
+    inline pointer operator->() const { return _elements; }
 
-    TensorIterator &operator++() {
+    inline TensorIterator &operator++() {
       _elements += _step;
       return *this;
     }
 
-    TensorIterator operator++(int) {
+    inline TensorIterator operator++(int) {
       auto aux = *this;
       ++(*this);
       return aux;
     }
 
-    TensorIterator &operator--() {
+    inline TensorIterator &operator--() {
       _elements -= _step;
       return *this;
     }
 
-    TensorIterator operator--(int) {
+    inline TensorIterator operator--(int) {
       auto aux = *this;
       --(*this);
       return aux;
     }
 
-    TensorIterator &operator+=(const difference_type &val) {
+    inline TensorIterator &operator+=(const difference_type &val) {
       _elements += val * _step;
       return *this;
     }
 
-    TensorIterator &operator-=(const difference_type &val) {
+    inline TensorIterator &operator-=(const difference_type &val) {
       _elements -= val * _step;
       return *this;
     }
@@ -72,16 +72,24 @@ class TensorIterator {
       return iterator;
     }
 
-    difference_type operator-(const TensorIterator &other) const {
+    inline difference_type operator-(const TensorIterator &other) const {
       return (_elements - other._elements) / _step;
     }
 
-    bool operator==(const TensorIterator &other) const { return _elements == other._elements; }
-    bool operator!=(const TensorIterator &other) const { return _elements != other._elements; }
-    bool operator<(const TensorIterator &other) const { return _elements < other._elements; }
-    bool operator>(const TensorIterator &other) const { return _elements > other._elements; }
-    bool operator<=(const TensorIterator &other) const { return _elements <= other._elements; }
-    bool operator>=(const TensorIterator &other) const { return _elements >= other._elements; }
+    inline bool operator==(const TensorIterator &other) const {
+      return _elements == other._elements;
+    }
+    inline bool operator!=(const TensorIterator &other) const {
+      return _elements != other._elements;
+    }
+    inline bool operator<(const TensorIterator &other) const { return _elements < other._elements; }
+    inline bool operator>(const TensorIterator &other) const { return _elements > other._elements; }
+    inline bool operator<=(const TensorIterator &other) const {
+      return _elements <= other._elements;
+    }
+    inline bool operator>=(const TensorIterator &other) const {
+      return _elements >= other._elements;
+    }
 };
 
 } // namespace txeo

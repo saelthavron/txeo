@@ -1,143 +1,114 @@
-#include "txeo/Tensor.h"
-#include "txeo/TensorShape.h"
-#include "txeo/detail/utils.h"
-#include <cstddef>
-#include <initializer_list>
+#include <iostream>
+#include <tensorflow/cc/client/client_session.h>
+#include <tensorflow/cc/saved_model/loader.h>
+#include <tensorflow/cc/saved_model/tag_constants.h>
 #include <tensorflow/core/framework/tensor.h>
-#include <tensorflow/core/framework/tensor_shape.h>
 #include <tensorflow/core/framework/types.pb.h>
-#include <vector>
+#include <tensorflow/core/public/session.h>
 
 namespace tf = tensorflow;
 
-// void create_tensor() {
-//   tf::Tensor S(tf::DT_DOUBLE, tf::TensorShape({}));
-//   auto scal = S.scalar<double>();
-//   scal() = 10;
-//   std::cout << "Scalar: " << scal << std::endl;
-//   std::cout << "Scalar dimensions: " << scal.NumDimensions << std::endl;
-
-//   tf::Tensor V(tf::DT_DOUBLE, tf::TensorShape({3}));
-//   auto vec = V.vec<double>();
-//   vec(0) = 1;
-//   vec(1) = 2;
-//   vec(2) = 3;
-//   std::cout << "Vector: " << vec << std::endl;
-//   std::cout << "Vector dimensions: " << vec.NumDimensions << std::endl;
-
-//   tf::Tensor M(tf::DT_DOUBLE, tf::TensorShape({3, 3}));
-//   auto mat = M.matrix<double>();
-//   mat(0, 0) = 1.0;
-//   mat(1, 0) = 2.0;
-//   mat(2, 0) = 3.0;
-//   mat(0, 1) = 4.0;
-//   mat(1, 1) = 5.0;
-//   mat(2, 1) = 6.0;
-//   mat(0, 2) = 7.0;
-//   mat(1, 2) = 8.0;
-//   mat(2, 2) = 9.0;
-//   std::cout << "Matrix: \n" << mat << std::endl;
-//   std::cout << "Matrix dimensions: " << mat.NumDimensions << std::endl;
-
-//   tf::Tensor M1(tf::DT_DOUBLE, tf::TensorShape({2, 3}));
-//   auto mat1 = M1.matrix<double>();
-//   mat1.setZero();
-//   std::cout << "Zero Matrix: \n" << mat1 << std::endl;
-
-//   tf::Tensor M2(tf::DT_DOUBLE, tf::TensorShape({4, 2}));
-//   auto mat2 = M2.matrix<double>();
-//   mat2.setConstant(2.6);
-//   std::cout << "Value Matrix: \n" << mat2 << std::endl;
-// }
-
-// int multby2(const int &a) {
-//   return 2 * a;
-// }
-
-// class Foo {
-//   public:
-//     tf::Tensor M = tf::Tensor(tf::DT_DOUBLE, tf::TensorShape({3, 3}));
-
-//     template <typename... Args>
-//     double &operator()(Args... args) {
-//       static_assert(((std::is_integral_v<Args>) && ...), "All arguments must be integers!");
-//       auto aux = M.tensor<double, 2>();
-//       //      aux.setConstant(2576.23);
-//       return aux(args...);
-//     }
-// };
-
-template <typename T>
-void fill_data_shape(const std::initializer_list<std::initializer_list<T>> &list,
-                     std::vector<T> &flat_data, std::vector<size_t> &shape) {
-
-  shape.emplace_back(list.size());
-  std::vector<std::initializer_list<T>> v_list(list);
-  for (size_t i{1}; i < v_list.size(); ++i)
-    if (v_list[i].size() != v_list[i - 1].size())
-      throw txeo::TensorError("Tensor initialization is inconsistent!");
-
-  shape.emplace_back(v_list[0].size());
-  for (auto &item : v_list)
-    for (auto &subitem : item)
-      flat_data.emplace_back(subitem);
-}
-
-template <typename T>
-void fill_data_shape(
-    const std::initializer_list<std::initializer_list<std::initializer_list<T>>> &list,
-    std::vector<T> &flat_data, std::vector<size_t> &shape) {
-
-  shape.emplace_back(list.size());
-  std::vector<std::initializer_list<std::initializer_list<T>>> v_list(list);
-  for (size_t i{1}; i < v_list.size(); ++i)
-    if (v_list[i].size() != v_list[i - 1].size())
-      throw txeo::TensorError("Tensor initialization is inconsistent!");
-
-  shape.emplace_back(v_list[0].size());
-  bool emplaced{false};
-  for (size_t i{0}; i < v_list.size(); ++i) {
-    std::vector<std::initializer_list<T>> v_sublist(v_list[i]);
-    for (size_t i{1}; i < v_sublist.size(); ++i)
-      if (v_sublist[i].size() != v_sublist[i - 1].size())
-        throw txeo::TensorError("Tensor initialization is inconsistent!");
-
-    if (!emplaced) {
-      shape.emplace_back(v_sublist[0].size());
-      emplaced = true;
-    }
-    for (auto &item : v_sublist)
-      for (auto &subitem : item)
-        flat_data.emplace_back(subitem);
-  }
-}
+#include <iostream>
+#include <tensorflow/cc/saved_model/loader.h>
+#include <tensorflow/core/framework/tensor.h>
+#include <tensorflow/core/public/session.h>
 
 int main() {
+  tf::SavedModelBundle model;
+  tf::SessionOptions session_options;
+  tf::RunOptions run_options;
+  std::unordered_set<std::string> tags{static_cast<const char *>(tf::kSavedModelTagServe)};
 
-  // std::vector<double> flat_data;
-  // std::vector<size_t> shape;
+  std::string model_dir = "/home/roberto/my_works/personal/hello_python/model_regression";
+  tf::Status status = tf::LoadSavedModel(session_options, run_options, model_dir, tags, &model);
+  if (!status.ok()) {
+    std::cerr << "Error loading model: " << status.ToString() << std::endl;
+    return 1;
+  }
+  std::cout << "Model loaded successfully!" << std::endl;
 
-  // fill_data_shape<double>({{{1, 2, 3}, {4, 5, 6}},
-  //                          {{7, 8, 9}, {10, 11, 12}},
-  //                          {{13, 14, 15}, {16, 17, 18}},
-  //                          {{19, 20, 21}, {22, 23, 24}}},
-  //                         flat_data, shape);
+  tensorflow::MetaGraphDef meta_graph_def = model.meta_graph_def;
+  auto signature_map = meta_graph_def.signature_def().at("serving_default");
 
-  // for (auto &item : flat_data) {
-  //   std::cout << item << " ";
-  // }
+  const auto &input_name = (*std::begin(signature_map.inputs())).second.name();
+
+  // std::cout << "Inputs:\n";
+  //   for (const auto &input : signature_map.inputs()) {
+  //     std::cout << input.second.name() << std::endl;
+  //   }
+  const auto &output_name = (*std::begin(signature_map.outputs())).second.name();
+
   // std::cout << std::endl;
-
-  // for (auto &item : shape) {
-  //   std::cout << item << " ";
+  // std::cout << "Outputs:\n";
+  // for (const auto &output : signature_map.outputs()) {
+  //   std::cout << output.second.name() << std::endl;
   // }
-  // std::cout << std::endl;
 
-  txeo::Tensor<double> a(
-      txeo::TensorShape({4, 2, 3}),
-      {1, 2, 3, 4, 5, 6, 7, 8, 9, 444, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24});
+  // Prepare input tensor
+  std::vector<float> input_data = {0.5869565217391305f,
+                                   0.2479149852031207f,
+                                   0.4f,
+                                   1.0f,
+                                   0.0f,
+                                   1.0f,
+                                   0.0f,
+                                   1.0f,
+                                   0.0f,
+                                   0.0f,
+                                   0.0f,
+                                   0.3913043478260869f,
+                                   0.3782620392789884f,
+                                   0.0f,
+                                   1.0f,
+                                   0.0f,
+                                   1.0f,
+                                   0.0f,
+                                   0.0f,
+                                   1.0f,
+                                   0.0f,
+                                   0.0f,
+                                   1.0f,
+                                   0.2939198278181328f,
+                                   0.0f,
+                                   1.0f,
+                                   0.0f,
+                                   0.0f,
+                                   1.0f,
+                                   0.0f,
+                                   1.0f,
+                                   0.0f,
+                                   0.0f};
 
-  std::cout << a << std::endl;
+  //
+
+  tf::Tensor input_tensor(tf::DT_FLOAT, tf::TensorShape({3, 11}));
+  auto input_map = input_tensor.flat<float>();
+  for (size_t i = 0; i < input_data.size(); ++i) {
+    input_map(i) = input_data[i];
+  }
+
+  // Run model inference
+  std::vector<std::pair<std::string, tf::Tensor>> inputs = {{input_name, input_tensor}};
+  std::vector<tf::Tensor> outputs;
+
+  status = model.session->Run(inputs, {output_name}, {}, &outputs);
+  if (!status.ok()) {
+    std::cerr << "Error running model: " << status.ToString() << std::endl;
+    return 1;
+  }
+
+  // Extract and print predictions
+  auto output_map = outputs[0].flat<float>();
+  std::cout << "Model Prediction: ";
+  for (int i = 0; i < output_map.size(); i++) {
+    std::cout << output_map(i) << " ";
+  }
+  std::cout << std::endl;
+
+  if (!model.session->Close().ok()) {
+    std::cerr << "Error closing session: " << status.ToString() << std::endl;
+    return 1;
+  }
 
   return 0;
 }

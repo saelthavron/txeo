@@ -1,5 +1,5 @@
 
-set(TXEO_SOURCES utils.cpp TensorShape.cpp Tensor.cpp TensorIO.cpp)
+set(TXEO_SOURCES utils.cpp TensorShape.cpp Tensor.cpp TensorIO.cpp Model.cpp)
 
 
 #################################################### Finding Tensorflow ####################################################
