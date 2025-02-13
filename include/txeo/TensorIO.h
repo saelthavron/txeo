@@ -27,7 +27,7 @@ class TensorIO {
      * @param path Path to the file
      * @param separator Character delimiting each element in a row
      */
-    TensorIO(std::string path, char separator = ',')
+    explicit TensorIO(std::string path, char separator = ',')
         : _path(std::move(path)), _separator(separator) {};
 
     /**

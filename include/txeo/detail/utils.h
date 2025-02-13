@@ -1,13 +1,14 @@
 #ifndef TXEO_UTILS_H
 #define TXEO_UTILS_H
-
 #pragma once
 
 #include <cstddef>
 #include <cstdint>
+#include <tensorflow/core/framework/tensor.h>
 #include <tensorflow/core/framework/tensor_shape.h>
 
 #include "tensorflow/core/framework/types.h"
+#include "txeo/Tensor.h"
 #include "txeo/TensorShape.h"
 
 namespace tf = tensorflow;
@@ -50,6 +51,16 @@ int to_int(const int64_t &val);
 std::string format(const double &a, int precision);
 
 txeo::TensorShape to_txeo_tensor_shape(const tf::TensorShape &shape);
+
+template <typename T>
+txeo::Tensor<T> to_txeo_tensor(const tf::Tensor &tensor) {
+  txeo::Tensor<T> resp(to_txeo_tensor_shape(tensor.shape()));
+  auto t_data = static_cast<T *>(tensor.data());
+  for (size_t i{0}; i < resp.dim(); ++i)
+    resp.data()[i] = t_data[i];
+
+  return resp;
+};
 
 std::vector<size_t> calc_stride(const tf::TensorShape &shape);
 

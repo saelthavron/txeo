@@ -1,5 +1,5 @@
 
-set(TXEO_SOURCES utils.cpp TensorShape.cpp Tensor.cpp TensorIO.cpp Model.cpp)
+set(TXEO_SOURCES utils.cpp TensorShape.cpp Tensor.cpp TensorIO.cpp Predictor.cpp)
 
 
 #################################################### Finding Tensorflow ####################################################
@@ -21,7 +21,7 @@ set_target_properties(txeo_static PROPERTIES OUTPUT_NAME "txeo")
 
 #################################################### Dynamic Library ####################################################
 
-# Avoiding compatibility issues between Ninja and Intel compiler
+# Avoiding incompatibility issues between Ninja and Intel compiler
 if(CMAKE_GENERATOR STREQUAL "Ninja" AND $ENV{CXX} STREQUAL "icpx") 
     set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
     set(CMAKE_SKIP_RPATH FALSE)

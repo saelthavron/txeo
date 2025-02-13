@@ -1,6 +1,5 @@
 #ifndef TENSOR_H
 #define TENSOR_H
-#include "txeo/TensorIterator.h"
 #pragma once
 
 #include <cstddef>
@@ -10,11 +9,15 @@
 #include <vector>
 
 #include "TensorShape.h"
+#include "txeo/TensorIterator.h"
 
 namespace txeo {
 
 template <typename T>
 concept c_numeric = std::is_arithmetic_v<T> && !std::is_same_v<T, bool>;
+
+template <typename T>
+class Predictor;
 
 /**
  * @brief Implements the mathematical concept of tensor, which is a magnitude of multiple order. A
@@ -28,6 +31,8 @@ class Tensor {
   private:
     struct Impl;
     std::unique_ptr<Impl> _impl{nullptr};
+
+    friend class Predictor<T>;
 
     template <typename P>
     void create_from_shape(P &&shape);
