@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <tensorflow/core/framework/tensor_shape.h>
+#include <tensorflow/core/framework/tensor_shape.pb.h>
 
 namespace tf = tensorflow;
 
@@ -63,6 +64,20 @@ txeo::TensorShape to_txeo_tensor_shape(const tf::TensorShape &shape) {
   std::vector<size_t> aux;
   auto dim_sizes = shape.dim_sizes();
   std::ranges::copy(std::begin(dim_sizes), std::end(dim_sizes), std::back_inserter(aux));
+
+  txeo::TensorShape res(aux);
+
+  return res;
+}
+
+txeo::TensorShape proto_to_txeo_tensor_shape(const tf::TensorShapeProto &shape) {
+  std::vector<size_t> aux;
+  for (const auto &item : shape.dim()) {
+    if (item.size() < 0)
+      aux.emplace_back(0);
+    else
+      aux.emplace_back(static_cast<size_t>(item.size()));
+  }
 
   txeo::TensorShape res(aux);
 

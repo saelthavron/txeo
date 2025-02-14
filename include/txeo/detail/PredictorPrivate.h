@@ -13,8 +13,8 @@ struct txeo::Predictor<T>::Impl {
     tensorflow::SessionOptions session_options;
     tensorflow::RunOptions run_options;
 
-    Predictor<T>::TensorInfo input_name_shape_map;
-    Predictor<T>::TensorInfo output_name_shape_map;
+    Predictor<T>::TensorInfo in_name_shape_map;
+    Predictor<T>::TensorInfo out_name_shape_map;
 };
 
 #endif

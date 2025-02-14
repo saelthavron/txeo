@@ -1,5 +1,6 @@
 #ifndef PREDIOCTOR_H
 #define PREDIOCTOR_H
+#include <optional>
 #pragma once
 
 #include <memory>
@@ -18,15 +19,21 @@ class Predictor {
 
   public:
     using TensorInfo = std::vector<std::pair<std::string, txeo::TensorShape>>;
+    using TensorIdent = std::vector<std::pair<std::string, txeo::Tensor<T>>>;
+
     explicit Predictor(std::string model_path);
     ~Predictor();
 
     [[nodiscard]] const TensorInfo &get_input_metadata() const;
     [[nodiscard]] const TensorInfo &get_output_metadata() const;
 
+    [[nodiscard]] std::optional<txeo::TensorShape>
+    get_input_metadata_shape(const std::string &name) const;
+    [[nodiscard]] std::optional<txeo::TensorShape>
+    get_output_metadata_shape(const std::string &name) const;
+
     [[nodiscard]] txeo::Tensor<T> predict(const txeo::Tensor<T> input) const;
-    // [[nodiscard]] std::vector<txeo::Tensor<T>>
-    // predict(const std::vector<txeo::Tensor<T>> inputs) const;
+    [[nodiscard]] std::vector<txeo::Tensor<T>> predict(const TensorIdent &inputs) const;
 };
 
 class PredictorError : public std::runtime_error {

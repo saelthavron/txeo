@@ -52,6 +52,8 @@ std::string format(const double &a, int precision);
 
 txeo::TensorShape to_txeo_tensor_shape(const tf::TensorShape &shape);
 
+txeo::TensorShape proto_to_txeo_tensor_shape(const tf::TensorShapeProto &shape);
+
 template <typename T>
 txeo::Tensor<T> to_txeo_tensor(const tf::Tensor &tensor) {
   txeo::Tensor<T> resp(to_txeo_tensor_shape(tensor.shape()));
