@@ -1,12 +1,12 @@
 #ifndef TENSORIO_H
 #define TENSORIO_H
-#include <cstddef>
-#include <type_traits>
 #pragma once
 
-#include <string>
-
 #include "txeo/Tensor.h"
+
+#include <cstddef>
+#include <string>
+#include <type_traits>
 
 namespace txeo {
 

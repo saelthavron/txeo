@@ -1,3 +1,9 @@
+
+#include "txeo/TensorShape.h"
+#include "txeo/detail/TensorPrivate.h"
+#include "txeo/detail/TensorShapePrivate.h"
+#include "txeo/detail/utils.h"
+
 #include <algorithm>
 #include <cstddef>
 #include <initializer_list>
@@ -7,11 +13,6 @@
 #include <tensorflow/core/framework/tensor_shape.h>
 #include <utility>
 #include <vector>
-
-#include "txeo/TensorShape.h"
-#include "txeo/detail/TensorPrivate.h"
-#include "txeo/detail/TensorShapePrivate.h"
-#include "txeo/detail/utils.h"
 
 namespace txeo {
 

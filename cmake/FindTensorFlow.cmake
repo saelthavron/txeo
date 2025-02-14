@@ -7,7 +7,6 @@ find_path(TensorFlow_INCLUDE_DIR
   HINTS
     ${TensorFlow_HOME}/include
     $ENV{TensorFlow_HOME}/include
-    /usr/local/include/tensorflow
     /opt/tensorflow/include
 )
 
@@ -16,7 +15,6 @@ find_library(TensorFlow_CC_LIBRARY
   HINTS
     ${TensorFlow_HOME}/lib
     $ENV{TensorFlow_HOME}/lib
-    /usr/local/lib
     /opt/tensorflow/lib
 )
 
@@ -25,7 +23,6 @@ find_library(TensorFlow_FRAMEWORK_LIBRARY
   HINTS
     ${TensorFlow_HOME}/lib
     $ENV{TensorFlow_HOME}/lib
-    /usr/local/lib
     /opt/tensorflow/lib
 )
 
@@ -35,7 +32,6 @@ find_path(Protobuf_INCLUDE_DIR
   HINTS
     ${Protobuf_HOME}/include
     $ENV{Protobuf_HOME}/include
-    /usr/local/include
     /opt/protobuf/include
 )
 
@@ -44,7 +40,6 @@ find_library(Protobuf_LIBRARY
   HINTS
     ${Protobuf_HOME}/lib
     $ENV{Protobuf_HOME}/lib
-    /usr/local/lib
     /opt/protobuf/lib
 )
 

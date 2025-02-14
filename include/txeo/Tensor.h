@@ -2,14 +2,14 @@
 #define TENSOR_H
 #pragma once
 
+#include "TensorShape.h"
+#include "txeo/TensorIterator.h"
+
 #include <cstddef>
 #include <initializer_list>
 #include <memory>
 #include <type_traits>
 #include <vector>
-
-#include "TensorShape.h"
-#include "txeo/TensorIterator.h"
 
 namespace txeo {
 

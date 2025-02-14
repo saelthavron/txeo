@@ -1,10 +1,10 @@
 #include "txeo/Predictor.h"
 #include "txeo/Tensor.h"
 #include "txeo/TensorShape.h"
-#include "txeo/detail/TensorPrivate.h"
-
 #include "txeo/detail/PredictorPrivate.h"
+#include "txeo/detail/TensorPrivate.h"
 #include "txeo/detail/utils.h"
+
 #include <cstddef>
 #include <memory>
 #include <tensorflow/cc/saved_model/tag_constants.h>
@@ -15,11 +15,13 @@ namespace tf = tensorflow;
 namespace txeo {
 
 template <typename T>
-Predictor<T>::Predictor(std::string model_path) : _impl{std::make_unique<Impl>()} {
+inline void Predictor<T>::load_model() {
   std::unordered_set<std::string> tags{static_cast<const char *>(tf::kSavedModelTagServe)};
+  tensorflow::ConfigProto *config = &_impl->session_options.config;
+  config->mutable_gpu_options()->set_allow_growth(true);
 
-  tf::Status status = tf::LoadSavedModel(_impl->session_options, _impl->run_options, model_path,
-                                         tags, &_impl->model);
+  tf::Status status = tf::LoadSavedModel(_impl->session_options, _impl->run_options,
+                                         _impl->model_path, tags, &_impl->model);
   if (!status.ok())
     throw txeo::PredictorError("Error loading model: " + status.ToString());
 
@@ -46,17 +48,23 @@ Predictor<T>::Predictor(std::string model_path) : _impl{std::make_unique<Impl>()
 }
 
 template <typename T>
+Predictor<T>::Predictor(std::filesystem::path model_path) : _impl{std::make_unique<Impl>()} {
+  _impl->model_path = model_path;
+  this->load_model();
+}
+
+template <typename T>
 inline Predictor<T>::~Predictor() {
   auto aux = _impl->model.session->Close();
 }
 
 template <typename T>
-inline const Predictor<T>::TensorInfo &Predictor<T>::get_input_metadata() const {
+inline const Predictor<T>::TensorInfo &Predictor<T>::get_input_metadata() const noexcept {
   return _impl->in_name_shape_map;
 }
 
 template <typename T>
-inline const Predictor<T>::TensorInfo &Predictor<T>::get_output_metadata() const {
+inline const Predictor<T>::TensorInfo &Predictor<T>::get_output_metadata() const noexcept {
   return _impl->out_name_shape_map;
 }
 
@@ -73,8 +81,8 @@ inline txeo::Tensor<T> Predictor<T>::predict(const txeo::Tensor<T> input) const 
   auto input_name = _impl->in_name_shape_map[0].first;
   auto output_name = _impl->out_name_shape_map[0].first;
   auto tf_tensor = *input._impl->tf_tensor;
-  std::vector<tf::Tensor> outputs;
 
+  std::vector<tf::Tensor> outputs;
   auto status = _impl->model.session->Run({{input_name, tf_tensor}}, {output_name}, {}, &outputs);
   if (!status.ok())
     txeo::PredictorError("Error running model: " + status.ToString());
@@ -103,7 +111,8 @@ Predictor<T>::get_output_metadata_shape(const std::string &name) const {
 }
 
 template <typename T>
-std::vector<txeo::Tensor<T>> Predictor<T>::predict(const Predictor<T>::TensorIdent &inputs) const {
+std::vector<txeo::Tensor<T>>
+Predictor<T>::predict_batch(const Predictor<T>::TensorIdent &inputs) const {
   if (_impl->out_name_shape_map.size() == 0)
     throw txeo::PredictorError("The loaded model has no output metadata!");
   for (size_t i{0}; i < inputs.size(); ++i) {
@@ -133,6 +142,31 @@ std::vector<txeo::Tensor<T>> Predictor<T>::predict(const Predictor<T>::TensorIde
 
   return resp;
 }
+
+template <typename T>
+void Predictor<T>::enable_xla(bool enable) {
+  _impl->session_options.config.mutable_graph_options()
+      ->mutable_optimizer_options()
+      ->set_global_jit_level(enable ? tensorflow::OptimizerOptions::ON_1
+                                    : tensorflow::OptimizerOptions::OFF);
+  auto aux = _impl->model.session->Close();
+  this->load_model();
+}
+
+template <typename T>
+std::vector<txeo::DeviceInfo> Predictor<T>::get_devices() const {
+  std::vector<tensorflow::DeviceAttributes> devices;
+  tensorflow::Status status = _impl->model.session->ListDevices(&devices);
+  std::vector<txeo::DeviceInfo> resp;
+  for (auto &item : devices) {
+    txeo::DeviceInfo aux{.name = item.name(),
+                         .device_type = item.device_type(),
+                         .memory_limit = txeo::detail::to_size_t(item.memory_limit())};
+    resp.emplace_back(aux);
+  }
+
+  return resp;
+};
 
 template class Predictor<short>;
 template class Predictor<int>;

@@ -15,6 +15,7 @@ struct txeo::Predictor<T>::Impl {
 
     Predictor<T>::TensorInfo in_name_shape_map;
     Predictor<T>::TensorInfo out_name_shape_map;
+    std::filesystem::path model_path{""};
 };
 
 #endif

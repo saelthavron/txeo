@@ -8,6 +8,7 @@
 #include <tensorflow/core/framework/types.pb.h>
 #include <tensorflow/core/protobuf/meta_graph.pb.h>
 #include <tensorflow/core/public/session.h>
+#include <utility>
 
 namespace tf = tensorflow;
 
@@ -21,25 +22,36 @@ namespace tf = tensorflow;
 int main() {
 
   txeo::Predictor pred{"/home/roberto/my_works/personal/hello_python/model_regression"};
+  pred.enable_xla(true);
 
-  const auto &in_meta = pred.get_input_metadata();
-  const auto &out_meta = pred.get_output_metadata();
-
-  std::cout << "INPUTS:" << std::endl;
-  for (auto &item : in_meta) {
-    std::cout << item.first << ":" << std::endl;
-    std::cout << item.second << ":" << std::endl;
+  auto devices = pred.get_devices();
+  for (const auto &device : devices) {
+    std::cout << "Name:   " << device.name << " (" << device.device_type << ")" << " - "
+              << device.memory_limit << std::endl;
   }
 
-  std::cout << std::endl;
-  std::cout << "OUTPUTS:" << std::endl;
-  for (auto &item : out_meta) {
-    std::cout << item.first << ":" << std::endl;
-    std::cout << item.second << ":" << std::endl;
-  }
+  // const auto &in_meta = pred.get_input_metadata();
+  // const auto &out_meta = pred.get_output_metadata();
+
+  // std::cout << "INPUTS:" << std::endl;
+  // for (auto &item : in_meta) {
+  //   std::cout << item.first << ":" << std::endl;
+  //   std::cout << item.second << ":" << std::endl;
+  // }
+
+  // std::cout << std::endl;
+  // std::cout << "OUTPUTS:" << std::endl;
+  // for (auto &item : out_meta) {
+  //   std::cout << item.first << ":" << std::endl;
+  //   std::cout << item.second << ":" << std::endl;
+  // }
 
   txeo::TensorIO io{"/home/roberto/my_works/personal/txeo-tf/tests/teste.txt"};
   txeo::Tensor<float> input = io.read_text_file<float>(true);
+
+  //  std::vector<std::pair<std::string, txeo::Tensor<float>>> inputs;
+
+  //  inputs.emplace_back("serving_default_dense_8_input:0", input);
 
   auto resp = pred.predict(input);
 
