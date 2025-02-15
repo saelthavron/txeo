@@ -1,2 +1,9 @@
 add_executable(txeo_example txeo_example.cpp)
+add_executable(txeo_shapes txeo_shapes.cpp)
+add_executable(txeo_tensors txeo_tensors.cpp)
+add_executable(txeo_tensorio txeo_tensorio.cpp)
+
 target_link_libraries(txeo_example PRIVATE txeo_static)
+target_link_libraries(txeo_shapes PRIVATE txeo_static)
+target_link_libraries(txeo_tensors PRIVATE txeo_static)
+target_link_libraries(txeo_tensorio PRIVATE txeo_static)

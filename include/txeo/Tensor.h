@@ -1,5 +1,6 @@
 #ifndef TENSOR_H
 #define TENSOR_H
+#include <exception>
 #pragma once
 
 #include "TensorShape.h"
@@ -310,6 +311,57 @@ class Tensor {
     explicit Tensor(const txeo::TensorShape &shape, const std::vector<T> &values);
 
     /**
+     * @brief Constructs a Tensor object from a specified std::vector<size_t> and fills it with a
+     * std::vector of values in a row-major scheme
+     *
+     * @param shape Shape of the constructed tensor
+     * @param values Elements of the constructed tensor
+     *
+     * @throw  txeo::TensorError
+     *
+     * **Example Usage:**
+     * @code
+     * #include <iostream>
+     * #include "txeo/Tensor.h"
+     * #include "txeo/TensorShape.h"
+     *
+     * int main() {
+     *     txeo::Tensor<int> tensor(std::vector<size_t>({2, 3}), {1, 2, 3, 4, 5, 6});
+     *
+     *     std::cout << "Tensor initialized with: " << tensor << std::endl;
+     *     return 0;
+     * }
+     * @endcode
+     */
+    explicit Tensor(const std::vector<size_t> &shape, const std::vector<T> &values);
+
+    /**
+     * @brief Constructs a Tensor object from a specified initializer list and fills it with a
+     * std::vector of values in a row-major scheme
+     *
+     * @param shape Shape of the constructed tensor
+     * @param values Elements of the constructed tensor
+     *
+     * @throw  txeo::TensorError
+     *
+     * **Example Usage:**
+     * @code
+     * #include <iostream>
+     * #include "txeo/Tensor.h"
+     * #include "txeo/TensorShape.h"
+     *
+     * int main() {
+     *     txeo::Tensor<int> tensor({2, 3}, {1, 2, 3, 4, 5, 6});
+     *
+     *     std::cout << "Tensor initialized with: " << tensor << std::endl;
+     *     return 0;
+     * }
+     * @endcode
+     */
+    explicit Tensor(std::initializer_list<size_t> shape, const std::vector<T> &values)
+        : Tensor(std::vector<size_t>(shape), values) {}
+
+    /**
      * @brief Constructs a second order Tensor from a nested std::initializer_list.
      *
      * @param values Nested initializer list
@@ -466,7 +518,9 @@ class Tensor {
      *
      */
     template <typename U>
-    [[nodiscard]] bool is_equal_shape(const Tensor<U> &other) const;
+    [[nodiscard]] bool is_equal_shape(const Tensor<U> &other) const {
+      return this->shape() == other.shape();
+    };
 
     /**
      * @brief Accesses the value of this tensor if it is a scalar (order zero).
@@ -845,6 +899,10 @@ class Tensor {
     txeo::TensorIterator<const T> end() const;
 };
 
+/**
+ * @brief Exceptions concerning @ref txeo::Tensor
+ *
+ */
 class TensorError : public std::runtime_error {
   public:
     using std::runtime_error::runtime_error;
@@ -886,7 +944,11 @@ template <typename... Args>
 inline T &Tensor<T>::at(Args... args) {
   if (this->order() != sizeof...(Args))
     throw TensorError("The number of axes specified and the order of this tensor do no match.");
-  check_indexes({static_cast<size_t>(args)...});
+  try {
+    check_indexes({static_cast<size_t>(args)...});
+  } catch (std::exception e) {
+    throw txeo::TensorError(e.what());
+  }
 
   return (*this)(args...);
 }
@@ -897,7 +959,11 @@ template <typename... Args>
 inline const T &Tensor<T>::at(Args... args) const {
   if (this->order() != sizeof...(Args))
     throw TensorError("The number of axes specified and the order of this tensor do no match.");
-  check_indexes({static_cast<size_t>(args)...});
+  try {
+    check_indexes({static_cast<size_t>(args)...});
+  } catch (std::exception e) {
+    throw txeo::TensorError(e.what());
+  }
 
   return (*this)(args...);
 }
@@ -949,8 +1015,3 @@ void Tensor<T>::fill_data_shape(
 } // namespace txeo
 
 #endif // TENSOR_H
-
-// construir um identity factory
-// gpt void map(std::function<T(T)> func);
-// gpt Tensor<T> transpose(const std::vector<size_t> &perm) const;
-// deep Iterators for STL Compatibility

@@ -74,9 +74,18 @@ inline txeo::Tensor<T> Predictor<T>::predict(const txeo::Tensor<T> input) const 
     throw txeo::PredictorError("The loaded model has no input metadata!");
   if (_impl->out_name_shape_map.size() == 0)
     throw txeo::PredictorError("The loaded model has no output metadata!");
-  if (_impl->in_name_shape_map[0].second.axis_dim(0) != 0)
+  if (_impl->in_name_shape_map[0].second.axis_dim(0) != 0) {
     if (_impl->in_name_shape_map[0].second != input.shape())
       throw txeo::PredictorError("The shape of the input tensor and the model input do not match!");
+  } else {
+    if (_impl->in_name_shape_map[0].second.number_of_axes() != input.order())
+      throw txeo::PredictorError("The shape of the input tensor and the model input do not match!");
+    for (int i{1}; i < input.order(); ++i) {
+      if (_impl->in_name_shape_map[0].second.axis_dim(i) != input.shape().axis_dim(i))
+        throw txeo::PredictorError(
+            "The shape of the input tensor and the model input do not match!");
+    }
+  }
 
   auto input_name = _impl->in_name_shape_map[0].first;
   auto output_name = _impl->out_name_shape_map[0].first;

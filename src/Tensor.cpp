@@ -21,9 +21,9 @@ namespace tf = tensorflow;
 template <typename T>
 void Tensor<T>::check_indexes(const std::vector<size_t> &indexes) {
   for (size_t i{0}; i < indexes.size(); ++i) {
-    if (_impl->txeo_shape.axis_dim(i) >= txeo::detail::to_int64(indexes[i]))
-      throw TensorError("Axis " + std::to_string(i) + " not in the range [0," +
-                        std::to_string(_impl->txeo_shape.axis_dim(i) - 1) + "]");
+    auto aux = txeo::detail::to_int64(indexes[i]);
+    if (aux < 0 || aux >= _impl->txeo_shape.axis_dim(i))
+      throw TensorError("Index out of bounds!");
   }
 }
 
@@ -115,6 +115,16 @@ Tensor<T>::Tensor(const txeo::TensorShape &shape, const std::vector<T> &values)
 }
 
 template <typename T>
+Tensor<T>::Tensor(const std::vector<size_t> &shape, const std::vector<T> &values)
+    : _impl{std::make_unique<Impl>()} {
+  txeo::TensorShape aux(shape);
+  if (values.size() != aux.calculate_capacity())
+    throw txeo::TensorError("Shape and number of values are incompatible!");
+  create_from_shape(aux);
+  std::copy(std::begin(values), std::end(values), this->data());
+}
+
+template <typename T>
 Tensor<T>::Tensor(const std::initializer_list<std::initializer_list<T>> &values)
     : _impl{std::make_unique<Impl>()} {
   std::vector<T> flat_data;
@@ -187,11 +197,11 @@ int Tensor<T>::order() const {
   return _impl->txeo_shape.number_of_axes();
 }
 
-template <typename T>
-template <typename U>
-bool Tensor<T>::is_equal_shape(const Tensor<U> &other) const {
-  return _impl->txeo_shape == other._impl->txeo_shape;
-}
+// template <typename T>
+// template <typename U>
+// bool Tensor<T>::is_equal_shape(const Tensor<U> &other) const {
+//   return this->shape() == other.shape();
+// }
 
 template <typename T>
 size_t Tensor<T>::dim() const {

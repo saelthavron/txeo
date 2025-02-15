@@ -21,6 +21,8 @@ namespace tf = tensorflow;
 
 int main() {
 
+  txeo::Tensor<float> xx({1, 256, 256, 3});
+
   txeo::Predictor pred{"/home/roberto/my_works/personal/hello_python/model_regression"};
   pred.enable_xla(true);
 
@@ -30,23 +32,23 @@ int main() {
               << device.memory_limit << std::endl;
   }
 
-  // const auto &in_meta = pred.get_input_metadata();
-  // const auto &out_meta = pred.get_output_metadata();
+  const auto &in_meta = pred.get_input_metadata();
+  const auto &out_meta = pred.get_output_metadata();
 
-  // std::cout << "INPUTS:" << std::endl;
-  // for (auto &item : in_meta) {
-  //   std::cout << item.first << ":" << std::endl;
-  //   std::cout << item.second << ":" << std::endl;
-  // }
+  std::cout << "INPUTS:" << std::endl;
+  for (auto &item : in_meta) {
+    std::cout << item.first << ":" << std::endl;
+    std::cout << item.second << ":" << std::endl;
+  }
 
-  // std::cout << std::endl;
-  // std::cout << "OUTPUTS:" << std::endl;
-  // for (auto &item : out_meta) {
-  //   std::cout << item.first << ":" << std::endl;
-  //   std::cout << item.second << ":" << std::endl;
-  // }
+  std::cout << std::endl;
+  std::cout << "OUTPUTS:" << std::endl;
+  for (auto &item : out_meta) {
+    std::cout << item.first << ":" << std::endl;
+    std::cout << item.second << ":" << std::endl;
+  }
 
-  txeo::TensorIO io{"/home/roberto/my_works/personal/txeo-tf/tests/teste.txt"};
+  txeo::TensorIO io{"/home/roberto/my_works/personal/txeo-tf/tests/test_data/teste.txt"};
   txeo::Tensor<float> input = io.read_text_file<float>(true);
 
   //  std::vector<std::pair<std::string, txeo::Tensor<float>>> inputs;
@@ -55,7 +57,8 @@ int main() {
 
   auto resp = pred.predict(input);
 
-  txeo::TensorIO::write_textfile(resp, "/home/roberto/my_works/personal/txeo-tf/tests/w_teste.txt");
+  txeo::TensorIO::write_textfile(
+      resp, "/home/roberto/my_works/personal/txeo-tf/tests/test_data/w_teste.txt");
 
   // tf::SavedModelBundle model;
   // tf::SessionOptions session_options;

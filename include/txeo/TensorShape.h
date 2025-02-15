@@ -310,7 +310,7 @@ class TensorShape {
 };
 
 /**
- * @brief Exception class related to errors in @ref txeo::TensorShape
+ * @brief Exceptions concerning @ref txeo::TensorShape
  *
  */
 class TensorShapeError : public std::runtime_error {

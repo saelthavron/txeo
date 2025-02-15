@@ -158,6 +158,10 @@ class TensorIO {
     };
 };
 
+/**
+ * @brief Exceptions concerning @ref txeo::TensorIO
+ *
+ */
 class TensorIOError : public std::runtime_error {
   public:
     using std::runtime_error::runtime_error;
