@@ -27,32 +27,51 @@ endif()
 
 #################################################### Txeo Installation ####################################################
 
-include(GNUInstallDirs)
-install(TARGETS txeo_static txeo_shared EXPORT txeoTargets
-  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-)
-install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
-
-install(EXPORT txeoTargets
-  FILE txeoConfig.cmake
-  NAMESPACE txeo::
-  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/txeo
-)
+# After defining your library targets (add_library) but before install()
 
 include(CMakePackageConfigHelpers)
+include(GNUInstallDirs)
+
 write_basic_package_version_file(
-  "${CMAKE_CURRENT_BINARY_DIR}/txeoConfigVersion.cmake"
+  TxeoConfigVersion.cmake
   VERSION ${PROJECT_VERSION}
-  COMPATIBILITY AnyNewerVersion
+  COMPATIBILITY SameMajorVersion  
 )
 
-install(FILES
-  "${CMAKE_CURRENT_BINARY_DIR}/txeoConfigVersion.cmake"
-  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/txeo
+configure_package_config_file(
+  cmake/TxeoConfig.cmake.in
+  ${CMAKE_CURRENT_BINARY_DIR}/TxeoConfig.cmake
+  INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/Txeo
 )
 
+install(
+  TARGETS txeo_static txeo_shared
+  EXPORT TxeoTargets
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}  
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}  
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}  
+  INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}  
+)
+
+install(
+  EXPORT TxeoTargets
+  FILE TxeoTargets.cmake
+  NAMESPACE Txeo::  # Add namespace here
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/Txeo
+)
+
+install(
+  FILES
+    ${CMAKE_CURRENT_BINARY_DIR}/TxeoConfig.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/TxeoConfigVersion.cmake
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/Txeo
+)
+
+install(
+  DIRECTORY include/
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+  PATTERN "*.h"  
+)
 
 #################################################### Automating Doxygen ####################################################
 

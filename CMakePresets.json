@@ -17,6 +17,8 @@
         "BUILD_TESTING": true
       },
       "environment": {
+        "TensorFlow_HOME": "/opt/tensorflow",
+        "Protobuf_HOME": "/opt/protobuf",
         "CC": "clang",
         "CXX": "clang++"
       }
@@ -31,6 +33,8 @@
         "TXEO_ENABLE_COVERAGE": true
       },
       "environment": {
+        "TensorFlow_HOME": "/opt/tensorflow",
+        "Protobuf_HOME": "/opt/protobuf",
         "CC": "clang",
         "CXX": "clang++"
       }
@@ -49,6 +53,8 @@
         "CMAKE_BUILD_TYPE": "Release"
       },
       "environment": {
+        "TensorFlow_HOME": "/opt/tensorflow",
+        "Protobuf_HOME": "/opt/protobuf",
         "CC": "clang",
         "CXX": "clang++"
       }
@@ -67,6 +73,8 @@
         "CMAKE_BUILD_TYPE": "Release"
       },
       "environment": {
+        "TensorFlow_HOME": "/opt/tensorflow",
+        "Protobuf_HOME": "/opt/protobuf",
         "CC": "gcc",
         "CXX": "g++"
       }
@@ -84,6 +92,8 @@
         "CMAKE_BUILD_TYPE": "Release"
       },
       "environment": {
+        "TensorFlow_HOME": "/opt/tensorflow",
+        "Protobuf_HOME": "/opt/protobuf",
         "CC": "icx",
         "CXX": "icpx"
       }
