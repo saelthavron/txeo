@@ -56,7 +56,7 @@ install(FILES
 
 #################################################### Automating Doxygen ####################################################
 
-find_package(Doxygen REQUIRED COMPONENTS dot)
+find_package(Doxygen QUIET COMPONENTS dot)
 
 if(DOXYGEN_FOUND)
   set(DOXYGEN_IN ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile)
