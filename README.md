@@ -121,7 +121,8 @@ sudo make install
 
 Considering that TensorFlow and **Txeo** are installed in `/opt`:
 
-```cmake title="CMakeLists.txt"
+```cmake 
+# CMakeLists.txt
 cmake_minimum_required(VERSION 3.25)
 project(HelloTxeo LANGUAGES CXX)
 
@@ -135,7 +136,8 @@ set(TXEO_LIBRARY "/opt/txeo/lib/libtxeo.so")
 
 # Manually specify TensorFlow paths
 set(TENSORFLOW_INCLUDE_DIR "/opt/tensorflow/include")
-set(TENSORFLOW_LIBRARY "/opt/tensorflow/lib/libtensorflow_cc.so")
+set(TENSORFLOW_CC_LIBRARY "/opt/tensorflow/lib/libtensorflow_cc.so")
+set(TENSORFLOW_FRAMEWORK "/opt/tensorflow/lib/libtensorflow_framework.so")
 
 # Create an executable
 add_executable(hello_txeo main.cpp)
@@ -144,7 +146,7 @@ add_executable(hello_txeo main.cpp)
 target_include_directories(hello_txeo PRIVATE ${TXEO_INCLUDE_DIR} ${TENSORFLOW_INCLUDE_DIR})
 
 # Link Txeo and TensorFlow manually
-target_link_libraries(hello_txeo PRIVATE ${TXEO_LIBRARY} ${TENSORFLOW_LIBRARY})
+target_link_libraries(hello_txeo PRIVATE ${TXEO_LIBRARY} ${TENSORFLOW_CC_LIBRARY} ${TENSORFLOW_FRAMEWORK})
 
 # Optionally set rpath for runtime library search
 set_target_properties(hello_txeo PROPERTIES INSTALL_RPATH "/opt/txeo/lib;/opt/tensorflow/lib")
