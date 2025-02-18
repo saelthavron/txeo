@@ -23,31 +23,26 @@
 - **TensorFlow 2.18.0** - <https://github.com/tensorflow/tensorflow>
 - **Protobuf 3.21.9** - <https://github.com/protocolbuffers/protobuf>
 
-### **Steps with TensorFlow and Protobuf binaries (fastest way)**
+### **Steps with TensorFlow binaries (fastest way)**
 
 #### **1️⃣ Download and install binaries**
-
-Choosing clang generated binaries for protobuf and installing them in `/opt`:
-
-```sh
-wget https://github.com/rdabra/txeo-tf/releases/download/v1.0.0/libprotobuf-3.21.9-clang19-linux-x64.tar.gz
-sudo tar -xzf libprotobuf-3.21.9-clang19-linux-x64.tar.gz -C /opt/
-export Protobuf_ROOT_DIR=/opt/protobuf
-```
 
 Choosing clang generated binaries for tensorflow and installing them in `/opt`:
 
 ```sh
 wget https://github.com/rdabra/txeo-tf/releases/download/v1.0.0/libtensorflow-2.18-clang19-linux-x64-cpu.tar.gz
 sudo tar -xzf libtensorflow-2.18-clang19-linux-x64-cpu.tar.gz -C /opt/
-export TensorFlow_ROOT_DIR=/opt/tensorflow
+echo "export TensorFlow_ROOT_DIR=/opt/tensorflow" >> ~/.bashrc
+source ~/.bashrc
 ```
 
-> **📌 Important Note:** The source codes of TensorFlow and Protobuf used for the binaries available here for download were not modified in any way, shape or form. Our intention is solely to provide the user a fast way to install **Txeo**.  
+💡 **Important Note** : The TensorFlow source code used for the provided binaries **was not modified** in any way. These binaries are **only provided to simplify installation** for Txeo users.
 
 📁 Other assets are available <https://github.com/rdabra/txeo-tf/releases/tag/v1.0.0>
 
 #### **2️⃣ Clone and install Txeo**
+
+Txeo is also instaled in `/opt` by default.
 
 ```sh
 git clone https://github.com/rdabra/txeo-tf.git
@@ -58,22 +53,9 @@ make -j$(nproc)
 sudo make install
 ```
 
-### **Steps with TensorFlow and Protobuf built from source (may take a very long time)**
+### **Steps with TensorFlow built from source (may take a very long time)**
 
-#### **1️⃣ Clone and install Protobuf**
-
-```sh
-git clone https://github.com/protocolbuffers/protobuf.git
-cd protobuf
-git checkout refs/tags/v3.21.9
-cmake -S. -Bcmake-out -G Ninja -DCMAKE_INSTALL_PREFIX="/opt/protobuf" -Dprotobuf_ABSL_PROVIDER=package -Dprotobuf_BUILD_TESTS=OFF
-cd cmake-out
-cmake --build .
-sudo cmake --install .
-export Protobuf_ROOT_DIR=/opt/protobuf 
-```
-
-#### **2️⃣ Clone and install Tensorflow**
+#### **1️⃣ Clone and install Tensorflow**
 
 Bazel must be installed previously (see <https://github.com/bazelbuild/bazelisk>). During the config phase, choose not to compile for gpu (without cuda support). This build was tested in clang v19 and gcc v13 (without the `-std=gnu2x` key).
 
@@ -93,10 +75,13 @@ sudo mkdir /opt/tensorflow
 sudo cp -r tensorflow/include /opt/tensorflow
 sudo mkdir /opt/tensorflow/lib
 sudo cp -r tensorflow/*.so* /opt/tensorflow/lib
-export TensorFlow_ROOT_DIR=/opt/tensorflow 
+echo "export TensorFlow_ROOT_DIR=/opt/tensorflow" >> ~/.bashrc
+source ~/.bashrc 
 ```
 
 #### **3️⃣ Clone and install Txeo**
+
+**Txeo** is also instaled in `/opt` by default.
 
 ```sh
 git clone https://github.com/rdabra/txeo-tf.git
@@ -106,6 +91,65 @@ cmake .. -DCMAKE_BUILD_TYPE=Release
 make -j$(nproc)
 sudo make install
 ```
+
+## 🚗 Basic Usage
+
+### **A simple CMakeLists.txt**
+
+Considering that TensorFlow and **Txeo** are installed in `/opt`:
+
+```cmake title="CMakeLists.txt"
+cmake_minimum_required(VERSION 3.25)
+project(HelloTxeo LANGUAGES CXX)
+
+# Set C++ standard
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# Manually specify Txeo installation paths
+set(TXEO_INCLUDE_DIR "/opt/txeo/include")
+set(TXEO_LIBRARY "/opt/txeo/lib/libtxeo.so")
+
+# Manually specify TensorFlow paths
+set(TENSORFLOW_INCLUDE_DIR "/opt/tensorflow/include")
+set(TENSORFLOW_LIBRARY "/opt/tensorflow/lib/libtensorflow_cc.so")
+
+# Create an executable
+add_executable(hello_txeo main.cpp)
+
+# Include directories for Txeo and TensorFlow
+target_include_directories(hello_txeo PRIVATE ${TXEO_INCLUDE_DIR} ${TENSORFLOW_INCLUDE_DIR})
+
+# Link Txeo and TensorFlow manually
+target_link_libraries(hello_txeo PRIVATE ${TXEO_LIBRARY} ${TENSORFLOW_LIBRARY})
+
+# Optionally set rpath for runtime library search
+set_target_properties(hello_txeo PROPERTIES INSTALL_RPATH "/opt/txeo/lib;/opt/tensorflow/lib")
+```
+
+Here is a code sample where a 3x3 `txeo::Tensor` is defined, written to a file and then another instance is created from the saved file.
+
+```cpp title="main.cpp"
+#include "txeo/Tensor.h"
+#include "txeo/TensorIO.h"
+#include <iostream>
+
+int main() {
+
+  // 3x3 tensor created from a list of float values in row major scheme
+  txeo::Tensor<double> tensor({3, 3}, {1, 2, 3, 4, 5, 6, 7, 8, 9});
+
+  txeo::TensorIO::write_textfile(tensor, "tensor.txt");
+
+  auto loaded_tensor = txeo::TensorIO::read_textfile<double>("tensor.txt");
+
+  std::cout << loaded_tensor << std::endl;
+
+  return 0;
+}
+```
+
+📁 For more samples, please visit the [examples folder](https://github.com/rdabra/txeo-tf/tree/main/examples).
 
 ## 📜 License
 

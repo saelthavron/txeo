@@ -29,68 +29,41 @@ endif()
 
 # After defining your library targets (add_library) but before install()
 
-include(CMakePackageConfigHelpers)
+set(CMAKE_INSTALL_PREFIX "/opt/txeo" CACHE PATH "Install path prefix" FORCE)
+
+# Define installation directories
 include(GNUInstallDirs)
 
-write_basic_package_version_file(
-  TxeoConfigVersion.cmake
-  VERSION ${PROJECT_VERSION}
-  COMPATIBILITY SameMajorVersion  
+# Install libraries
+install(TARGETS txeo_static txeo_shared
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}    # Static libraries (.a)
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}    # Shared libraries (.so)
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}    # Executables (if any)
 )
 
-configure_package_config_file(
-  cmake/TxeoConfig.cmake.in
-  ${CMAKE_CURRENT_BINARY_DIR}/TxeoConfig.cmake
-  INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/Txeo
-)
+# Install headers
+install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
-install(
-  TARGETS txeo_static txeo_shared
-  EXPORT TxeoTargets
-  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}  
-  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}  
-  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}  
-  INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}  
-)
-
-install(
-  EXPORT TxeoTargets
-  FILE TxeoTargets.cmake
-  NAMESPACE Txeo::  # Add namespace here
-  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/Txeo
-)
-
-install(
-  FILES
-    ${CMAKE_CURRENT_BINARY_DIR}/TxeoConfig.cmake
-    ${CMAKE_CURRENT_BINARY_DIR}/TxeoConfigVersion.cmake
-  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/Txeo
-)
-
-install(
-  DIRECTORY include/
-  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-  PATTERN "*.h"  
-)
 
 #################################################### Automating Doxygen ####################################################
 
 find_package(Doxygen QUIET COMPONENTS dot)
 
-if(DOXYGEN_FOUND)
-  set(DOXYGEN_IN ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile)
+if (NOT CMAKE_BUILD_TYPE STREQUAL "Release")
+  if(DOXYGEN_FOUND)
+    set(DOXYGEN_IN ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile)
 
-  add_custom_target(doxygen ALL
-      COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_IN}
-      WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-      COMMENT "Generating Doxygen documentation..."
-      VERBATIM
-  )
-  install(DIRECTORY ${DOXYGEN_OUT} DESTINATION share/docs)
-else()
-  message(WARNING "Doxygen not found. Documentation target will not be available.")
+    add_custom_target(doxygen ALL
+        COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_IN}
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+        COMMENT "Generating Doxygen documentation..."
+        VERBATIM
+    )
+    install(DIRECTORY ${DOXYGEN_OUT} DESTINATION share/docs)
+  else()
+    message(WARNING "Doxygen not found. Documentation target will not be available.")
+  endif()
 endif()
-
 
 #################################################### Automating gcovr ####################################################
 
