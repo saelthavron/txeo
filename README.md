@@ -23,11 +23,20 @@
 - **TensorFlow 2.18.0** - <https://github.com/tensorflow/tensorflow>
 - **Protobuf 3.21.9** - <https://github.com/protocolbuffers/protobuf>
 
-### **Steps with TensorFlow binaries (fastest way)**
+### **Steps with Protobuf and TensorFlow binaries (fastest way)**
 
 #### **1️⃣ Download and install binaries**
 
-Choosing clang generated binaries for tensorflow and installing them in `/opt`:
+Choosing clang generated binaries for Protobuf and installing them in `/opt`:
+
+```sh
+wget https://github.com/rdabra/txeo-tf/releases/download/v1.0.0/libprotobuf-3.21.9-clang19-linux-x64.tar.gz
+sudo tar -xzf libprotobuf-3.21.9-clang19-linux-x64.tar.gz -C /opt/
+echo "export Protobuf_ROOT_DIR=/opt/protobuf" >> ~/.bashrc
+source ~/.bashrc
+```
+
+Choosing clang generated binaries for TensorFlow and installing them in `/opt`:
 
 ```sh
 wget https://github.com/rdabra/txeo-tf/releases/download/v1.0.0/libtensorflow-2.18-clang19-linux-x64-cpu.tar.gz
@@ -36,7 +45,7 @@ echo "export TensorFlow_ROOT_DIR=/opt/tensorflow" >> ~/.bashrc
 source ~/.bashrc
 ```
 
-💡 **Important Note** : The TensorFlow source code used for the provided binaries **was not modified** in any way. These binaries are **only provided to simplify installation** for Txeo users.
+💡 **Important Note** : The Protobuf and TensorFlow source codes used for the provided binaries **were not modified** in any way. These binaries are **only provided to simplify installation** for Txeo users.
 
 📁 Other assets are available <https://github.com/rdabra/txeo-tf/releases/tag/v1.0.0>
 
@@ -55,7 +64,21 @@ sudo make install
 
 ### **Steps with TensorFlow built from source (may take a very long time)**
 
-#### **1️⃣ Clone and install Tensorflow**
+#### **1️⃣ Clone and install Protobuf**
+
+```sh
+git clone https://github.com/protocolbuffers/protobuf.git
+cd protobuf
+git checkout refs/tags/v3.21.9
+cmake -S. -Bcmake-out -G Ninja -DCMAKE_INSTALL_PREFIX="/opt/protobuf" -Dprotobuf_ABSL_PROVIDER=package -Dprotobuf_BUILD_TESTS=OFF
+cd cmake-out
+cmake --build .
+sudo cmake --install .
+echo "export Protobuf_ROOT_DIR=/opt/protobuf" >> ~/.bashrc
+source ~/.bashrc
+```
+
+#### **2️⃣ Clone and install Tensorflow**
 
 Bazel must be installed previously (see <https://github.com/bazelbuild/bazelisk>). During the config phase, choose not to compile for gpu (without cuda support). This build was tested in clang v19 and gcc v13 (without the `-std=gnu2x` key).
 
