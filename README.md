@@ -15,10 +15,6 @@
 - 💻 **XLA Enabling** - Enabling/disabling of XLA features.
 - 🐚 **TensorFlow Encapsulation** - TensorFlow is hidden from **Txeo** users.
 
-
-
-
-
 ## ⚡ Installation
 
 ### **Requirements**
