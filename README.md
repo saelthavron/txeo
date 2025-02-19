@@ -1,41 +1,47 @@
-# Txeo: a Developer-Friendly TensorFlow C++ Wrapper
+# Txeo: a Modern C++ Wrapper for TensorFlow
 
 [![License: Apache 2.0](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
+[![Build](https://github.com/rdabra/txeo-tf/actions/workflows/build.yml/badge.svg)](https://github.com/rdabra/txeo-tf/actions)
+[![GitHub release](https://img.shields.io/github/v/release/rdabra/txeo-tf)](https://github.com/rdabra/txeo-tf/releases)
+[![GitHub issues](https://img.shields.io/github/issues/rdabra/txeo-tf)](https://github.com/rdabra/txeo-tf/issues)
+[![Docs](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://rdabra.github.io/txeo/)
+[![Last Commit](https://img.shields.io/github/last-commit/rdabra/txeo-tf)](https://github.com/rdabra/txeo-tf/commits/main)
 
 ## 📝 Overview
 
-**Txeo** is a lightweight and intuitive **C++ wrapper for TensorFlow 2.0**, designed to **simplify TensorFlow C++ development** while preserving **high performance and flexibility**. Built entirely with **Modern C++**, **Txeo** allows developers to use TensorFlow with the ease of a high-level API, eliminating the complexity of its low-level C++ interface.
+**Txeo** is a lightweight and intuitive **C++ wrapper for TensorFlow**, designed to **simplify TensorFlow C++ development** while preserving **high performance and flexibility**. Built entirely with **Modern C++**, **Txeo** allows developers to use TensorFlow with the ease of a high-level API, eliminating the complexity of its low-level C++ interface.
 
 ## ✨ Features
 
-- 📦 **Easy-to-use API** – Designed for a clean and readable C++ interface.
-- 🔧 **Tensor abstraction** – Simplifies TensorFlow tensor creation and manipulation.
-- 💾 **Tensor IO** – Reading and writing tensors from and to text files.
-- 🏗 **Model wrapper** – Streamlined saved model loading and inference.
-- 💻 **XLA Enabling** - Enabling/disabling of XLA features.
-- 🐚 **TensorFlow Encapsulation** - TensorFlow is hidden from **Txeo** users.
+- 📦 **Intuitive API** – A clean and modern C++ interface, simplifying TensorFlow C++ usage.
+- 🔧 **High-Level Tensor Abstraction** – Easily create, manipulate, and operate on tensors.
+- 💾 **Flexible Tensor IO** – Seamless reading and writing of tensors to text files.
+- 🏗 **Simplified Model Loading** – Load and run saved TensorFlow models with minimal setup.
+- ⚡ **XLA Acceleration** – Enable or disable TensorFlow’s XLA optimizations effortlessly.
+- 🛡 **Encapsulated TensorFlow API** – Fully abstracts TensorFlow internals for a cleaner experience.
 
-## ⚡ Installation
+## ⚡ Installation Guide
 
-### **Requirements**
+### **🔹Requirements**
 
-- **Linux** - Tested in Ubuntu and Manjaro. Not yet available for other platforms.
-- **Build Essentials** - Essential tools for C/C++ development.
-- **CMake** - Built with v3.25.
-- **Compilers**
-  - clang (tested with v19.1.0)
-  - gcc (tested with v13.2.0)
-  - Most support C++20 features: concepts, ranges, etc.
-- **TensorFlow 2.18.0** - <https://github.com/tensorflow/tensorflow>
-- **Protobuf 3.21.9** - <https://github.com/protocolbuffers/protobuf>
+- **Supported OS:** 🐧 **Linux** (Tested on Ubuntu and Manjaro).  
+  - ⚠️ **Windows and macOS are not yet officially supported.**
+- **Build Tools:** 🛠 Essential C/C++ development tools.
+- **CMake:** 🏗 Built with **v3.25+**.
+- **Compilers:** 💻 Requires a C++20-compatible compiler:
+  - ✅ **Clang** (Tested with **v19.1.2**)
+  - ✅ **GCC** (Tested with **v13.2.0**)
+  - ✅ **Intel** (Tested with **v2025.0.4**)
+  - 🛠 Supports **concepts, ranges, and other C++20 features**.
+- **Dependencies:**
+  - 🔗 **TensorFlow 2.18.0** → [GitHub](https://github.com/tensorflow/tensorflow)
+  - 📜 **Protobuf 3.21.9** → [GitHub](https://github.com/protocolbuffers/protobuf)
 
-### **Steps with Protobuf and TensorFlow binaries (fastest way)**
+### **🔹Steps with Precompiled Binaries (Fastest Way)**
 
-In the following sections, a bash shell is assumed and all the resources are installed in directory `/opt`.
+This method **installs TensorFlow and Protobuf binaries** into `/opt/`.
 
-#### **1️⃣ Download and install binaries**
-
-Installing Protobuf binaries:
+#### **1️⃣ Download and install Protobuf**
 
 ```sh
 wget https://github.com/rdabra/txeo-tf/releases/download/v1.0.0/libprotobuf-3.21.9-linux-x64.tar.gz
@@ -44,11 +50,15 @@ echo "export Protobuf_ROOT_DIR=/opt/protobuf" >> ~/.bashrc
 source ~/.bashrc
 ```
 
-For TensorFlow, we provide the binaries
+#### **2️⃣ Download and install TensorFlow**
 
-- Without CPU optimizations: [libtensorflow-2.18-linux-x64-cpu.tar.gz](https://github.com/rdabra/txeo-tf/releases/download/v1.0.0/libtensorflow-2.18-linux-x64-cpu.tar.gz)
-- With CPU optimizations: [libtensorflow-2.18-linux-x64-cpu-opt.tar.gz](https://github.com/rdabra/txeo-tf/releases/download/v1.0.0/libtensorflow-2.18-linux-x64-cpu-opt.tar.gz)
-- With GPU support: [libtensorflow-2.18-linux-x64-gpu.tar.gz](https://github.com/rdabra/txeo-tf/releases/download/v1.0.0/libtensorflow-2.18-linux-x64-gpu.tar.gz)
+Choose the correct version based on your system:
+
+| Version | Download |
+| -------- | ------- |
+| 💻 Without CPU optimizations | [libtensorflow-2.18-linux-x64-cpu.tar.gz](https://github.com/rdabra/txeo-tf/releases/download/v1.0.0/libtensorflow-2.18-linux-x64-cpu.tar.gz) |
+| 🚀 With CPU optimizations: | [libtensorflow-2.18-linux-x64-cpu-opt.tar.gz](https://github.com/rdabra/txeo-tf/releases/download/v1.0.0/libtensorflow-2.18-linux-x64-cpu-opt.tar.gz) |
+| 🎮 With GPU support: | [libtensorflow-2.18-linux-x64-gpu.tar.gz](https://github.com/rdabra/txeo-tf/releases/download/v1.0.0/libtensorflow-2.18-linux-x64-gpu.tar.gz) |
 
 💡 **Important Note** : The Protobuf and TensorFlow source codes used for compiling the binaries above **were not modified** in any way. These assets are **only provided to simplify installation** for **Txeo** users.
 
@@ -61,7 +71,7 @@ echo "export TensorFlow_ROOT_DIR=/opt/tensorflow" >> ~/.bashrc
 source ~/.bashrc
 ```
 
-#### **2️⃣ Clone and install Txeo**
+#### **3️⃣ Clone and install Txeo**
 
 Installing **Txeo** and making libraries visible via library path:
 
@@ -75,7 +85,7 @@ sudo make install
 echo "export LD_LIBRARY_PATH=/opt/tensorflow/lib:/opt/txeo/lib:$LD_LIBRARY_PATH" >> ~/.bashrc
 ```
 
-### **Steps with Protobuf and TensorFlow built from source (may take a long time)**
+### **🔹Steps with Protobuf and TensorFlow built from source (may take a long time)**
 
 #### **1️⃣ Clone and install Protobuf**
 
@@ -93,7 +103,9 @@ source ~/.bashrc
 
 #### **2️⃣ Clone and install Tensorflow**
 
-Bazel must be installed previously (see <https://github.com/bazelbuild/bazelisk>). For the gcc compiler, key `-std=gnu2x` must be removed.
+⚠️ Important:
+Ensure Bazel is installed before proceeding. You can use Bazelisk to manage Bazel versions:
+[Bazelisk GitHub](https://github.com/bazelbuild/bazelisk). For the gcc compiler, key `-std=gnu2x` must be removed.
 
 ```sh
 git clone https://github.com/tensorflow/tensorflow.git
@@ -115,7 +127,7 @@ echo "export TensorFlow_ROOT_DIR=/opt/tensorflow" >> ~/.bashrc
 source ~/.bashrc 
 ```
 
-#### **3️⃣ Clone and install Txeo**
+#### **3️⃣ Installing Txeo**
 
 ```sh
 git clone https://github.com/rdabra/txeo-tf.git
@@ -129,9 +141,18 @@ echo "export LD_LIBRARY_PATH=/opt/tensorflow/lib:/opt/txeo/lib:$LD_LIBRARY_PATH"
 
 ## 🚗 Basic Usage
 
-### **A Simple CMakeLists.txt**
+This section provides **two simple C++ examples** to help you get started with **Txeo**.
 
-Considering that TensorFlow and **Txeo** are properly installed:
+> **📌 Prerequisite:** Before compiling, ensure that TensorFlow and **Txeo** are properly installed in `/opt/`.  
+> If necessary, add the library paths:  
+>
+> ```sh
+> export LD_LIBRARY_PATH=/opt/tensorflow/lib:/opt/txeo/lib:$LD_LIBRARY_PATH
+> ```
+
+### **🔹 A Simple CMakeLists.txt**
+
+To compile a project using **Txeo**, use the following **CMakeLists.txt** file.
 
 ```cmake
 # CMakeLists.txt
@@ -164,7 +185,9 @@ target_link_libraries(hello_txeo PRIVATE ${TXEO_LIBRARY} ${TENSORFLOW_CC_LIBRARY
 set_target_properties(hello_txeo PROPERTIES INSTALL_RPATH "/opt/txeo/lib;/opt/tensorflow/lib")
 ```
 
-### **Two Simple Examples**
+💡 Note: If TensorFlow is installed in a different location, update TENSORFLOW_INCLUDE_DIR and TENSORFLOW_LIBRARY paths accordingly.
+
+### 🔢 **Example 1: Tensor Operations**
 
 Here is a code sample where a 3x3 `txeo::Tensor` is defined, written to a file and then another instance is created from the saved file.
 
@@ -179,20 +202,25 @@ using namespace std;
 
 int main() {
 
-  // 3x3 tensor created from a list of float values in row major scheme
+  // 3×3 tensor created from a list of double values in row-major order
   Tensor<double> tensor({3, 3}, {1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f});
 
+  // Save tensor to file
   TensorIO::write_textfile(tensor, "tensor.txt");
 
+  // Load tensor from file
   auto loaded_tensor = TensorIO::read_textfile<double>("tensor.txt");
 
+  // Display loaded tensor
   cout << loaded_tensor << endl;
 
   return 0;
 }
 ```
 
-By providing a directory path containing a properly saved model (`.pb`), input data and output info, inference is intuitive and straightforward with `txeo::Predictor` :
+### 🔮 **Example 2: Running Inference with a Saved Model**
+
+This example loads a saved TensorFlow model, performs inference on an input tensor, and saves the output:
 
 ```cpp
 //main.cpp
@@ -205,27 +233,67 @@ using namespace std;
 
 int main() {
 
+  // Define paths to model and input/output tensors
   string model_path{"path/to/saved_model"};
   string input_path{"path/to/input_tensor.txt"};
   string output_path{"path/to/output_tensor.txt"};
 
+  // Load the model
   Predictor<float> predictor{model_path};
+  
+  // Read input tensor from file
   auto input = TensorIO::read_textfile<float>(input_path);
+  
+  // Run inference
   auto output = predictor.predict(input);
+  
+  // Save output tensor to file
   TensorIO::write_textfile(output, output_path);
 
   return 0;
 }
 ```
 
+💡 Note: Ensure that "path/to/saved_model" contains a valid TensorFlow model before running this example.
+
 📁 For more samples, please visit the [examples folder](https://github.com/rdabra/txeo-tf/tree/main/examples).
+
+## ⏰ Roadmap
+
+**Txeo** is actively evolving! Here are some of the upcoming features:
+
+### 🏋️ Training Capabilities
+
+- **Model Training** - Enable training models using TensorFlow C++.
+- **Backpropagation Support** - Implement automatic differentiation.
+- **Gradient Descent & Optimizers** - Integrate optimizers like SGD and Adam.
+
+### 🔢 Advanced Tensor Operations
+
+- **Matrix Multiplication (`matmul`)** - Perform tensor dot products.
+- **Broadcasting Support** - Support element-wise operations on different shapes.
+- **Reduction Operations (`sum`, `mean`, `max`)** - Compute statistics on tensors.
+- **Linear Algebra Functions (SVD, QR decomposition)** - Matrix Computations on tensors.
+
+### 📊 Model Saving & Loading Enhancements
+
+- **Checkpointing** - Save model weights at different training stages.
+- **Frozen Graph Support** - Load & optimize frozen models for inference.
+
+💡 **Want to contribute?** Feel free to check out the [issues page](https://github.com/rdabra/txeo-tf/issues) or suggest new features!
 
 ## 📜 License
 
-**Txeo** is licensed under the Apache License 2.0.
+**Txeo** is licensed under the **Apache License 2.0**, meaning it is **open-source, free to use, modify, and distribute**, while requiring proper attribution.
 
-### Third-Party Licenses
+### 📄 Third-Party Licenses
 
-**Txeo** uses TensorFlow C++ (licensed under Apache 2.0).  
-TensorFlow’s original license is included in [`third_party/tensorflow/LICENSE`](third_party/tensorflow/LICENSE).  
-For more details, visit [TensorFlow GitHub](https://github.com/tensorflow/tensorflow).
+**Txeo** depends on third-party libraries that have their own licenses:
+
+- **TensorFlow C++** - Licensed under **Apache License 2.0**  
+  - 📜 [TensorFlow License](third_party/tensorflow/LICENSE)  
+  - 🔗 [TensorFlow GitHub](https://github.com/tensorflow/tensorflow)
+- **Protobuf** - Licensed under **BSD 3-Clause**  
+  - 📜 [Protobuf License](https://github.com/protocolbuffers/protobuf/blob/main/LICENSE)
+
+> **📌 Note:** The precompiled binaries of TensorFlow and Protobuf provided in the releases section **are unmodified versions** of the official source code.
