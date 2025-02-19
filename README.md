@@ -37,7 +37,7 @@
   - 🔗 **TensorFlow 2.18.0** → [GitHub](https://github.com/tensorflow/tensorflow)
   - 📜 **Protobuf 3.21.9** → [GitHub](https://github.com/protocolbuffers/protobuf)
 
-### **🔹Steps with Precompiled Binaries (Fastest Way)**
+### **🔹Option 1: Installation Steps with Precompiled Binaries (Fastest Way)**
 
 This method **installs TensorFlow and Protobuf binaries** into `/opt/`.
 
@@ -85,7 +85,7 @@ sudo make install
 echo "export LD_LIBRARY_PATH=/opt/tensorflow/lib:/opt/txeo/lib:$LD_LIBRARY_PATH" >> ~/.bashrc
 ```
 
-### **🔹Steps with Protobuf and TensorFlow built from source (may take a long time)**
+### **🔹Option 2: Installation Steps with Protobuf and TensorFlow built from source (may take a long time)**
 
 #### **1️⃣ Clone and install Protobuf**
 
@@ -187,7 +187,7 @@ set_target_properties(hello_txeo PROPERTIES INSTALL_RPATH "/opt/txeo/lib;/opt/te
 
 💡 Note: If TensorFlow is installed in a different location, update TENSORFLOW_INCLUDE_DIR and TENSORFLOW_LIBRARY paths accordingly.
 
-### 🔢 **Example 1: Tensor Operations**
+### 🔢 **Example 1: Tensor Basics**
 
 Here is a code sample where a 3x3 `txeo::Tensor` is defined, written to a file and then another instance is created from the saved file.
 
@@ -258,7 +258,7 @@ int main() {
 
 📁 For more samples, please visit the [examples folder](https://github.com/rdabra/txeo-tf/tree/main/examples).
 
-## ⏰ Roadmap
+## 📆 Roadmap
 
 **Txeo** is actively evolving! Here are some of the upcoming features:
 
@@ -280,7 +280,13 @@ int main() {
 - **Checkpointing** - Save model weights at different training stages.
 - **Frozen Graph Support** - Load & optimize frozen models for inference.
 
-💡 **Want to contribute?** Feel free to check out the [issues page](https://github.com/rdabra/txeo-tf/issues) or suggest new features!
+## 📬 Contact
+
+For any inquiries or contributions:
+
+- **GitHub Discussions:** [Start a discussion](https://github.com/rdabra/txeo-tf/discussions)
+- **Issue Reporting:** [Open an issue](https://github.com/rdabra/txeo-tf/issues)
+- **Email:** [your-email@example.com](mailto:your-email@example.com) *(for serious inquiries only)*
 
 ## 📜 License
 
