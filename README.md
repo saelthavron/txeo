@@ -310,7 +310,7 @@ For any inquiries or contributions:
 
 - **GitHub Discussions:** [Start a discussion](https://github.com/rdabra/txeo-tf/discussions)
 - **Issue Reporting:** [Open an issue](https://github.com/rdabra/txeo-tf/issues)
-- **Email:** [your-email@example.com](mailto:your-email@example.com) *(for serious inquiries only)*
+- **Email:** [robertodias70@outlook.com](mailto:your-email@example.com) *(for serious inquiries only)*
 
 ## 📜 License
 

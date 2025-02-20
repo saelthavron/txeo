@@ -30,7 +30,7 @@ class Predictor;
  */
 template <typename T>
 class Tensor {
-  public:
+  private:
     struct Impl;
     std::unique_ptr<Impl> _impl{nullptr};
 
