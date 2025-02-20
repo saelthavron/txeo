@@ -281,6 +281,8 @@ int main() {
 
 📁 For more samples, please visit the [examples folder](https://github.com/rdabra/txeo-tf/tree/main/examples).
 
+👓 Documentation with extensive usage examples is available at [txeo site](https://rdabra.github.io/txeo-tf/).
+
 ## 📆 Roadmap
 
 **Txeo** is actively evolving! Here are some of the upcoming features:
