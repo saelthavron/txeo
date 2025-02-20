@@ -18,3 +18,10 @@ jobs:
 
       - name: Generate Doxygen Documentation
         run: doxygen Doxyfile
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          publish_dir: ./docs/html
+          keep_files: false
+          force_orphan: true
