@@ -23,24 +23,25 @@
 
 ## 🚀 Performance Comparison
 
-**Txeo** was benchmarked against the native **TensorFlow C++ API** using a **multiclassification convolution model** and a hardware with a AMD Ryzen 7 5700X CPU and a NVIDIA GeForce RTX 3060 GPU.
+**Txeo** was benchmarked against the native **TensorFlow C++ API** using inference from a saved **multiclassification convolution model**.
 
-- **Model Info:**
+- **Model and other info:**
   - **279,610 parameters**
   - **1 Softmax Output Layer** with 10 classes
   - **3 Fully-Connected ReLU Convolutional Layers** with 200 nodes each
-  - **Input**: 70,000 grayscale images (28×28) from the **Fashion MNIST** dataset.
+  - **Input**: 210,000 grayscale images (28×28).
+  - **CPU**: AMD Ryzen 7 5700X CPU
+  - **TensorFlow**: Compiled with CPU optimization
 
 ### 🔎 **Results Overview**
 
-| Compiler | Txeo (ms) | TensorFlow (ms) | Difference (%) |
+| Compiler | Txeo (μs) | TensorFlow (μs) | Difference (%) |
 |----------|-----------|-----------------|----------------|
-| Intel    | 243       | 241             | +0.83%         |
-| GCC      | 245       | 242             | +1.24%         |
-| Clang    | 248       | 241             | +2.90%         |
+| GCC      | 233,994   | 232,494         | +0.65%         |
+| Intel    | 234,489   | 232,683         | +0.78%         |
+| Clang    | 236,858   | 234,016         | +1.21%         |
 
-- The performance overhead is **negligible**, ranging from **0.83% to 2.90%**.
-- **Intel compiler** shows the smallest overhead, demonstrating **superior optimization capabilities**.
+- The performance overhead is **negligible**, ranging from **0.65% to 1.21%**.
 - **Txeo’s abstraction layer** provides **ease of use** with almost no cost to performance.
 
 ## ⚡ Installation Guide
