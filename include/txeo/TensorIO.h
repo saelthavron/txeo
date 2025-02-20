@@ -1,11 +1,11 @@
 #ifndef TENSORIO_H
 #define TENSORIO_H
+#include <filesystem>
 #pragma once
 
 #include "txeo/Tensor.h"
 
 #include <cstddef>
-#include <string>
 #include <type_traits>
 
 namespace txeo {
@@ -17,7 +17,7 @@ namespace txeo {
  */
 class TensorIO {
   private:
-    std::string _path;
+    std::filesystem::path _path;
     char _separator;
 
   public:
@@ -27,7 +27,7 @@ class TensorIO {
      * @param path Path to the file
      * @param separator Character delimiting each element in a row
      */
-    explicit TensorIO(std::string path, char separator = ',')
+    explicit TensorIO(const std::filesystem::path &path, char separator = ',')
         : _path(std::move(path)), _separator(separator) {};
 
     /**
@@ -105,7 +105,7 @@ class TensorIO {
      * @endcode
      */
     template <typename T>
-    static txeo::Tensor<T> read_textfile(std::string path, char separator = ',',
+    static txeo::Tensor<T> read_textfile(const std::filesystem::path &path, char separator = ',',
                                          bool has_header = false) {
       txeo::TensorIO io{path, separator};
       Tensor<T> resp{io.read_text_file<T>(has_header)};
@@ -127,7 +127,7 @@ class TensorIO {
      * @endcode
      */
     template <typename T>
-    static void write_textfile(const txeo::Tensor<T> &tensor, std::string path,
+    static void write_textfile(const txeo::Tensor<T> &tensor, const std::filesystem::path &path,
                                char separator = ',') {
       txeo::TensorIO io{path, separator};
       io.write_text_file(tensor);
@@ -151,8 +151,8 @@ class TensorIO {
      */
     template <typename T>
       requires(std::is_floating_point_v<T>)
-    static void write_textfile(const txeo::Tensor<T> &tensor, size_t precision, std::string path,
-                               char separator = ',') {
+    static void write_textfile(const txeo::Tensor<T> &tensor, size_t precision,
+                               const std::filesystem::path &path, char separator = ',') {
       txeo::TensorIO io{path, separator};
       io.write_text_file(tensor, precision);
     };

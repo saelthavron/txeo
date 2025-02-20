@@ -7,7 +7,6 @@
 #include "txeo/TensorShape.h"
 
 #include <filesystem>
-#include <memory>
 #include <optional>
 #include <string>
 
@@ -181,7 +180,7 @@ class Predictor {
      * std::cout << "Prediction: " << output(0) << "\n";
      * @endcode
      */
-    [[nodiscard]] txeo::Tensor<T> predict(const txeo::Tensor<T> input) const;
+    [[nodiscard]] txeo::Tensor<T> predict(const txeo::Tensor<T> &input) const;
 
     /**
      * @brief Perform batch inference with multiple named inputs

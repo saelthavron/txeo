@@ -1,21 +1,17 @@
-#include "txeo/Predictor.h"
-#include "txeo/Tensor.h"
-#include "txeo/TensorShape.h"
 #include "txeo/detail/PredictorPrivate.h"
 #include "txeo/detail/TensorPrivate.h"
-#include "txeo/detail/utils.h"
+#include "txeo/detail/TensorShapePrivate.h"
 
-#include <cstddef>
-#include <memory>
+#include "txeo/detail/utils.h"
 #include <tensorflow/cc/saved_model/tag_constants.h>
-#include <tensorflow/core/framework/tensor_shape.h>
+#include <tensorflow/core/framework/tensor.h>
 
 namespace tf = tensorflow;
 
 namespace txeo {
 
 template <typename T>
-inline void Predictor<T>::load_model() {
+void Predictor<T>::load_model() {
   std::unordered_set<std::string> tags{static_cast<const char *>(tf::kSavedModelTagServe)};
   tensorflow::ConfigProto *config = &_impl->session_options.config;
   config->mutable_gpu_options()->set_allow_growth(true);
@@ -27,6 +23,11 @@ inline void Predictor<T>::load_model() {
 
   auto meta_graph_def = _impl->model.meta_graph_def;
   auto signature_map = meta_graph_def.signature_def().at("serving_default");
+
+  if (signature_map.inputs().size() == 0)
+    throw txeo::PredictorError("The loaded model has no input metadata!");
+  if (signature_map.outputs().size() == 0)
+    throw txeo::PredictorError("The loaded model has no output metadata!");
 
   for (const auto &input : signature_map.inputs()) {
     auto info = input.second;
@@ -54,26 +55,22 @@ Predictor<T>::Predictor(std::filesystem::path model_path) : _impl{std::make_uniq
 }
 
 template <typename T>
-inline Predictor<T>::~Predictor() {
+Predictor<T>::~Predictor() {
   auto aux = _impl->model.session->Close();
 }
 
 template <typename T>
-inline const Predictor<T>::TensorInfo &Predictor<T>::get_input_metadata() const noexcept {
+const Predictor<T>::TensorInfo &Predictor<T>::get_input_metadata() const noexcept {
   return _impl->in_name_shape_map;
 }
 
 template <typename T>
-inline const Predictor<T>::TensorInfo &Predictor<T>::get_output_metadata() const noexcept {
+const Predictor<T>::TensorInfo &Predictor<T>::get_output_metadata() const noexcept {
   return _impl->out_name_shape_map;
 }
 
 template <typename T>
-inline txeo::Tensor<T> Predictor<T>::predict(const txeo::Tensor<T> input) const {
-  if (_impl->in_name_shape_map.size() == 0)
-    throw txeo::PredictorError("The loaded model has no input metadata!");
-  if (_impl->out_name_shape_map.size() == 0)
-    throw txeo::PredictorError("The loaded model has no output metadata!");
+txeo::Tensor<T> Predictor<T>::predict(const txeo::Tensor<T> &input) const {
   if (_impl->in_name_shape_map[0].second.axis_dim(0) != 0) {
     if (_impl->in_name_shape_map[0].second != input.shape())
       throw txeo::PredictorError("The shape of the input tensor and the model input do not match!");
@@ -87,22 +84,27 @@ inline txeo::Tensor<T> Predictor<T>::predict(const txeo::Tensor<T> input) const 
     }
   }
 
-  auto input_name = _impl->in_name_shape_map[0].first;
-  auto output_name = _impl->out_name_shape_map[0].first;
-  auto tf_tensor = *input._impl->tf_tensor;
-
+  const auto &input_name = _impl->in_name_shape_map[0].first;
+  const auto &output_name = _impl->out_name_shape_map[0].first;
+  const auto &tf_tensor = *input._impl->tf_tensor;
   std::vector<tf::Tensor> outputs;
+
   auto status = _impl->model.session->Run({{input_name, tf_tensor}}, {output_name}, {}, &outputs);
+
   if (!status.ok())
     txeo::PredictorError("Error running model: " + status.ToString());
 
-  txeo::Tensor<T> resp{txeo::detail::to_txeo_tensor<T>(outputs[0])};
+  txeo::Tensor<T> resp;
+  resp._impl->tf_tensor = std::make_unique<tf::Tensor>(std::move(outputs[0]));
+  resp._impl->txeo_shape._impl->ext_tf_shape = &resp._impl->tf_tensor->shape();
+  resp._impl->txeo_shape._impl->stride =
+      txeo::detail::calc_stride(*resp._impl->txeo_shape._impl->ext_tf_shape);
 
   return resp;
 }
 
 template <typename T>
-inline std::optional<txeo::TensorShape>
+std::optional<txeo::TensorShape>
 Predictor<T>::get_input_metadata_shape(const std::string &name) const {
   for (auto &item : _impl->in_name_shape_map)
     if (item.first == name)
@@ -111,7 +113,7 @@ Predictor<T>::get_input_metadata_shape(const std::string &name) const {
 }
 
 template <typename T>
-inline std::optional<txeo::TensorShape>
+std::optional<txeo::TensorShape>
 Predictor<T>::get_output_metadata_shape(const std::string &name) const {
   for (auto &item : _impl->out_name_shape_map)
     if (item.first == name)
@@ -122,8 +124,6 @@ Predictor<T>::get_output_metadata_shape(const std::string &name) const {
 template <typename T>
 std::vector<txeo::Tensor<T>>
 Predictor<T>::predict_batch(const Predictor<T>::TensorIdent &inputs) const {
-  if (_impl->out_name_shape_map.size() == 0)
-    throw txeo::PredictorError("The loaded model has no output metadata!");
   for (size_t i{0}; i < inputs.size(); ++i) {
     auto shp = this->get_input_metadata_shape(inputs[i].first);
     if (!shp)
@@ -146,8 +146,14 @@ Predictor<T>::predict_batch(const Predictor<T>::TensorIdent &inputs) const {
     txeo::PredictorError("Error running model: " + status.ToString());
 
   std::vector<txeo::Tensor<T>> resp;
-  for (auto &item : outputs)
-    resp.emplace_back(txeo::detail::to_txeo_tensor<T>(item));
+  for (auto &item : outputs) {
+    txeo::Tensor<T> aux;
+    aux._impl->tf_tensor = std::make_unique<tf::Tensor>(std::move(item));
+    aux._impl->txeo_shape._impl->ext_tf_shape = &aux._impl->tf_tensor->shape();
+    aux._impl->txeo_shape._impl->stride =
+        txeo::detail::calc_stride(*aux._impl->txeo_shape._impl->ext_tf_shape);
+    resp.emplace_back(aux);
+  }
 
   return resp;
 }

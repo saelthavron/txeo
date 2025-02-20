@@ -39,6 +39,10 @@ void Tensor<T>::create_from_shape(P &&shape) {
 }
 
 template <typename T>
+inline Tensor<T>::Tensor() : _impl{std::make_unique<Impl>()} {
+}
+
+template <typename T>
 Tensor<T>::Tensor(const Tensor &tensor) : _impl{std::make_unique<Impl>()} {
   create_from_shape(tensor.shape().clone());
   for (size_t i{0}; i < this->dim(); ++i)
@@ -197,12 +201,6 @@ int Tensor<T>::order() const {
   return _impl->txeo_shape.number_of_axes();
 }
 
-// template <typename T>
-// template <typename U>
-// bool Tensor<T>::is_equal_shape(const Tensor<U> &other) const {
-//   return this->shape() == other.shape();
-// }
-
 template <typename T>
 size_t Tensor<T>::dim() const {
   return _impl->txeo_shape.calculate_capacity();
@@ -344,7 +342,8 @@ std::ostream &operator<<(std::ostream &os, const Tensor<T> &tensor) {
 }
 
 template <typename T>
-void Tensor<T>::fill_with_uniform_random(const T &min, const T &max, size_t seed1, size_t seed2) {
+void Tensor<T>::fill_with_uniform_random(const T &min, const T &max, const size_t &seed1,
+                                         const size_t &seed2) {
   if (this->dim() == 0)
     return;
   if (max <= min)

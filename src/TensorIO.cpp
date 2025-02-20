@@ -99,7 +99,7 @@ template <typename T>
 void TensorIO::write_text_file(const txeo::Tensor<T> &tensor, size_t precision) const {
   if (precision <= 1)
     throw txeo::TensorIOError("Precision must be greater than 1!");
-  --precision;
+  auto prec = precision - 1;
   if (tensor.order() != 2)
     throw txeo::TensorIOError("Tensor is not a matrix!");
   std::ofstream wf{_path, std::ios::out};
@@ -111,7 +111,7 @@ void TensorIO::write_text_file(const txeo::Tensor<T> &tensor, size_t precision) 
     while (aux_r < n_rows) {
       size_t aux_c{0};
       while (aux_c < n_cols) {
-        wf << txeo::detail::format(*iterator, precision);
+        wf << txeo::detail::format(*iterator, prec);
         ++iterator;
         if (++aux_c < n_cols)
           wf << _separator;

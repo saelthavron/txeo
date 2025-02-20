@@ -1,10 +1,11 @@
 #ifndef TENSOR_H
 #define TENSOR_H
-#include <exception>
+
 #pragma once
 
 #include "TensorShape.h"
 #include "txeo/TensorIterator.h"
+#include <exception>
 
 #include <cstddef>
 #include <initializer_list>
@@ -29,7 +30,7 @@ class Predictor;
  */
 template <typename T>
 class Tensor {
-  private:
+  public:
     struct Impl;
     std::unique_ptr<Impl> _impl{nullptr};
 
@@ -47,9 +48,9 @@ class Tensor {
 
     void check_indexes(const std::vector<size_t> &indexes);
 
-  public:
-    explicit Tensor() = delete;
+    explicit Tensor();
 
+  public:
     /**
      * @note This copy constructor performs a deep copy, behaving differently from TensorFlow C++.
      */
@@ -172,7 +173,8 @@ class Tensor {
      * }
      * @endcode
      */
-    explicit Tensor(std::initializer_list<size_t> shape) : Tensor(std::vector<size_t>(shape)) {}
+    explicit Tensor(const std::initializer_list<size_t> &shape)
+        : Tensor(std::vector<size_t>(shape)) {}
 
     /**
      * @brief Constructs a Tensor from a specified @ref txeo::TensorShape and fills it with a value
@@ -281,7 +283,7 @@ class Tensor {
      * }
      * @endcode
      */
-    explicit Tensor(std::initializer_list<size_t> shape, const T &fill_value)
+    explicit Tensor(const std::initializer_list<size_t> &shape, const T &fill_value)
         : Tensor(std::vector<size_t>(shape), fill_value) {}
 
     /**
@@ -358,7 +360,7 @@ class Tensor {
      * }
      * @endcode
      */
-    explicit Tensor(std::initializer_list<size_t> shape, const std::vector<T> &values)
+    explicit Tensor(const std::initializer_list<size_t> &shape, const std::vector<T> &values)
         : Tensor(std::vector<size_t>(shape), values) {}
 
     /**
@@ -833,7 +835,8 @@ class Tensor {
      * }
      * @endcode
      */
-    void fill_with_uniform_random(const T &min, const T &max, size_t seed1, size_t seed2);
+    void fill_with_uniform_random(const T &min, const T &max, const size_t &seed1,
+                                  const size_t &seed2);
 
     /**
      * @brief Shuffles the elements of this tensor

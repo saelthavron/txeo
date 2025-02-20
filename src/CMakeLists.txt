@@ -22,12 +22,12 @@ set_target_properties(txeo_static PROPERTIES OUTPUT_NAME "txeo")
 #################################################### Dynamic Library ####################################################
 set(CMAKE_BUILD_WITH_INSTALL_RPATH OFF)
 
-# Avoiding incompatibility issues between Ninja and Intel compiler
-# if(CMAKE_GENERATOR STREQUAL "Ninja" AND $ENV{CXX} STREQUAL "icpx") 
-#     set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
-#     set(CMAKE_SKIP_RPATH FALSE)
-# endif()
-
+#Avoiding incompatibility issues between Ninja and Intel compiler
+if(CMAKE_GENERATOR STREQUAL "Ninja" AND $ENV{CXX} STREQUAL "icpx") 
+    set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
+    set(CMAKE_SKIP_RPATH FALSE)
+endif()
+  
 add_library(txeo_shared SHARED ${TXEO_SOURCES})
 target_compile_definitions(txeo_shared PUBLIC TXEO_SHARED)
 target_include_directories(txeo_shared PUBLIC

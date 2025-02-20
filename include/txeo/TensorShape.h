@@ -28,6 +28,9 @@ class TensorShape {
     template <typename T>
     friend class Tensor;
 
+    template <typename T>
+    friend class Predictor;
+
     template <typename P>
     void create_from_vector(P &&shape);
 
@@ -125,7 +128,7 @@ class TensorShape {
      * }
      * @endcode
      */
-    explicit TensorShape(std::initializer_list<size_t> shape)
+    explicit TensorShape(const std::initializer_list<size_t> &shape)
         : TensorShape(std::vector<size_t>(shape)) {}
 
     /**
