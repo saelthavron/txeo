@@ -1,7 +1,6 @@
 # Txeo: a Modern C++ Wrapper for TensorFlow
 
 [![License: Apache 2.0](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
-[![Build](https://github.com/rdabra/txeo-tf/actions/workflows/build.yml/badge.svg)](https://github.com/rdabra/txeo-tf/actions)
 [![GitHub release](https://img.shields.io/github/v/release/rdabra/txeo-tf)](https://github.com/rdabra/txeo-tf/releases)
 [![GitHub issues](https://img.shields.io/github/issues/rdabra/txeo-tf)](https://github.com/rdabra/txeo-tf/issues)
 [![Docs](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://rdabra.github.io/txeo/)
