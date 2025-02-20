@@ -17,7 +17,7 @@
 - 💾 **Flexible Tensor IO** – Seamless reading and writing of tensors to text files.
 - 🏗 **Simplified Model Loading** – Load and run saved TensorFlow models with minimal setup.
 - ⚡ **XLA Acceleration** – Effortlessly enable or disable TensorFlow’s XLA optimizations.
-- 🚀 **Near-Native Performance** – Achieves up to **99.17% of native TensorFlow speed** with negligible overhead.
+- 🚀 **Near-Native Performance** – Achieves up to **99.35% of native TensorFlow speed** with negligible overhead.
 - 🛡 **Encapsulated TensorFlow API** – Fully abstracts TensorFlow internals for a cleaner, more maintainable experience.
 
 ## 🚀 Performance Comparison
@@ -233,6 +233,9 @@ int main() {
 
   // Load tensor from file
   auto loaded_tensor = TensorIO::read_textfile<double>("tensor.txt");
+
+  // Reshapes the loaded tensor to one order (one axis)   
+  loaded_tensor.reshape({9});
 
   // Display loaded tensor
   cout << loaded_tensor << endl;
