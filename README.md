@@ -5,6 +5,7 @@
 [![GitHub issues](https://img.shields.io/github/issues/rdabra/txeo)](https://github.com/rdabra/txeo/issues)
 [![Docs](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://rdabra.github.io/txeo/)
 [![Last Commit](https://img.shields.io/github/last-commit/rdabra/txeo)](https://github.com/rdabra/txeo/commits/main)
+[![Star Badge](https://img.shields.io/github/stars/rdabra/txeo-tf?style=social)]
 
 ## 📝 Overview
 
