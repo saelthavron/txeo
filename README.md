@@ -79,16 +79,16 @@ Choose the correct version based on your system:
 
 | Version | Download |
 | -------- | ------- |
-| 💻 Without CPU optimizations | [libtensorflow-2.18-linux-x64-cpu.tar.gz](https://github.com/rdabra/txeo-tf/releases/download/v1.0.0/libtensorflow-2.18-linux-x64-cpu.tar.gz) |
-| 🚀 With CPU optimizations: | [libtensorflow-2.18-linux-x64-cpu-opt.tar.gz](https://github.com/rdabra/txeo-tf/releases/download/v1.0.0/libtensorflow-2.18-linux-x64-cpu-opt.tar.gz) |
-| 🎮 With GPU support: | [libtensorflow-2.18-linux-x64-gpu.tar.gz](https://github.com/rdabra/txeo-tf/releases/download/v1.0.0/libtensorflow-2.18-linux-x64-gpu.tar.gz) |
+| 💻 Without CPU optimizations | [libtensorflow-2.18-linux-x64-cpu.tar.gz](https://github.com/rdabra/txeo/releases/download/v1.0.0/libtensorflow-2.18-linux-x64-cpu.tar.gz) |
+| 🚀 With CPU optimizations: | [libtensorflow-2.18-linux-x64-cpu-opt.tar.gz](https://github.com/rdabra/txeo/releases/download/v1.0.0/libtensorflow-2.18-linux-x64-cpu-opt.tar.gz) |
+| 🎮 With GPU support: | [libtensorflow-2.18-linux-x64-gpu.tar.gz](https://github.com/rdabra/txeo/releases/download/v1.0.0/libtensorflow-2.18-linux-x64-gpu.tar.gz) |
 
 💡 **Important Note** : The Protobuf and TensorFlow source codes used for compiling the binaries above **were not modified** in any way. These assets are **only provided to simplify installation** for **Txeo** users.
 
 Installing TensorFlow binaries:
 
 ```sh
-wget https://github.com/rdabra/txeo-tf/releases/download/v1.0.0/libtensorflow-2.18-linux-x64-cpu.tar.gz
+wget https://github.com/rdabra/txeo/releases/download/v1.0.0/libtensorflow-2.18-linux-x64-cpu.tar.gz
 sudo tar -xzf libtensorflow-2.18-linux-x64-cpu.tar.gz -C /opt/
 echo "export TensorFlow_ROOT_DIR=/opt/tensorflow" >> ~/.bashrc
 source ~/.bashrc
@@ -99,7 +99,7 @@ source ~/.bashrc
 Installing **Txeo** and making libraries visible via library path:
 
 ```sh
-git clone https://github.com/rdabra/txeo-tf.git
+git clone https://github.com/rdabra/txeo.git
 cd txeo-tf
 mkdir build && cd build
 cmake .. -DCMAKE_BUILD_TYPE=Release
@@ -153,7 +153,7 @@ source ~/.bashrc
 #### **3️⃣ Installing Txeo**
 
 ```sh
-git clone https://github.com/rdabra/txeo-tf.git
+git clone https://github.com/rdabra/txeo.git
 cd txeo-tf
 mkdir build && cd build
 cmake .. -DCMAKE_BUILD_TYPE=Release
@@ -312,9 +312,9 @@ int main() {
 
 For any inquiries or contributions:
 
-- **GitHub Discussions:** [Start a discussion](https://github.com/rdabra/txeo-tf/discussions)
-- **Issue Reporting:** [Open an issue](https://github.com/rdabra/txeo-tf/issues)
-- **Email:** [robertodias70@outlook.com](mailto:your-email@example.com) *(for serious inquiries only)*
+- **GitHub Discussions:** [Start a discussion](https://github.com/rdabra/txeo/discussions)
+- **Issue Reporting:** [Open an issue](https://github.com/rdabra/txeo/issues)
+- **Email:** [robertodias70@outlook.com](mailto:robertodias70@outlook.com) *(for serious inquiries only)*
 
 ## 📜 License
 
