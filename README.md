@@ -1,10 +1,10 @@
 # Txeo: a Modern C++ Wrapper for TensorFlow
 
 [![License: Apache 2.0](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
-[![GitHub release](https://img.shields.io/github/v/release/rdabra/txeo-tf)](https://github.com/rdabra/txeo-tf/releases)
-[![GitHub issues](https://img.shields.io/github/issues/rdabra/txeo-tf)](https://github.com/rdabra/txeo-tf/issues)
+[![GitHub release](https://img.shields.io/github/v/release/rdabra/txeo)](https://github.com/rdabra/txeo/releases)
+[![GitHub issues](https://img.shields.io/github/issues/rdabra/txeo)](https://github.com/rdabra/txeo/issues)
 [![Docs](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://rdabra.github.io/txeo/)
-[![Last Commit](https://img.shields.io/github/last-commit/rdabra/txeo-tf)](https://github.com/rdabra/txeo-tf/commits/main)
+[![Last Commit](https://img.shields.io/github/last-commit/rdabra/txeo)](https://github.com/rdabra/txeo/commits/main)
 
 ## 📝 Overview
 
@@ -67,7 +67,7 @@ This method **installs TensorFlow and Protobuf binaries** into `/opt/`.
 #### **1️⃣ Download and install Protobuf**
 
 ```sh
-wget https://github.com/rdabra/txeo-tf/releases/download/v1.0.0/libprotobuf-3.21.9-linux-x64.tar.gz
+wget https://github.com/rdabra/txeo/releases/download/v1.0.0/libprotobuf-3.21.9-linux-x64.tar.gz
 sudo tar -xzf libprotobuf-3.21.9-linux-x64.tar.gz -C /opt/
 echo "export Protobuf_ROOT_DIR=/opt/protobuf" >> ~/.bashrc
 source ~/.bashrc
@@ -100,7 +100,7 @@ Installing **Txeo** and making libraries visible via library path:
 
 ```sh
 git clone https://github.com/rdabra/txeo.git
-cd txeo-tf
+cd txeo
 mkdir build && cd build
 cmake .. -DCMAKE_BUILD_TYPE=Release
 make -j$(nproc)
@@ -154,7 +154,7 @@ source ~/.bashrc
 
 ```sh
 git clone https://github.com/rdabra/txeo.git
-cd txeo-tf
+cd txeo
 mkdir build && cd build
 cmake .. -DCMAKE_BUILD_TYPE=Release
 make -j$(nproc)
@@ -282,9 +282,9 @@ int main() {
 
 💡 Note: Ensure that "path/to/saved_model" contains a valid TensorFlow model before running this example.
 
-📁 For more samples, please visit the [examples folder](https://github.com/rdabra/txeo-tf/tree/main/examples).
+📁 For more samples, please visit the [examples folder](https://github.com/rdabra/txeo/tree/main/examples).
 
-👓 Documentation with extensive usage examples is available at [txeo site](https://rdabra.github.io/txeo-tf/).
+👓 Documentation with extensive usage examples is available at [txeo site](https://rdabra.github.io/txeo/).
 
 ## 📆 Roadmap
 
