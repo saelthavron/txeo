@@ -58,8 +58,8 @@
   - ✅ **Intel** (Tested with **v2025.0.4**)
   - 🛠 Supports **concepts, ranges, and other C++20 features**.
 - **Dependencies:**
-  - 🔗 **TensorFlow 2.18.0** → [GitHub](https://github.com/tensorflow/tensorflow)
-  - 📜 **Protobuf 3.21.9** → [GitHub](https://github.com/protocolbuffers/protobuf)
+  - 🔗 **TensorFlow 2.18.0** → [GitHub](https://github.com/tensorflow/tensorflow){:target="_blank"}
+  - 📜 **Protobuf 3.21.9** → [GitHub](https://github.com/protocolbuffers/protobuf){:target="_blank"}
 
 ### **🔹Option 1: Installation Steps with Precompiled Binaries (Fastest Way)**
 
@@ -283,9 +283,9 @@ int main() {
 
 💡 Note: Ensure that "path/to/saved_model" contains a valid TensorFlow model before running this example.
 
-📁 For more samples, please visit the [examples folder](https://github.com/rdabra/txeo/tree/main/examples).
+📁 For more samples, please visit the [examples folder](https://github.com/rdabra/txeo/tree/main/examples){:target="_blank"}.
 
-👓 Documentation with extensive usage examples is hosted at [Netlify](https://bit.ly/4kpqaKb).
+👓 Documentation with extensive usage examples is hosted at [Netlify](https://bit.ly/4kpqaKb){:target="_blank"}.
 
 ## 📆 Roadmap
 
@@ -313,8 +313,8 @@ int main() {
 
 For any inquiries or contributions:
 
-- **GitHub Discussions:** [Start a discussion](https://github.com/rdabra/txeo/discussions)
-- **Issue Reporting:** [Open an issue](https://github.com/rdabra/txeo/issues)
+- **GitHub Discussions:** [Start a discussion](https://github.com/rdabra/txeo/discussions){:target="_blank"}
+- **Issue Reporting:** [Open an issue](https://github.com/rdabra/txeo/issues){:target="_blank"}
 - **Email:** [robertodias70@outlook.com](mailto:robertodias70@outlook.com) *(for serious inquiries only)*
 
 ## 📜 License
@@ -326,9 +326,9 @@ For any inquiries or contributions:
 **Txeo** depends on third-party libraries that have their own licenses:
 
 - **TensorFlow C++** - Licensed under **Apache License 2.0**  
-  - 📜 [TensorFlow License](third_party/tensorflow/LICENSE)  
-  - 🔗 [TensorFlow GitHub](https://github.com/tensorflow/tensorflow)
+  - 📜 [TensorFlow License](third_party/tensorflow/LICENSE){:target="_blank"}
+  -   - 🔗 [TensorFlow GitHub](https://github.com/tensorflow/tensorflow){:target="_blank"}
 - **Protobuf** - Licensed under **BSD 3-Clause**  
-  - 📜 [Protobuf License](https://github.com/protocolbuffers/protobuf/blob/main/LICENSE)
+  - 📜 [Protobuf License](https://github.com/protocolbuffers/protobuf/blob/main/LICENSE){:target="_blank"}
 
 > **📌 Note:** The precompiled binaries of TensorFlow and Protobuf provided in the releases section **are unmodified versions** of the official source code.
