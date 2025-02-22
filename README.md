@@ -285,7 +285,7 @@ int main() {
 
 📁 For more samples, please visit the [examples folder](https://github.com/rdabra/txeo/tree/main/examples).
 
-👓 Documentation with extensive usage examples is available at [txeo site](https://rdabra.github.io/txeo/).
+👓 Documentation with extensive usage examples is hosted at [Netlify](https://bit.ly/4kpqaKb).
 
 ## 📆 Roadmap
 
