@@ -1,10 +1,12 @@
 #include <algorithm>
+#include <cmath>
 #include <cstddef>
 #include <cstdint>
 #include <gtest/gtest.h>
 #include <vector>
 
 #include "txeo/Tensor.h"
+#include "txeo/TensorOp.h"
 #include "txeo/TensorShape.h"
 
 namespace txeo {
@@ -378,6 +380,198 @@ TEST(TensorTest, IteratorComparison) {
   it1 += 3;
   EXPECT_TRUE(it1 >= it2);
   EXPECT_TRUE(it2 <= it1);
+}
+
+TEST(TensorTest, AdditionOperator) {
+  Tensor<float> t1({2, 2}, {1.0f, 2.0f, 3.0f, 4.0f});
+  Tensor<float> t2({2, 2}, {5.0f, 6.0f, 7.0f, 8.0f});
+
+  Tensor<float> result = t1 + t2;
+
+  ASSERT_EQ(result.shape(), txeo::TensorShape({2, 2}));
+  EXPECT_FLOAT_EQ(result(0, 0), 6.0f);
+  EXPECT_FLOAT_EQ(result(0, 1), 8.0f);
+  EXPECT_FLOAT_EQ(result(1, 0), 10.0f);
+  EXPECT_FLOAT_EQ(result(1, 1), 12.0f);
+}
+
+TEST(TensorTest, SubtractionOperator) {
+  Tensor<double> t1({3}, {5.0, 6.0, 7.0});
+  Tensor<double> t2({3}, {1.0, 2.0, 3.0});
+
+  Tensor<double> result = t1 - t2;
+
+  ASSERT_EQ(result.shape(), txeo::TensorShape({3}));
+  EXPECT_DOUBLE_EQ(result(0), 4.0);
+  EXPECT_DOUBLE_EQ(result(1), 4.0);
+  EXPECT_DOUBLE_EQ(result(2), 4.0);
+}
+
+TEST(TensorTest, ScalarMultiplication) {
+  Tensor<int> t1({2, 3}, {1, 2, 3, 4, 5, 6});
+
+  Tensor<int> result = t1 * 2;
+
+  ASSERT_EQ(result.shape(), txeo::TensorShape({2, 3}));
+  EXPECT_EQ(result(0, 0), 2);
+  EXPECT_EQ(result(1, 2), 12);
+}
+
+TEST(TensorTest, CompoundAddition) {
+  Tensor<float> t1({2}, {1.5f, 2.5f});
+  Tensor<float> t2({2}, {0.5f, 1.5f});
+
+  t1 += t2;
+
+  ASSERT_EQ(t1.shape(), txeo::TensorShape({2}));
+  EXPECT_FLOAT_EQ(t1(0), 2.0f);
+  EXPECT_FLOAT_EQ(t1(1), 4.0f);
+}
+
+TEST(TensorTest, CompoundSubtraction) {
+  Tensor<double> t1({3}, {10.0, 20.0, 30.0});
+  Tensor<double> t2({3}, {1.0, 2.0, 3.0});
+
+  t1 -= t2;
+
+  ASSERT_EQ(t1.shape(), txeo::TensorShape({3}));
+  EXPECT_DOUBLE_EQ(t1(0), 9.0);
+  EXPECT_DOUBLE_EQ(t1(1), 18.0);
+  EXPECT_DOUBLE_EQ(t1(2), 27.0);
+}
+
+TEST(TensorTest, CompoundScalarMultiplication) {
+  Tensor<int> t1({2, 2}, {1, 2, 3, 4});
+
+  t1 *= 3;
+
+  ASSERT_EQ(t1.shape(), txeo::TensorShape({2, 2}));
+  EXPECT_EQ(t1(0, 0), 3);
+  EXPECT_EQ(t1(1, 1), 12);
+}
+
+TEST(TensorTest, ShapeMismatchAddition) {
+  Tensor<float> t1({2, 2}, {1.0f, 2.0f, 3.0f, 4.0f});
+  Tensor<float> t2({2, 3}, {1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f});
+
+  EXPECT_THROW(t1 + t2, TensorOpError);
+}
+
+TEST(TensorTest, EmptyTensorOperations) {
+  Tensor<float> empty({0});
+  Tensor<float> t1({0});
+
+  EXPECT_THROW(empty + t1, TensorOpError);
+  EXPECT_THROW(t1 *= 2.0f, TensorOpError); // Should fail if empty
+}
+
+TEST(TensorTest, ScalarMultiplicationDouble) {
+  Tensor<double> t1({2}, {1.5, 2.5});
+  Tensor<double> result = t1 * 2.0;
+
+  ASSERT_EQ(result.shape(), txeo::TensorShape({2}));
+  EXPECT_DOUBLE_EQ(result(0), 3.0);
+  EXPECT_DOUBLE_EQ(result(1), 5.0);
+}
+
+TEST(TensorTest, NegativeScalarMultiplication) {
+  Tensor<float> t1({3}, {1.0f, 2.0f, 3.0f});
+  Tensor<float> result = t1 * -1.0f;
+
+  EXPECT_FLOAT_EQ(result(0), -1.0f);
+  EXPECT_FLOAT_EQ(result(1), -2.0f);
+  EXPECT_FLOAT_EQ(result(2), -3.0f);
+}
+
+TEST(TensorTest, HadamardProdValidShapes) {
+  Tensor<float> t1({2, 2}, {1.0f, 2.0f, 3.0f, 4.0f});
+  Tensor<float> t2({2, 2}, {2.0f, 3.0f, 4.0f, 5.0f});
+
+  t1.hadamard_prod_by(t2);
+
+  ASSERT_EQ(t1.shape(), txeo::TensorShape({2, 2}));
+  EXPECT_FLOAT_EQ(t1(0, 0), 2.0f);
+  EXPECT_FLOAT_EQ(t1(1, 1), 20.0f);
+}
+
+TEST(TensorTest, HadamardProdDifferentShapes) {
+  Tensor<double> t1({3}, {1.0, 2.0, 3.0});
+  Tensor<double> t2({2, 2}, {1.0, 2.0, 3.0, 4.0});
+
+  EXPECT_THROW(t1.hadamard_prod_by(t2), TensorOpError);
+}
+
+TEST(TensorTest, PowerElemPositiveExponent) {
+  Tensor<float> t({2, 2}, {2.0f, 3.0f, 4.0f, 5.0f});
+
+  t.power_elem_by(2.0f);
+
+  EXPECT_FLOAT_EQ(t(0, 0), 4.0f);
+  EXPECT_FLOAT_EQ(t(1, 1), 25.0f);
+}
+
+TEST(TensorTest, PowerElemZeroExponent) {
+  Tensor<double> t({3}, {2.0, 3.0, 4.0});
+
+  t.power_elem_by(0.0);
+
+  EXPECT_DOUBLE_EQ(t(0), 1.0);
+  EXPECT_DOUBLE_EQ(t(1), 1.0);
+  EXPECT_DOUBLE_EQ(t(2), 1.0);
+}
+
+TEST(TensorTest, PowerElemNegativeExponent) {
+  Tensor<float> t({2}, {2.0f, 4.0f});
+
+  t.power_elem_by(-1.0f);
+
+  EXPECT_FLOAT_EQ(t(0), 0.5f);
+  EXPECT_FLOAT_EQ(t(1), 0.25f);
+}
+
+TEST(TensorTest, EmptyTensorHadamard) {
+  Tensor<float> empty({0});
+  Tensor<float> t({2}, {1.0f, 2.0f});
+
+  EXPECT_THROW(empty.hadamard_prod_by(t), TensorOpError);
+}
+
+TEST(TensorTest, ChainedOperations) {
+  Tensor<double> t({2, 2}, {2.0, 3.0, 4.0, 5.0});
+
+  t.hadamard_prod_by(Tensor<double>({2, 2}, {1.0, 2.0, 3.0, 4.0})).power_elem_by(2.0);
+
+  EXPECT_DOUBLE_EQ(t(0, 0), 4.0);   // (2*1)^2
+  EXPECT_DOUBLE_EQ(t(1, 1), 400.0); // (5*4)^2
+}
+
+TEST(TensorTest, MixedDataTypes) {
+  Tensor<int> t1({3}, {2, 3, 4});
+  Tensor<int> t2({3}, {5, 6, 7});
+
+  t1.hadamard_prod_by(t2).power_elem_by(2);
+
+  EXPECT_EQ(t1(0), 100); // (2*5)^2
+  EXPECT_EQ(t1(2), 784); // (4*7)^2
+}
+
+TEST(TensorTest, SelfAssignmentHadamard) {
+  Tensor<float> t({2}, {3.0f, 4.0f});
+
+  t.hadamard_prod_by(t);
+
+  EXPECT_FLOAT_EQ(t(0), 9.0f);
+  EXPECT_FLOAT_EQ(t(1), 16.0f);
+}
+
+TEST(TensorTest, NonDestructiveShape) {
+  Tensor<double> t({2, 3}, {1.0, 2.0, 3.0, 4.0, 5.0, 6.0});
+  auto original_shape = t.shape();
+
+  t.power_elem_by(1.5);
+
+  ASSERT_EQ(t.shape(), original_shape);
+  EXPECT_DOUBLE_EQ(t(1, 2), std::pow(6.0, 1.5));
 }
 
 } // namespace txeo
