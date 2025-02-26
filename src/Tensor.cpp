@@ -394,6 +394,11 @@ txeo::Tensor<U> operator*(const txeo::Tensor<U> &tensor, const U &scalar) {
   return TensorOp<U>::multiply(tensor, scalar);
 };
 
+template <typename U>
+txeo::Tensor<U> operator/(const txeo::Tensor<U> &tensor, const U &scalar) {
+  return TensorOp<U>::divide(tensor, scalar);
+};
+
 template <typename T>
 Tensor<T> &Tensor<T>::operator+=(const Tensor<T> &tensor) {
   txeo::TensorOp<T>::sum_by(*this, tensor);
@@ -413,14 +418,45 @@ Tensor<T> &Tensor<T>::operator*=(const T &scalar) {
 }
 
 template <typename T>
-inline Tensor<T> &Tensor<T>::hadamard_prod_by(const Tensor<T> &tensor) {
+inline Tensor<T> &Tensor<T>::operator/=(const T &scalar) {
+  txeo::TensorOp<T>::divide_by(*this, scalar);
+  return *this;
+}
+
+template <typename T>
+Tensor<T> &Tensor<T>::sum_by(const T &scalar) {
+  txeo::TensorOp<T>::sum_by(*this, scalar);
+  return *this;
+}
+
+template <typename T>
+Tensor<T> &Tensor<T>::subtract_by(const T &scalar) {
+  txeo::TensorOp<T>::subtract_by(*this, scalar);
+  return *this;
+}
+
+template <typename T>
+Tensor<T> &Tensor<T>::divide_by(const T &scalar) {
+  txeo::TensorOp<T>::divide_by(*this, scalar);
+  return *this;
+}
+
+template <typename T>
+Tensor<T> &Tensor<T>::hadamard_prod_by(const Tensor<T> &tensor) {
   txeo::TensorOp<T>::hadamard_prod_by(*this, tensor);
 
   return *this;
 }
 
 template <typename T>
-inline Tensor<T> &Tensor<T>::power_elem_by(const T &exponent) {
+Tensor<T> &Tensor<T>::hadamard_div_by(const Tensor<T> &tensor) {
+  txeo::TensorOp<T>::hadamard_div_by(*this, tensor);
+
+  return *this;
+}
+
+template <typename T>
+Tensor<T> &Tensor<T>::power_elem_by(const T &exponent) {
   txeo::TensorOp<T>::power_elem_by(*this, exponent);
 
   return *this;
@@ -489,5 +525,13 @@ template txeo::Tensor<long> operator*(const txeo::Tensor<long> &, const long &);
 template txeo::Tensor<long long> operator*(const txeo::Tensor<long long> &, const long long &);
 template txeo::Tensor<float> operator*(const txeo::Tensor<float> &, const float &);
 template txeo::Tensor<double> operator*(const txeo::Tensor<double> &, const double &);
+
+template txeo::Tensor<short> operator/(const txeo::Tensor<short> &, const short &);
+template txeo::Tensor<int> operator/(const txeo::Tensor<int> &, const int &);
+template txeo::Tensor<bool> operator/(const txeo::Tensor<bool> &, const bool &);
+template txeo::Tensor<long> operator/(const txeo::Tensor<long> &, const long &);
+template txeo::Tensor<long long> operator/(const txeo::Tensor<long long> &, const long long &);
+template txeo::Tensor<float> operator/(const txeo::Tensor<float> &, const float &);
+template txeo::Tensor<double> operator/(const txeo::Tensor<double> &, const double &);
 
 } // namespace txeo

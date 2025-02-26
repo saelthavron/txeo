@@ -58,6 +58,9 @@ class TensorOp {
      */
     static void sum_by(txeo::Tensor<T> &left, const txeo::Tensor<T> &right);
 
+    static txeo::Tensor<T> sum(const txeo::Tensor<T> &left, const T &right);
+    static void sum_by(txeo::Tensor<T> &left, const T &right);
+
     /**
      * @brief Returns the subtraction of two tensors
      *
@@ -93,6 +96,12 @@ class TensorOp {
      */
     static void subtract_by(txeo::Tensor<T> &left, const txeo::Tensor<T> &right);
 
+    static txeo::Tensor<T> subtract(const txeo::Tensor<T> &left, const T &right);
+    static void subtract_by(txeo::Tensor<T> &left, const T &right);
+
+    static txeo::Tensor<T> subtract(const T &left, const txeo::Tensor<T> &right);
+    static void subtract_by(const T &left, txeo::Tensor<T> &right);
+
     /**
      * @brief Returns the multiplication of a tensor and a scalar
      *
@@ -121,6 +130,12 @@ class TensorOp {
      * @endcode
      */
     static void multiply_by(txeo::Tensor<T> &tensor, const T &scalar);
+
+    static txeo::Tensor<T> divide(const txeo::Tensor<T> &tensor, const T &scalar);
+    static void divide_by(txeo::Tensor<T> &tensor, const T &scalar);
+
+    static txeo::Tensor<T> divide(const T &scalar, const txeo::Tensor<T> &tensor);
+    static void divide_by(const T &scalar, txeo::Tensor<T> &tensor);
 
     /**
      * @brief Returns the element-wise product (Hadamard Product) of two tensors
@@ -157,6 +172,10 @@ class TensorOp {
      * @endcode
      */
     static void hadamard_prod_by(txeo::Tensor<T> &left, const txeo::Tensor<T> &right);
+
+    static txeo::Tensor<T> hadamard_div(const txeo::Tensor<T> &left, const txeo::Tensor<T> &right);
+
+    static void hadamard_div_by(txeo::Tensor<T> &left, const txeo::Tensor<T> &right);
 
     /**
      * @brief Returns the element-wise potentiation of a tensor
@@ -198,3 +217,35 @@ class TensorOpError : public std::runtime_error {
 
 } // namespace txeo
 #endif
+
+// / Element-wise division between two tensors
+// static txeo::Tensor<T> divide(const txeo::Tensor<T> &left, const txeo::Tensor<T> &right);
+
+// // In-place element-wise division
+// static void divide_by(txeo::Tensor<T> &left, const txeo::Tensor<T> &right);
+
+// // Tensor divided by scalar
+// static txeo::Tensor<T> divide(const txeo::Tensor<T> &tensor, const T &scalar);
+
+// // Scalar divided by tensor
+// static txeo::Tensor<T> divide_scalar(const T &scalar, const txeo::Tensor<T> &tensor);
+
+// // In-place tensor divided by scalar
+// static void divide_by(txeo::Tensor<T> &tensor, const T &scalar);
+
+// // Add scalar to tensor
+// static txeo::Tensor<T> add_scalar(const txeo::Tensor<T> &tensor, const T &scalar);
+// static void add_scalar_by(txeo::Tensor<T> &tensor, const T &scalar);
+
+// // Subtract scalar from tensor
+// static txeo::Tensor<T> subtract_scalar(const txeo::Tensor<T> &tensor, const T &scalar);
+// static void subtract_scalar_by(txeo::Tensor<T> &tensor, const T &scalar);
+
+// // Element-wise tensor^tensor exponentiation
+// static txeo::Tensor<T> power_elem_tensor(const txeo::Tensor<T> &base, const txeo::Tensor<T>
+// &exponent); static void power_elem_tensor_by(txeo::Tensor<T> &base, const txeo::Tensor<T>
+// &exponent);
+
+// // Unary operations (example: absolute value)
+// static txeo::Tensor<T> abs(const txeo::Tensor<T> &tensor);
+// static void abs_by(txeo::Tensor<T> &tensor);

@@ -2,14 +2,14 @@
 #define TXEO_UTILS_H
 #pragma once
 
+#include "txeo/Tensor.h"
+#include "txeo/TensorShape.h"
+
 #include <cstddef>
 #include <cstdint>
 #include <tensorflow/core/framework/tensor.h>
 #include <tensorflow/core/framework/tensor_shape.h>
-
-#include "tensorflow/core/framework/types.h"
-#include "txeo/Tensor.h"
-#include "txeo/TensorShape.h"
+#include <tensorflow/core/framework/types.h>
 
 namespace tf = tensorflow;
 
@@ -65,6 +65,14 @@ txeo::Tensor<T> to_txeo_tensor(const tf::Tensor &tensor) {
 };
 
 std::vector<size_t> calc_stride(const tf::TensorShape &shape);
+
+template <typename T>
+bool is_zero(T value) {
+  if constexpr (std::is_floating_point_v<T>)
+    return std::abs(value) < std::numeric_limits<T>::epsilon();
+
+  return value == 0;
+}
 
 } // namespace txeo::detail
 

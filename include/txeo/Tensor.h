@@ -955,6 +955,13 @@ class Tensor {
     template <typename U>
     friend txeo::Tensor<U> operator*(const txeo::Tensor<U> &tensor, const U &scalar);
 
+    template <typename U>
+    friend txeo::Tensor<U> operator/(const txeo::Tensor<U> &tensor, const U &scalar);
+
+    Tensor<T> &sum_by(const T &scalar);
+    Tensor<T> &subtract_by(const T &scalar);
+    Tensor<T> &divide_by(const T &scalar);
+
     /**
      * @brief Performs the element-wise multiplication (Hadamard Product) of this parameter on this
      * tensor
@@ -971,6 +978,8 @@ class Tensor {
      *
      */
     Tensor<T> &hadamard_prod_by(const Tensor<T> &tensor);
+
+    Tensor<T> &hadamard_div_by(const Tensor<T> &tensor);
 
     /**
      * @brief Performs the element-wise potentiation of this tensor
@@ -992,6 +1001,7 @@ class Tensor {
     Tensor<T> &operator+=(const Tensor<T> &tensor);
     Tensor<T> &operator-=(const Tensor<T> &tensor);
     Tensor<T> &operator*=(const T &scalar);
+    Tensor<T> &operator/=(const T &scalar);
 
     txeo::TensorIterator<T> begin();
     txeo::TensorIterator<T> end();

@@ -168,12 +168,10 @@ TEST(TensorOpTest, ShapeMismatchHadamard) {
 TEST(TensorOpTest, PowerElemSpecialCases) {
   Tensor<float> t1({2}, {4.0f, 9.0f});
 
-  // Test zero exponent
   auto result1 = TensorOp<float>::power_elem(t1, 0.0f);
   EXPECT_FLOAT_EQ(result1(0), 1.0f);
   EXPECT_FLOAT_EQ(result1(1), 1.0f);
 
-  // Test fractional exponent
   auto result2 = TensorOp<float>::power_elem(t1, 0.5f);
   EXPECT_FLOAT_EQ(result2(0), 2.0f);
   EXPECT_FLOAT_EQ(result2(1), 3.0f);
@@ -203,6 +201,105 @@ TEST(TensorOpTest, InPlaceModificationCheck) {
   TensorOp<float>::hadamard_prod_by(copy, operand);
   EXPECT_FLOAT_EQ(copy(0), 6.0f);
   EXPECT_FLOAT_EQ(copy(1), 2.0f);
+}
+
+TEST(TensorOpTest, SumTensorScalar) {
+  Tensor<int> input({2, 2}, {1, 2, 3, 4});
+  Tensor<int> result = TensorOp<int>::sum(input, 5);
+  ASSERT_EQ(result.shape(), txeo::TensorShape({2, 2}));
+  EXPECT_EQ(result.data()[0], 6);
+  EXPECT_EQ(result.data()[1], 7);
+  EXPECT_EQ(result.data()[2], 8);
+  EXPECT_EQ(result.data()[3], 9);
+}
+
+TEST(TensorOpTest, SumByTensorScalar) {
+  Tensor<float> input({3}, {1.1f, 2.2f, 3.3f});
+  TensorOp<float>::sum_by(input, 10.0f);
+  ASSERT_FLOAT_EQ(input.data()[0], 11.1f);
+  ASSERT_FLOAT_EQ(input.data()[1], 12.2f);
+  ASSERT_FLOAT_EQ(input.data()[2], 13.3f);
+}
+
+TEST(TensorOpTest, SubtractTensorScalar) {
+  Tensor<double> input({2}, {10.5, 20.5});
+  Tensor<double> result = TensorOp<double>::subtract(input, 5.0);
+  ASSERT_EQ(result.shape(), txeo::TensorShape({2}));
+  EXPECT_DOUBLE_EQ(result.data()[0], 5.5);
+  EXPECT_DOUBLE_EQ(result.data()[1], 15.5);
+}
+
+TEST(TensorOpTest, SubtractScalarTensor) {
+  Tensor<int> input({3}, {3, 5, 7});
+  Tensor<int> result = TensorOp<int>::subtract(20, input);
+  ASSERT_EQ(result.data()[0], 17);
+  ASSERT_EQ(result.data()[1], 15);
+  ASSERT_EQ(result.data()[2], 13);
+}
+
+TEST(TensorOpTest, SubtractByScalarTensor) {
+  Tensor<float> input({2}, {100.0f, 200.0f});
+  TensorOp<float>::subtract_by(50.0f, input);
+  ASSERT_FLOAT_EQ(input.data()[0], -50.0f);
+  ASSERT_FLOAT_EQ(input.data()[1], -150.0f);
+}
+
+TEST(TensorOpTest, DivideTensorByScalar) {
+  Tensor<double> input({3}, {10.0, 20.0, 30.0});
+  Tensor<double> result = TensorOp<double>::divide(input, 2.0);
+  ASSERT_DOUBLE_EQ(result.data()[0], 5.0);
+  ASSERT_DOUBLE_EQ(result.data()[1], 10.0);
+  ASSERT_DOUBLE_EQ(result.data()[2], 15.0);
+}
+
+TEST(TensorOpTest, DivideScalarByTensor) {
+  Tensor<int> input({2}, {2, 5});
+  Tensor<int> result = TensorOp<int>::divide(10, input);
+  ASSERT_EQ(result.data()[0], 5);
+  ASSERT_EQ(result.data()[1], 2);
+}
+
+TEST(TensorOpTest, DivideByTensorScalar) {
+  Tensor<float> input({2}, {9.0f, 16.0f});
+  TensorOp<float>::divide_by(input, 3.0f);
+  ASSERT_FLOAT_EQ(input.data()[0], 3.0f);
+  ASSERT_FLOAT_EQ(input.data()[1], 5.3333333f);
+}
+
+TEST(TensorOpTest, DivideByScalarTensor) {
+  Tensor<double> input({2}, {2.0, 4.0});
+  TensorOp<double>::divide_by(8.0, input);
+  ASSERT_DOUBLE_EQ(input.data()[0], 4.0);
+  ASSERT_DOUBLE_EQ(input.data()[1], 2.0);
+}
+
+TEST(TensorOpTest, HadamardDiv) {
+  Tensor<int> left({3}, {10, 20, 30});
+  Tensor<int> right({3}, {2, 5, 6});
+  Tensor<int> result = TensorOp<int>::hadamard_div(left, right);
+  ASSERT_EQ(result.data()[0], 5);
+  ASSERT_EQ(result.data()[1], 4);
+  ASSERT_EQ(result.data()[2], 5);
+}
+
+TEST(TensorOpTest, HadamardDivBy) {
+  Tensor<float> left({2}, {15.0f, 25.0f});
+  Tensor<float> right({2}, {3.0f, 5.0f});
+  TensorOp<float>::hadamard_div_by(left, right);
+  ASSERT_FLOAT_EQ(left.data()[0], 5.0f);
+  ASSERT_FLOAT_EQ(left.data()[1], 5.0f);
+}
+
+TEST(TensorOpTest, HandleEmptyTensor) {
+  Tensor<int> empty_tensor({0}, {});
+  EXPECT_THROW(TensorOp<int>::sum(empty_tensor, 5), TensorOpError);
+}
+
+TEST(TensorOpTest, MixedPrecisionOperations) {
+  Tensor<double> input({2}, {1.5, 2.5});
+  Tensor<double> result = TensorOp<double>::divide(input, 2);
+  ASSERT_DOUBLE_EQ(result.data()[0], 0.75);
+  ASSERT_DOUBLE_EQ(result.data()[1], 1.25);
 }
 
 } // namespace txeo

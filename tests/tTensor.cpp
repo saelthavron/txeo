@@ -574,4 +574,96 @@ TEST(TensorTest, NonDestructiveShape) {
   EXPECT_DOUBLE_EQ(t(1, 2), std::pow(6.0, 1.5));
 }
 
+TEST(TensorTest, DivisionOperatorTensorScalar) {
+  Tensor<int> t({3}, {10, 20, 30});
+  Tensor<int> result = t / 2;
+  ASSERT_EQ(result.shape(), txeo::TensorShape({3}));
+  EXPECT_EQ(result.data()[0], 5);
+  EXPECT_EQ(result.data()[1], 10);
+  EXPECT_EQ(result.data()[2], 15);
+}
+
+TEST(TensorTest, FloatingPointDivision) {
+  Tensor<double> t({2}, {7.5, 12.5});
+  Tensor<double> result = t / 2.5;
+  ASSERT_DOUBLE_EQ(result.data()[0], 3.0);
+  ASSERT_DOUBLE_EQ(result.data()[1], 5.0);
+}
+
+TEST(TensorTest, SumByScalar) {
+  Tensor<float> t({3}, {1.1f, 2.2f, 3.3f});
+  t.sum_by(10.0f);
+  EXPECT_FLOAT_EQ(t.data()[0], 11.1f);
+  EXPECT_FLOAT_EQ(t.data()[1], 12.2f);
+  EXPECT_FLOAT_EQ(t.data()[2], 13.3f);
+}
+
+TEST(TensorTest, SubtractByScalar) {
+  Tensor<int> t({4}, {15, 25, 35, 45});
+  t.subtract_by(5);
+  EXPECT_EQ(t.data()[0], 10);
+  EXPECT_EQ(t.data()[1], 20);
+  EXPECT_EQ(t.data()[2], 30);
+  EXPECT_EQ(t.data()[3], 40);
+}
+
+TEST(TensorTest, DivideByScalarAndOperator) {
+  Tensor<double> t({3}, {9.0, 21.0, 36.0});
+
+  t.divide_by(3.0);
+  ASSERT_DOUBLE_EQ(t.data()[0], 3.0);
+  ASSERT_DOUBLE_EQ(t.data()[1], 7.0);
+  ASSERT_DOUBLE_EQ(t.data()[2], 12.0);
+
+  t /= 2.0;
+  ASSERT_DOUBLE_EQ(t.data()[0], 1.5);
+  ASSERT_DOUBLE_EQ(t.data()[1], 3.5);
+  ASSERT_DOUBLE_EQ(t.data()[2], 6.0);
+}
+
+TEST(TensorTest, HadamardDivision) {
+  Tensor<int> t1({3}, {20, 50, 100});
+  Tensor<int> t2({3}, {4, 5, 10});
+  t1.hadamard_div_by(t2);
+  EXPECT_EQ(t1.data()[0], 5);
+  EXPECT_EQ(t1.data()[1], 10);
+  EXPECT_EQ(t1.data()[2], 10);
+}
+
+TEST(TensorTest, HadamardDivPrecision) {
+  Tensor<float> t1({2}, {15.0f, 24.0f});
+  Tensor<float> t2({2}, {4.0f, 6.0f});
+  t1.hadamard_div_by(t2);
+  ASSERT_FLOAT_EQ(t1.data()[0], 3.75f);
+  ASSERT_FLOAT_EQ(t1.data()[1], 4.0f);
+}
+
+TEST(TensorTest, OperationChaining) {
+  Tensor<int> t({2}, {100, 200});
+  t.sum_by(50).subtract_by(75).divide_by(5);
+  EXPECT_EQ(t.data()[0], (100 + 50 - 75) / 5);
+  EXPECT_EQ(t.data()[1], (200 + 50 - 75) / 5);
+}
+
+TEST(TensorTest, DivideByOne) {
+  Tensor<int> t({3}, {5, 10, 15});
+  t /= 1;
+  EXPECT_EQ(t.data()[0], 5);
+  EXPECT_EQ(t.data()[1], 10);
+  EXPECT_EQ(t.data()[2], 15);
+}
+
+TEST(TensorTest, EmptyTensorOperations2) {
+  Tensor<float> t({0});
+  EXPECT_THROW(t.sum_by(10.0f), TensorOpError);
+}
+
+TEST(TensorTest, IntegerDivisionTruncation) {
+  Tensor<int> t({3}, {7, 11, 15});
+  t /= 2;
+  EXPECT_EQ(t.data()[0], 3);
+  EXPECT_EQ(t.data()[1], 5);
+  EXPECT_EQ(t.data()[2], 7);
+}
+
 } // namespace txeo
