@@ -5,9 +5,9 @@
 
 #include "TensorShape.h"
 #include "txeo/TensorIterator.h"
-#include <exception>
 
 #include <cstddef>
+#include <exception>
 #include <initializer_list>
 #include <memory>
 #include <type_traits>
@@ -895,6 +895,195 @@ class Tensor {
      * @note A copy is performed
      */
     Tensor<T> clone() const;
+
+    /**
+     * @brief Returns the sum of two tensors
+     *
+     * @tparam U type of the tensors involved
+     * @param left Left operand
+     * @param right Right operand
+     * @return txeo::Tensor Result
+     *
+     * @exception txeo::TensorOpError
+     *
+     *
+     * **Example Usage:**
+     * @code
+     * txeo::Tensor<float> a({2,2}, {1,2,3,4});
+     * txeo::Tensor<float> b({2,2}, {5,6,7,8});
+     * auto c = a + b;  // Result: [[6,8],[10,12]]
+     * @endcode
+     */
+    template <typename U>
+    friend txeo::Tensor<U> operator+(const txeo::Tensor<U> &left, const txeo::Tensor<U> &right);
+
+    template <typename U>
+    friend txeo::Tensor<U> operator+(const txeo::Tensor<U> &left, const U &right);
+
+    /**
+     * @brief Returns the subtraction of two tensors
+     *
+     * @tparam U type of the tensors involved
+     * @param left Left operand
+     * @param right Right operand
+     * @return txeo::Tensor Result
+     *
+     * @exception txeo::TensorOpError
+     *
+     * **Example Usage:**
+     * @code
+     * txeo::Tensor<double> a({2}, {5,7});
+     * txeo::Tensor<double> b({2}, {1,3});
+     * auto c = a - b;  // Result: [4,4]
+     * @endcode
+     */
+    template <typename U>
+    friend txeo::Tensor<U> operator-(const txeo::Tensor<U> &left, const txeo::Tensor<U> &right);
+
+    /**
+     * @brief Element-wise tensor-scalar addition operator
+
+     * @tparam U Numeric type of tensor elements
+     * @param left Input tensor
+     * @param right Scalar to add
+     * @return New tensor with elements: left[i] + right
+     *
+     * **Example Usage:**
+     * @code
+     * txeo::Tensor<int> t({2, 2}, {1, 2, 3, 4});
+     * auto result = t + 5;
+     * // result contains [6, 7, 8, 9] with shape [2, 2]
+     * @endcode
+     */
+    template <typename U>
+    friend txeo::Tensor<U> operator-(const txeo::Tensor<U> &left, const U &right);
+
+    /**
+     * @brief Element-wise scalar-tensor subtraction operator
+
+     * @tparam U Numeric type of tensor elements
+     * @param left Scalar value
+     * @param right Input tensor
+     * @return New tensor with elements: left - right[i]
+     *
+     * **Example Usage:**
+     * @code
+     * txeo::Tensor<int> t({4}, {2, 3, 5, 7});
+     * auto result = 10 - t;
+     * // result contains [8, 7, 5, 3]
+     * @endcode
+     */
+    template <typename U>
+    friend txeo::Tensor<U> operator-(const U &left, const txeo::Tensor<U> &right);
+
+    /**
+     * @brief Returns the scalar multiplication of a tensor
+     *
+     * @tparam U type of the tensor involved
+     * @param tensor Operand to be multiplied
+     * @param scalar Operand that multiplies
+     * @return txeo::Tensor Result
+     *
+     * **Example Usage:**
+     * @code
+     * txeo::Tensor<int> a({3}, {1,2,3});
+     * auto b = a * 2;  // Result: [2,4,6]
+     * @endcode
+     */
+    template <typename U>
+    friend txeo::Tensor<U> operator*(const txeo::Tensor<U> &tensor, const U &scalar);
+
+    /**
+     * @brief Element-wise division operator (tensor / scalar)
+     *
+     * @param left Input tensor
+     * @param right Divisor value
+     * @return New tensor with element-wise division results
+     *
+     * **Example Usage:**
+     * @code
+     * txeo::Tensor<double> t({2, 2}, {10.0, 20.0, 30.0, 40.0});
+     * auto result = t / 2.0;
+     * // result contains [5.0, 10.0, 15.0, 20.0] with shape [2, 2]
+     * @endcode
+     */
+    template <typename U>
+    friend txeo::Tensor<U> operator/(const txeo::Tensor<U> &left, const U &right);
+
+    /**
+     * @brief Element-wise scalar-tensor division operator
+     *
+     * @tparam U Numeric type of tensor elements
+     * @param left Scalar dividend
+     * @param right Tensor divisor
+     * @return New tensor with elements: left / right[i]
+     *
+     * **Example Usage:**
+     * @code
+     * txeo::Tensor<double> t({3}, {2.0, 4.0, 5.0});
+     * auto result = 100.0 / t;
+     * // result contains [50.0, 25.0, 20.0]
+     * @endcode
+     */
+    template <typename U>
+    friend txeo::Tensor<U> operator/(const U &left, const txeo::Tensor<U> &right);
+
+    /**
+     * @brief Performs the element-wise multiplication (Hadamard Product) of this parameter on this
+     * tensor
+     *
+     * @param tensor Tensor that multiplies
+     * @return Tensor<T>& This tensor modified
+     *
+     * **Example Usage:**
+     * @code
+     * txeo::Tensor<float> a({2,2}, {1,2,3,4});
+     * txeo::Tensor<float> b({2,2}, {2,3,4,5});
+     * a.hadamard_prod_by(b);  // a becomes [[2,6],[12,20]]
+     * @endcode
+     *
+     */
+    Tensor<T> &hadamard_prod_by(const Tensor<T> &tensor);
+
+    /**
+     * @brief In-place element-wise Hadamard division (chainable)
+
+     * @param tensor Divisor tensor (must match dimensions)
+     * @return Reference to modified tensor for chaining
+     *
+     * **Example Usage:**
+     * @code
+     * txeo::Tensor<int> a({2, 2}, {10, 20, 30, 40});
+     * txeo::Tensor<int> b({2, 2}, {2, 5, 10, 8});
+     * a.hadamard_div_by(b);
+     * // a now contains [5, 4, 3, 5]
+     * @endcode
+     */
+    Tensor<T> &hadamard_div_by(const Tensor<T> &tensor);
+
+    /**
+     * @brief Performs the element-wise potentiation of this tensor
+     *
+     * @param exponent Exponent of the potentiation
+     * @return Tensor<T>& This tensor modified
+     *
+     * **Example Usage:**
+     * @code
+     * txeo::Tensor<double> a({3}, {2,3,4});
+     * a.power_elem_by(2);  // a becomes [4,9,16]
+     * @endcode
+     *
+     * @note Handles negative exponents through reciprocal calculation*
+     *
+     */
+    Tensor<T> &power_elem_by(const T &exponent);
+
+    Tensor<T> &operator+=(const Tensor<T> &tensor);
+    Tensor<T> &operator+=(const T &tensor);
+    Tensor<T> &operator-=(const Tensor<T> &tensor);
+    Tensor<T> &operator-=(const T &tensor);
+    Tensor<T> &operator*=(const T &scalar);
+    Tensor<T> &operator/=(const T &scalar);
 
     txeo::TensorIterator<T> begin();
     txeo::TensorIterator<T> end();
