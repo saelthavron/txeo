@@ -592,7 +592,7 @@ TEST(TensorTest, FloatingPointDivision) {
 
 TEST(TensorTest, SumByScalar) {
   Tensor<float> t({3}, {1.1f, 2.2f, 3.3f});
-  t.sum_by(10.0f);
+  t += 10.0f;
   EXPECT_FLOAT_EQ(t.data()[0], 11.1f);
   EXPECT_FLOAT_EQ(t.data()[1], 12.2f);
   EXPECT_FLOAT_EQ(t.data()[2], 13.3f);
@@ -600,7 +600,7 @@ TEST(TensorTest, SumByScalar) {
 
 TEST(TensorTest, SubtractByScalar) {
   Tensor<int> t({4}, {15, 25, 35, 45});
-  t.subtract_by(5);
+  t -= 5;
   EXPECT_EQ(t.data()[0], 10);
   EXPECT_EQ(t.data()[1], 20);
   EXPECT_EQ(t.data()[2], 30);
@@ -610,7 +610,7 @@ TEST(TensorTest, SubtractByScalar) {
 TEST(TensorTest, DivideByScalarAndOperator) {
   Tensor<double> t({3}, {9.0, 21.0, 36.0});
 
-  t.divide_by(3.0);
+  t /= 3.0;
   ASSERT_DOUBLE_EQ(t.data()[0], 3.0);
   ASSERT_DOUBLE_EQ(t.data()[1], 7.0);
   ASSERT_DOUBLE_EQ(t.data()[2], 12.0);
@@ -640,7 +640,7 @@ TEST(TensorTest, HadamardDivPrecision) {
 
 TEST(TensorTest, OperationChaining) {
   Tensor<int> t({2}, {100, 200});
-  t.sum_by(50).subtract_by(75).divide_by(5);
+  ((t += 50) -= 75) /= 5;
   EXPECT_EQ(t.data()[0], (100 + 50 - 75) / 5);
   EXPECT_EQ(t.data()[1], (200 + 50 - 75) / 5);
 }
@@ -655,7 +655,7 @@ TEST(TensorTest, DivideByOne) {
 
 TEST(TensorTest, EmptyTensorOperations2) {
   Tensor<float> t({0});
-  EXPECT_THROW(t.sum_by(10.0f), TensorOpError);
+  EXPECT_THROW(t += 10.0f, TensorOpError);
 }
 
 TEST(TensorTest, IntegerDivisionTruncation) {
@@ -664,6 +664,108 @@ TEST(TensorTest, IntegerDivisionTruncation) {
   EXPECT_EQ(t.data()[0], 3);
   EXPECT_EQ(t.data()[1], 5);
   EXPECT_EQ(t.data()[2], 7);
+}
+
+TEST(TensorTest, AdditionOperator2) {
+  txeo::Tensor<int> t1({2, 2}, {1, 2, 3, 4});
+  auto result1 = t1 + 5;
+  EXPECT_EQ(result1.shape(), txeo::TensorShape({2, 2}));
+  EXPECT_EQ(result1.data()[0], 6);
+  EXPECT_EQ(result1.data()[1], 7);
+  EXPECT_EQ(result1.data()[2], 8);
+  EXPECT_EQ(result1.data()[3], 9);
+
+  txeo::Tensor<float> t2({3}, {-1.5f, 0.0f, 3.5f});
+  auto result2 = t2 + 2.5f;
+  EXPECT_FLOAT_EQ(result2.data()[0], 1.0f);
+  EXPECT_FLOAT_EQ(result2.data()[1], 2.5f);
+  EXPECT_FLOAT_EQ(result2.data()[2], 6.0f);
+}
+
+TEST(TensorTest, SubtractionOperatorTensorScalar) {
+  txeo::Tensor<double> t1({2}, {5.0, 10.0});
+  auto result1 = t1 - 2.5;
+  EXPECT_EQ(result1.shape(), txeo::TensorShape({2}));
+  EXPECT_DOUBLE_EQ(result1.data()[0], 2.5);
+  EXPECT_DOUBLE_EQ(result1.data()[1], 7.5);
+
+  txeo::Tensor<int> t2({3}, {8, 5, 3});
+  auto result2 = t2 - 0;
+  EXPECT_EQ(result2.data()[0], 8);
+  EXPECT_EQ(result2.data()[1], 5);
+  EXPECT_EQ(result2.data()[2], 3);
+}
+
+TEST(TensorTest, SubtractionOperatorScalarTensor) {
+  txeo::Tensor<int> t1({2, 2}, {2, 3, 4, 5});
+  auto result1 = 10 - t1;
+  EXPECT_EQ(result1.data()[0], 8);
+  EXPECT_EQ(result1.data()[1], 7);
+  EXPECT_EQ(result1.data()[2], 6);
+  EXPECT_EQ(result1.data()[3], 5);
+
+  txeo::Tensor<float> t2({3}, {1.5f, 3.0f, 4.5f});
+  auto result2 = 5.0f - t2;
+  EXPECT_FLOAT_EQ(result2.data()[0], 3.5f);
+  EXPECT_FLOAT_EQ(result2.data()[1], 2.0f);
+  EXPECT_FLOAT_EQ(result2.data()[2], 0.5f);
+}
+
+TEST(TensorTest, DivisionOperatorTensorScalar2) {
+  txeo::Tensor<double> t1({4}, {10.0, 20.0, 30.0, 40.0});
+  auto result1 = t1 / 2.0;
+  EXPECT_EQ(result1.data()[0], 5.0);
+  EXPECT_EQ(result1.data()[1], 10.0);
+  EXPECT_EQ(result1.data()[2], 15.0);
+  EXPECT_EQ(result1.data()[3], 20.0);
+
+  txeo::Tensor<int> t2({3}, {15, 25, 35});
+  auto result2 = t2 / 5;
+  EXPECT_EQ(result2.data()[0], 3);
+  EXPECT_EQ(result2.data()[1], 5);
+  EXPECT_EQ(result2.data()[2], 7);
+
+  txeo::Tensor<float> t3({1}, {5.0f});
+  EXPECT_THROW(t3 / 0.0f, txeo::TensorOpError);
+}
+
+TEST(TensorTest, DivisionOperatorScalarTensor) {
+  txeo::Tensor<int> t1({3}, {2, 5, 10});
+  auto result1 = 100 / t1;
+  EXPECT_EQ(result1.data()[0], 50);
+  EXPECT_EQ(result1.data()[1], 20);
+  EXPECT_EQ(result1.data()[2], 10);
+
+  txeo::Tensor<double> t2({2}, {4.0, 2.5});
+  auto result2 = 10.0 / t2;
+  EXPECT_DOUBLE_EQ(result2.data()[0], 2.5);
+  EXPECT_DOUBLE_EQ(result2.data()[1], 4.0);
+
+  txeo::Tensor<float> t3({2}, {5.0f, 0.0f});
+  EXPECT_THROW(10.0f / t3, txeo::TensorOpError);
+}
+
+TEST(TensorTest, ShapePreservation) {
+  txeo::Tensor<int> t({2, 3}, {1, 2, 3, 4, 5, 6});
+
+  auto add_result = t + 2;
+  EXPECT_EQ(add_result.shape(), txeo::TensorShape({2, 3}));
+
+  auto sub_result = 10 - t;
+  EXPECT_EQ(sub_result.shape(), txeo::TensorShape({2, 3}));
+
+  auto div_result = t / 1;
+  EXPECT_EQ(div_result.shape(), txeo::TensorShape({2, 3}));
+}
+
+TEST(TensorTest, Immutability) {
+  txeo::Tensor<int> orig({2}, {5, 10});
+  auto result = orig + 3;
+
+  EXPECT_EQ(orig.data()[0], 5);
+  EXPECT_EQ(orig.data()[1], 10);
+  EXPECT_EQ(result.data()[0], 8);
+  EXPECT_EQ(result.data()[1], 13);
 }
 
 } // namespace txeo

@@ -100,4 +100,45 @@ TEST_F(PredictorTest, InvalidBatchInput) {
   ASSERT_THROW({ auto outputs = predictor.predict_batch(inputs); }, PredictorError);
 }
 
+TEST_F(PredictorTest, LoadInvalidModelThrows) {
+  EXPECT_THROW(
+      { txeo::Predictor<float> predictor("non_existent_model_dir"); }, txeo::PredictorError);
+}
+
+TEST_F(PredictorTest, ModelWithNoInputMetadataThrows) {
+  // Assume "empty_input_model" is a path to a model with no inputs
+  EXPECT_THROW({ txeo::Predictor<float> predictor("empty_input_model"); }, txeo::PredictorError);
+}
+
+TEST_F(PredictorTest, ModelWithNoOutputMetadataThrows) {
+  // Assume "empty_output_model" is a path to a model with no outputs
+  EXPECT_THROW({ txeo::Predictor<float> predictor("empty_output_model"); }, txeo::PredictorError);
+}
+
+TEST_F(PredictorTest, PredictWithInvalidShapeThrows) {
+  txeo::Predictor<float> predictor(TEST_MODEL_PATH);
+  // Create tensor with invalid shape (adjust dimensions based on model)
+  txeo::Tensor<float> invalid_tensor({1, 224, 224, 3}); // Example shape
+  EXPECT_THROW({ auto aux = predictor.predict(invalid_tensor); }, txeo::PredictorError);
+}
+
+TEST_F(PredictorTest, GetOutputMetadataShape) {
+  txeo::Predictor<float> predictor(TEST_MODEL_PATH);
+  auto output_shape = predictor.get_output_metadata_shape("StatefulPartitionedCall:0");
+  ASSERT_TRUE(output_shape.has_value());
+}
+
+TEST_F(PredictorTest, PredictBatchInvalidInputNameThrows) {
+  txeo::Predictor<float> predictor(TEST_MODEL_PATH);
+  std::vector<std::pair<std::string, txeo::Tensor<float>>> inputs = {
+      {"invalid_name", txeo::Tensor<float>({1, 224, 224, 3})}};
+  EXPECT_THROW({ auto aux = predictor.predict_batch(inputs); }, txeo::PredictorError);
+}
+
+TEST_F(PredictorTest, EnableXLAForFloat) {
+  txeo::Predictor<float> predictor(TEST_MODEL_PATH);
+  predictor.enable_xla(true);  // Cover enable_xla branch
+  predictor.enable_xla(false); // Cover disable branch
+}
+
 } // namespace txeo

@@ -385,7 +385,22 @@ txeo::Tensor<U> operator+(const txeo::Tensor<U> &left, const txeo::Tensor<U> &ri
 };
 
 template <typename U>
+txeo::Tensor<U> operator+(const txeo::Tensor<U> &left, const U &right) {
+  return TensorOp<U>::sum(left, right);
+};
+
+template <typename U>
 txeo::Tensor<U> operator-(const txeo::Tensor<U> &left, const txeo::Tensor<U> &right) {
+  return TensorOp<U>::subtract(left, right);
+};
+
+template <typename U>
+txeo::Tensor<U> operator-(const U &left, const txeo::Tensor<U> &right) {
+  return TensorOp<U>::subtract(left, right);
+};
+
+template <typename U>
+txeo::Tensor<U> operator-(const txeo::Tensor<U> &left, const U &right) {
   return TensorOp<U>::subtract(left, right);
 };
 
@@ -397,6 +412,11 @@ txeo::Tensor<U> operator*(const txeo::Tensor<U> &tensor, const U &scalar) {
 template <typename U>
 txeo::Tensor<U> operator/(const txeo::Tensor<U> &tensor, const U &scalar) {
   return TensorOp<U>::divide(tensor, scalar);
+};
+
+template <typename U>
+txeo::Tensor<U> operator/(const U &left, const txeo::Tensor<U> &right) {
+  return TensorOp<U>::divide(left, right);
 };
 
 template <typename T>
@@ -424,20 +444,14 @@ inline Tensor<T> &Tensor<T>::operator/=(const T &scalar) {
 }
 
 template <typename T>
-Tensor<T> &Tensor<T>::sum_by(const T &scalar) {
+inline Tensor<T> &Tensor<T>::operator+=(const T &scalar) {
   txeo::TensorOp<T>::sum_by(*this, scalar);
   return *this;
 }
 
 template <typename T>
-Tensor<T> &Tensor<T>::subtract_by(const T &scalar) {
+inline Tensor<T> &Tensor<T>::operator-=(const T &scalar) {
   txeo::TensorOp<T>::subtract_by(*this, scalar);
-  return *this;
-}
-
-template <typename T>
-Tensor<T> &Tensor<T>::divide_by(const T &scalar) {
-  txeo::TensorOp<T>::divide_by(*this, scalar);
   return *this;
 }
 
@@ -509,6 +523,14 @@ template txeo::Tensor<long long> operator+(const txeo::Tensor<long long> &,
 template txeo::Tensor<float> operator+(const txeo::Tensor<float> &, const txeo::Tensor<float> &);
 template txeo::Tensor<double> operator+(const txeo::Tensor<double> &, const txeo::Tensor<double> &);
 
+template txeo::Tensor<short> operator+(const txeo::Tensor<short> &, const short &);
+template txeo::Tensor<int> operator+(const txeo::Tensor<int> &, const int &);
+template txeo::Tensor<bool> operator+(const txeo::Tensor<bool> &, const bool &);
+template txeo::Tensor<long> operator+(const txeo::Tensor<long> &, const long &);
+template txeo::Tensor<long long> operator+(const txeo::Tensor<long long> &, const long long &);
+template txeo::Tensor<float> operator+(const txeo::Tensor<float> &, const float &);
+template txeo::Tensor<double> operator+(const txeo::Tensor<double> &, const double &);
+
 template txeo::Tensor<short> operator-(const txeo::Tensor<short> &, const txeo::Tensor<short> &);
 template txeo::Tensor<int> operator-(const txeo::Tensor<int> &, const txeo::Tensor<int> &);
 template txeo::Tensor<bool> operator-(const txeo::Tensor<bool> &, const txeo::Tensor<bool> &);
@@ -517,6 +539,22 @@ template txeo::Tensor<long long> operator-(const txeo::Tensor<long long> &,
                                            const txeo::Tensor<long long> &);
 template txeo::Tensor<float> operator-(const txeo::Tensor<float> &, const txeo::Tensor<float> &);
 template txeo::Tensor<double> operator-(const txeo::Tensor<double> &, const txeo::Tensor<double> &);
+
+template txeo::Tensor<short> operator-(const txeo::Tensor<short> &, const short &);
+template txeo::Tensor<int> operator-(const txeo::Tensor<int> &, const int &);
+template txeo::Tensor<bool> operator-(const txeo::Tensor<bool> &, const bool &);
+template txeo::Tensor<long> operator-(const txeo::Tensor<long> &, const long &);
+template txeo::Tensor<long long> operator-(const txeo::Tensor<long long> &, const long long &);
+template txeo::Tensor<float> operator-(const txeo::Tensor<float> &, const float &);
+template txeo::Tensor<double> operator-(const txeo::Tensor<double> &, const double &);
+
+template txeo::Tensor<short> operator-(const short &, const txeo::Tensor<short> &);
+template txeo::Tensor<int> operator-(const int &, const txeo::Tensor<int> &);
+template txeo::Tensor<bool> operator-(const bool &, const txeo::Tensor<bool> &);
+template txeo::Tensor<long> operator-(const long &, const txeo::Tensor<long> &);
+template txeo::Tensor<long long> operator-(const long long &, const txeo::Tensor<long long> &);
+template txeo::Tensor<float> operator-(const float &, const txeo::Tensor<float> &);
+template txeo::Tensor<double> operator-(const double &, const txeo::Tensor<double> &);
 
 template txeo::Tensor<short> operator*(const txeo::Tensor<short> &, const short &);
 template txeo::Tensor<int> operator*(const txeo::Tensor<int> &, const int &);
@@ -533,5 +571,13 @@ template txeo::Tensor<long> operator/(const txeo::Tensor<long> &, const long &);
 template txeo::Tensor<long long> operator/(const txeo::Tensor<long long> &, const long long &);
 template txeo::Tensor<float> operator/(const txeo::Tensor<float> &, const float &);
 template txeo::Tensor<double> operator/(const txeo::Tensor<double> &, const double &);
+
+template txeo::Tensor<short> operator/(const short &, const txeo::Tensor<short> &);
+template txeo::Tensor<int> operator/(const int &, const txeo::Tensor<int> &);
+template txeo::Tensor<bool> operator/(const bool &, const txeo::Tensor<bool> &);
+template txeo::Tensor<long> operator/(const long &, const txeo::Tensor<long> &);
+template txeo::Tensor<long long> operator/(const long long &, const txeo::Tensor<long long> &);
+template txeo::Tensor<float> operator/(const float &, const txeo::Tensor<float> &);
+template txeo::Tensor<double> operator/(const double &, const txeo::Tensor<double> &);
 
 } // namespace txeo

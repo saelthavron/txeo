@@ -302,4 +302,48 @@ TEST(TensorOpTest, MixedPrecisionOperations) {
   ASSERT_DOUBLE_EQ(result.data()[1], 1.25);
 }
 
+TEST(TensorOpTest, HadamardDiv2) {
+  txeo::Tensor<double> a({2}, {1.0, 2.0});
+  txeo::Tensor<double> b({2}, {2.0, 1.0});
+  EXPECT_NO_THROW(txeo::TensorOp<double>::hadamard_div(a, b));
+}
+
+TEST(TensorOpTest, SubtractByScalar) {
+  txeo::Tensor<double> tensor({2}, {3.0, 4.0});
+  EXPECT_NO_THROW(txeo::TensorOp<double>::subtract_by(2.0, tensor));
+}
+
+TEST(TensorOpTest, HadamardProd) {
+  txeo::Tensor<int> a({2}, {2, 3});
+  txeo::Tensor<int> b({2}, {1, 2});
+  EXPECT_NO_THROW(txeo::TensorOp<int>::hadamard_prod(a, b));
+}
+
+TEST(TensorOpTest, PowerElem) {
+  txeo::Tensor<int> tensor({2}, {2, 3});
+  EXPECT_NO_THROW(txeo::TensorOp<int>::power_elem(tensor, 2));
+}
+
+TEST(TensorOpTest, Multiply) {
+  txeo::Tensor<long long> tensor({2}, {5LL, 6LL});
+  EXPECT_NO_THROW(txeo::TensorOp<long long>::multiply(tensor, 2LL));
+}
+
+TEST(TensorOpTest, SubtractByTensor) {
+  txeo::Tensor<long long> a({2}, {5LL, 6LL});
+  txeo::Tensor<long long> b({2}, {1LL, 2LL});
+  EXPECT_NO_THROW(txeo::TensorOp<long long>::subtract_by(a, b));
+}
+
+TEST(TensorOpTest, DivideByZeroDimTensor) {
+  txeo::Tensor<double> empty_tensor({0});
+  EXPECT_THROW(txeo::TensorOp<double>::divide(empty_tensor, 2.0), txeo::TensorOpError);
+}
+
+TEST(TensorOpTest, SubtractInvalidShapes) {
+  txeo::Tensor<int> a({2}, {1, 2});
+  txeo::Tensor<int> b({3}, {1, 2, 3});
+  EXPECT_THROW(txeo::TensorOp<int>::subtract(a, b), txeo::TensorOpError);
+}
+
 } // namespace txeo
