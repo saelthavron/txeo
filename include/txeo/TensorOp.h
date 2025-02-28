@@ -21,7 +21,7 @@ class TensorOp {
     TensorOp(TensorOp &&) = delete;
     TensorOp &operator=(const TensorOp &) = delete;
     TensorOp &operator=(TensorOp &&) = delete;
-    ~TensorOp();
+    ~TensorOp() = default;
 
     /**
      * @brief Returns the sum of two tensors

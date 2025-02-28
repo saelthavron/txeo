@@ -21,6 +21,9 @@ concept c_numeric = std::is_arithmetic_v<T> && !std::is_same_v<T, bool>;
 template <typename T>
 class Predictor;
 
+template <typename T>
+class TensorAgg;
+
 /**
  * @brief Implements the mathematical concept of tensor, which is a magnitude of multiple order. A
  * tensor of order zero is defined to be a scalar, of order one a vector, of order two a matrix and
@@ -35,6 +38,7 @@ class Tensor {
     std::unique_ptr<Impl> _impl{nullptr};
 
     friend class Predictor<T>;
+    friend class TensorAgg<T>;
 
     template <typename P>
     void create_from_shape(P &&shape);

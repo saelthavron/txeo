@@ -31,6 +31,9 @@ class TensorShape {
     template <typename T>
     friend class Predictor;
 
+    template <typename T>
+    friend class TensorAgg;
+
     template <typename P>
     void create_from_vector(P &&shape);
 
