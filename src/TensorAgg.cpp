@@ -1,14 +1,16 @@
 #include "txeo/TensorAgg.h"
-#include "tensorflow/cc/framework/ops.h"
-#include "tensorflow/cc/framework/scope.h"
-#include "tensorflow/cc/ops/const_op.h"
-#include "tensorflow/cc/ops/math_ops.h"
 #include "txeo/Tensor.h"
+#include "txeo/detail/TensorHelper.h"
 #include "txeo/detail/TensorPrivate.h"
-#include "txeo/detail/TensorShapePrivate.h"
 #include "txeo/detail/utils.h"
 
+#include <cstddef>
+#include <stdexcept>
+#include <string>
 #include <tensorflow/cc/client/client_session.h>
+#include <tensorflow/cc/framework/ops.h>
+#include <tensorflow/cc/framework/scope.h>
+#include <tensorflow/cc/ops/math_ops.h>
 #include <tensorflow/cc/ops/standard_ops.h>
 #include <tensorflow/core/framework/tensor.h>
 #include <tensorflow/core/framework/tensor_shape.h>
@@ -20,24 +22,166 @@ namespace txeo {
 namespace tf = tensorflow;
 
 template <typename T>
-txeo::Tensor<T> TensorAgg<T>::reduce_sum(const txeo::Tensor<T> &tensor,
-                                         std::initializer_list<size_t> axes) {
+txeo::Tensor<T> TensorAgg<T>::reduce_sum(const txeo::Tensor<T> &tensor, std::vector<size_t> axes) {
+  if (tensor.dim() == 0)
+    throw txeo::TensorAggError("Tensor has dimension zero.");
 
-  tf::Scope root = tf::Scope::NewRootScope();
+  for (auto &item : axes)
+    if (item >= txeo::detail::to_size_t(tensor.order()))
+      throw txeo::TensorAggError("Inconsistent axes.");
 
-  auto sum_op = tf::ops::Sum(root, *tensor._impl->tf_tensor, tf::ops::Const(root, axes));
+  try {
+    auto resp = txeo::detail::TensorHelper::reduce_tensor<T>(
+        *tensor._impl->tf_tensor, axes,
+        [](const tf::Scope &scope, tf::Input input, tf::Input axis) -> tf::Output {
+          return tf::ops::Sum(scope, input, axis);
+        });
+    return resp;
+  } catch (std::runtime_error e) {
+    throw txeo::TensorAggError("Reduction error: " + std::string{e.what()});
+  }
+}
 
-  tf::ClientSession session(root);
-  std::vector<tf::Tensor> outputs;
-  auto status = session.Run({sum_op}, &outputs);
-  if (!status.ok())
-    txeo::TensorAggError("Error reducing tensor: " + status.ToString());
+template <typename T>
+txeo::Tensor<T> TensorAgg<T>::reduce_mean(const txeo::Tensor<T> &tensor, std::vector<size_t> axes) {
+  if (tensor.dim() == 0)
+    throw txeo::TensorAggError("Tensor has dimension zero.");
 
-  Tensor<T> resp;
+  for (auto &item : axes)
+    if (item >= txeo::detail::to_size_t(tensor.order()))
+      throw txeo::TensorAggError("Inconsistent axes.");
 
-  //  auto resp = txeo::detail::to_txeo_tensor<T>(std::move(outputs[0]));
+  try {
+    auto resp = txeo::detail::TensorHelper::reduce_tensor<T>(
+        *tensor._impl->tf_tensor, axes,
+        [](const tf::Scope &scope, tf::Input input, tf::Input axis) -> tf::Output {
+          return tf::ops::Mean(scope, input, axis);
+        });
+    return resp;
+  } catch (std::runtime_error e) {
+    throw txeo::TensorAggError("Reduction error: " + std::string{e.what()});
+  }
+}
 
-  return resp;
+template <typename T>
+txeo::Tensor<T> TensorAgg<T>::reduce_max(const txeo::Tensor<T> &tensor, std::vector<size_t> axes) {
+  if (tensor.dim() == 0)
+    throw txeo::TensorAggError("Tensor has dimension zero.");
+
+  for (auto &item : axes)
+    if (item >= txeo::detail::to_size_t(tensor.order()))
+      throw txeo::TensorAggError("Inconsistent axes.");
+
+  try {
+    auto resp = txeo::detail::TensorHelper::reduce_tensor<T>(
+        *tensor._impl->tf_tensor, axes,
+        [](const tf::Scope &scope, tf::Input input, tf::Input axis) -> tf::Output {
+          return tf::ops::Max(scope, input, axis);
+        });
+    return resp;
+  } catch (std::runtime_error e) {
+    throw txeo::TensorAggError("Reduction error: " + std::string{e.what()});
+  }
+}
+
+template <typename T>
+txeo::Tensor<T> TensorAgg<T>::reduce_min(const txeo::Tensor<T> &tensor, std::vector<size_t> axes) {
+  if (tensor.dim() == 0)
+    throw txeo::TensorAggError("Tensor has dimension zero.");
+
+  for (auto &item : axes)
+    if (item >= txeo::detail::to_size_t(tensor.order()))
+      throw txeo::TensorAggError("Inconsistent axes.");
+
+  try {
+    auto resp = txeo::detail::TensorHelper::reduce_tensor<T>(
+        *tensor._impl->tf_tensor, axes,
+        [](const tf::Scope &scope, tf::Input input, tf::Input axis) -> tf::Output {
+          return tf::ops::Min(scope, input, axis);
+        });
+    return resp;
+  } catch (std::runtime_error e) {
+    throw txeo::TensorAggError("Reduction error: " + std::string{e.what()});
+  }
+}
+
+template <typename T>
+inline Tensor<T> TensorAgg<T>::arg_max(const txeo::Tensor<T> &tensor, std::vector<size_t> axes) {
+  if (tensor.dim() == 0)
+    throw txeo::TensorAggError("Tensor has dimension zero.");
+
+  for (auto &item : axes)
+    if (item >= txeo::detail::to_size_t(tensor.order()))
+      throw txeo::TensorAggError("Inconsistent axes.");
+
+  try {
+    auto resp = txeo::detail::TensorHelper::reduce_tensor<T>(
+        *tensor._impl->tf_tensor, axes,
+        [](const tf::Scope &scope, tf::Input input, tf::Input axis) -> tf::Output {
+          return tf::ops::ArgMax(scope, input, axis);
+        });
+    return resp;
+  } catch (std::runtime_error e) {
+    throw txeo::TensorAggError("Reduction error: " + std::string{e.what()});
+  }
+}
+
+template <typename T>
+inline Tensor<T> TensorAgg<T>::arg_min(const txeo::Tensor<T> &tensor, std::vector<size_t> axes) {
+  if (tensor.dim() == 0)
+    throw txeo::TensorAggError("Tensor has dimension zero.");
+
+  for (auto &item : axes)
+    if (item >= txeo::detail::to_size_t(tensor.order()))
+      throw txeo::TensorAggError("Inconsistent axes.");
+
+  try {
+    auto resp = txeo::detail::TensorHelper::reduce_tensor<T>(
+        *tensor._impl->tf_tensor, axes,
+        [](const tf::Scope &scope, tf::Input input, tf::Input axis) -> tf::Output {
+          return tf::ops::ArgMin(scope, input, axis);
+        });
+    return resp;
+  } catch (std::runtime_error e) {
+    throw txeo::TensorAggError("Reduction error: " + std::string{e.what()});
+  }
+}
+
+template <typename T>
+inline txeo::Tensor<T> TensorAgg<T>::abs(const txeo::Tensor<T> &tensor) {
+  if (tensor.dim() == 0)
+    throw txeo::TensorAggError("Tensor has dimension zero.");
+
+  try {
+    auto resp = txeo::detail::TensorHelper::reduce_tensor<T>(
+        *tensor._impl->tf_tensor, [](const tf::Scope &scope, tf::Input input) -> tf::Output {
+          return tf::ops::Abs(scope, input);
+        });
+    return resp;
+  } catch (std::runtime_error e) {
+    throw txeo::TensorAggError("Reduction error: " + std::string{e.what()});
+  }
+}
+
+template <typename T>
+T TensorAgg<T>::variance(const txeo::Tensor<T> &tensor) {
+  if (tensor.dim() == 0)
+    throw txeo::TensorAggError("Tensor has dimension zero.");
+
+  std::vector<size_t> axes;
+  for (size_t i{0}; i < txeo::detail::to_size_t(tensor.order()); ++i)
+    axes.emplace_back(i);
+
+  auto mean = TensorAgg<T>::reduce_mean(tensor, axes);
+  txeo::Tensor<T> sq_dif = (tensor - mean(0)).power_elem_by(2);
+  auto mean_sqdif = TensorAgg<T>::reduce_mean(sq_dif, axes);
+
+  return mean_sqdif(0);
+}
+
+template <typename T>
+inline T TensorAgg<T>::standard_deviation(const txeo::Tensor<T> &tensor) {
+  return std::sqrt(txeo::TensorAgg<T>::variance(tensor));
 }
 
 template class TensorAgg<short>;

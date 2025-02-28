@@ -11,6 +11,10 @@
 
 namespace txeo {
 
+namespace detail {
+class TensorHelper;
+}
+
 /**
  * @brief The shape of a tensor is an ordered collection of dimensions of mathematical vector
  * spaces.
@@ -33,6 +37,8 @@ class TensorShape {
 
     template <typename T>
     friend class TensorAgg;
+
+    friend class txeo::detail::TensorHelper;
 
     template <typename P>
     void create_from_vector(P &&shape);

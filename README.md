@@ -328,7 +328,7 @@ For any inquiries or contributions:
 - **TensorFlow C++** - Licensed under **Apache License 2.0**  
   - 📜 [TensorFlow License](third_party/tensorflow/LICENSE)
   - 🔗 [TensorFlow GitHub](https://github.com/tensorflow/tensorflow)
-  - **Protobuf** - Licensed under **BSD 3-Clause**  
+- **Protobuf** - Licensed under **BSD 3-Clause**  
   - 📜 [Protobuf License](https://github.com/protocolbuffers/protobuf/blob/main/LICENSE)
 
 > **📌 Note:** The precompiled binaries of TensorFlow and Protobuf provided in the releases section **are unmodified versions** of the official source code.

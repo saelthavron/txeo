@@ -20,8 +20,23 @@ class TensorAgg {
     TensorAgg &operator=(TensorAgg &&) = delete;
     ~TensorAgg() = default;
 
-    static txeo::Tensor<T> reduce_sum(const txeo::Tensor<T> &tensor,
-                                      std::initializer_list<size_t> axes);
+    static txeo::Tensor<T> reduce_sum(const txeo::Tensor<T> &tensor, std::vector<size_t> axes);
+
+    static txeo::Tensor<T> reduce_mean(const txeo::Tensor<T> &tensor, std::vector<size_t> axes);
+
+    static txeo::Tensor<T> reduce_max(const txeo::Tensor<T> &tensor, std::vector<size_t> axes);
+
+    static txeo::Tensor<T> reduce_min(const txeo::Tensor<T> &tensor, std::vector<size_t> axes);
+
+    static txeo::Tensor<T> arg_max(const txeo::Tensor<T> &tensor, std::vector<size_t> axes);
+
+    static txeo::Tensor<T> arg_min(const txeo::Tensor<T> &tensor, std::vector<size_t> axes);
+
+    static txeo::Tensor<T> abs(const txeo::Tensor<T> &tensor);
+
+    static T variance(const txeo::Tensor<T> &tensor);
+
+    static T standard_deviation(const txeo::Tensor<T> &tensor);
 };
 
 /**

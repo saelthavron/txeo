@@ -6,7 +6,6 @@
 
 #include "txeo/Tensor.h"
 #include "txeo/TensorShape.h"
-#include "txeo/detail/utils.h"
 
 template <typename T>
 struct txeo::Tensor<T>::Impl {

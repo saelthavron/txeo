@@ -18,6 +18,10 @@ namespace txeo {
 template <typename T>
 concept c_numeric = std::is_arithmetic_v<T> && !std::is_same_v<T, bool>;
 
+namespace detail {
+class TensorHelper;
+}
+
 template <typename T>
 class Predictor;
 
@@ -37,8 +41,9 @@ class Tensor {
     struct Impl;
     std::unique_ptr<Impl> _impl{nullptr};
 
-    friend class Predictor<T>;
-    friend class TensorAgg<T>;
+    friend class txeo::Predictor<T>;
+    friend class txeo::TensorAgg<T>;
+    friend class txeo::detail::TensorHelper;
 
     template <typename P>
     void create_from_shape(P &&shape);
