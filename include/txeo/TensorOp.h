@@ -371,6 +371,14 @@ class TensorOp {
      * @endcode
      */
     static void power_elem_by(txeo::Tensor<T> &tensor, const T &exponent);
+
+    static txeo::Tensor<T> square(const txeo::Tensor<T> &tensor);
+
+    static void square_by(txeo::Tensor<T> &tensor);
+
+    static txeo::Tensor<T> sqrt(const txeo::Tensor<T> &tensor);
+
+    static void sqrt_by(txeo::Tensor<T> &tensor);
 };
 
 /**

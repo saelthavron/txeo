@@ -1,5 +1,6 @@
 #ifndef TENSORHELPER_H
 #define TENSORHELPER_H
+#include <cstdint>
 #pragma once
 
 #include "txeo/detail/TensorPrivate.h"
@@ -29,6 +30,9 @@ class TensorHelper {
     TensorHelper &operator=(const TensorHelper &) = delete;
     TensorHelper &operator=(TensorHelper &&) = delete;
     ~TensorHelper();
+
+    using ReduFunc31 =
+        std::function<tf::Output(const tf::Scope &scope, tf::Input input, int64_t axis)>;
 
     using ReduFunc3 =
         std::function<tf::Output(const tf::Scope &scope, tf::Input input, tf::Input axis)>;
@@ -79,6 +83,24 @@ class TensorHelper {
       if (!status.ok())
         throw std::runtime_error(status.ToString());
       return txeo::detail::TensorHelper::to_txeo_tensor<T>(std::move(outputs[0]));
+    }
+
+    template <typename T>
+    static txeo::Tensor<size_t> reduce_tensor_to_indexes(const tf::Tensor &M, int64_t index,
+                                                         ReduFunc31 func) {
+      tf::Scope root = tf::Scope::NewRootScope();
+
+      auto ope = func(root, M, index);
+
+      tf::ClientSession session(root);
+      std::vector<tf::Tensor> outputs;
+      auto status = session.Run({ope}, &outputs);
+      if (!status.ok())
+        throw std::runtime_error(status.ToString());
+
+      auto resp = txeo::detail::TensorHelper::to_txeo_tensor<size_t>(std::move(outputs[0]));
+
+      return resp;
     }
 };
 } // namespace txeo::detail

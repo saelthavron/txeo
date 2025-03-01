@@ -270,6 +270,38 @@ void TensorOp<T>::power_elem_by(txeo::Tensor<T> &tensor, const T &exponent) {
     tensor.data()[i] = static_cast<T>(std::pow(tensor.data()[i], exponent));
 }
 
+template <typename T>
+txeo::Tensor<T> TensorOp<T>::square(const txeo::Tensor<T> &tensor) {
+  auto resp = TensorOp<T>::hadamard_prod(tensor, tensor);
+  return resp;
+}
+
+template <typename T>
+void TensorOp<T>::square_by(txeo::Tensor<T> &tensor) {
+  TensorOp<T>::hadamard_prod_by(tensor, tensor);
+}
+
+template <typename T>
+txeo::Tensor<T> TensorOp<T>::sqrt(const txeo::Tensor<T> &tensor) {
+  if (tensor.dim() == 0)
+    throw txeo::TensorOpError("Tensor has dimension zero.");
+
+  txeo::Tensor<T> resp(tensor.shape());
+  for (size_t i{0}; i < resp.dim(); ++i)
+    resp.data()[i] = static_cast<T>(std::sqrt(tensor.data()[i]));
+
+  return resp;
+}
+
+template <typename T>
+inline void TensorOp<T>::sqrt_by(txeo::Tensor<T> &tensor) {
+  if (tensor.dim() == 0)
+    throw txeo::TensorOpError("Tensor has dimension zero.");
+
+  for (size_t i{0}; i < tensor.dim(); ++i)
+    tensor.data()[i] = static_cast<T>(std::sqrt(tensor.data()[i]));
+}
+
 // Required for templated elements in cpp files
 
 template class TensorOp<short>;
@@ -279,5 +311,6 @@ template class TensorOp<long>;
 template class TensorOp<long long>;
 template class TensorOp<float>;
 template class TensorOp<double>;
+template class TensorOp<size_t>;
 
 } // namespace txeo

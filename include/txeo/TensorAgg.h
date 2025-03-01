@@ -1,6 +1,5 @@
 #ifndef TENSORAGG_H
 #define TENSORAGG_H
-#include <initializer_list>
 #pragma once
 
 #include "txeo/Tensor.h"
@@ -28,9 +27,9 @@ class TensorAgg {
 
     static txeo::Tensor<T> reduce_min(const txeo::Tensor<T> &tensor, std::vector<size_t> axes);
 
-    static txeo::Tensor<T> arg_max(const txeo::Tensor<T> &tensor, std::vector<size_t> axes);
+    static txeo::Tensor<size_t> arg_max(const txeo::Tensor<T> &tensor, size_t axis);
 
-    static txeo::Tensor<T> arg_min(const txeo::Tensor<T> &tensor, std::vector<size_t> axes);
+    static txeo::Tensor<size_t> arg_min(const txeo::Tensor<T> &tensor, size_t axis);
 
     static txeo::Tensor<T> abs(const txeo::Tensor<T> &tensor);
 

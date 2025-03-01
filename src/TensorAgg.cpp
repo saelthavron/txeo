@@ -5,6 +5,7 @@
 #include "txeo/detail/utils.h"
 
 #include <cstddef>
+#include <cstdint>
 #include <stdexcept>
 #include <string>
 #include <tensorflow/cc/client/client_session.h>
@@ -106,18 +107,20 @@ txeo::Tensor<T> TensorAgg<T>::reduce_min(const txeo::Tensor<T> &tensor, std::vec
 }
 
 template <typename T>
-inline Tensor<T> TensorAgg<T>::arg_max(const txeo::Tensor<T> &tensor, std::vector<size_t> axes) {
+inline Tensor<size_t> TensorAgg<T>::arg_max(const txeo::Tensor<T> &tensor, size_t axis) {
   if (tensor.dim() == 0)
     throw txeo::TensorAggError("Tensor has dimension zero.");
 
-  for (auto &item : axes)
-    if (item >= txeo::detail::to_size_t(tensor.order()))
-      throw txeo::TensorAggError("Inconsistent axes.");
+  if (axis >= txeo::detail::to_size_t(tensor.order()))
+    throw txeo::TensorAggError("Inconsistent axis.");
+
+  std::cout << "Tensor: \n";
+  std::cout << *tensor._impl->tf_tensor << std::endl;
 
   try {
-    auto resp = txeo::detail::TensorHelper::reduce_tensor<T>(
-        *tensor._impl->tf_tensor, axes,
-        [](const tf::Scope &scope, tf::Input input, tf::Input axis) -> tf::Output {
+    auto resp = txeo::detail::TensorHelper::reduce_tensor_to_indexes<T>(
+        *tensor._impl->tf_tensor, txeo::detail::to_int64(axis),
+        [](const tf::Scope &scope, tf::Input input, int64_t axis) -> tf::Output {
           return tf::ops::ArgMax(scope, input, axis);
         });
     return resp;
@@ -127,18 +130,17 @@ inline Tensor<T> TensorAgg<T>::arg_max(const txeo::Tensor<T> &tensor, std::vecto
 }
 
 template <typename T>
-inline Tensor<T> TensorAgg<T>::arg_min(const txeo::Tensor<T> &tensor, std::vector<size_t> axes) {
+Tensor<size_t> TensorAgg<T>::arg_min(const txeo::Tensor<T> &tensor, size_t axis) {
   if (tensor.dim() == 0)
     throw txeo::TensorAggError("Tensor has dimension zero.");
 
-  for (auto &item : axes)
-    if (item >= txeo::detail::to_size_t(tensor.order()))
-      throw txeo::TensorAggError("Inconsistent axes.");
+  if (axis >= txeo::detail::to_size_t(tensor.order()))
+    throw txeo::TensorAggError("Inconsistent axis.");
 
   try {
-    auto resp = txeo::detail::TensorHelper::reduce_tensor<T>(
-        *tensor._impl->tf_tensor, axes,
-        [](const tf::Scope &scope, tf::Input input, tf::Input axis) -> tf::Output {
+    auto resp = txeo::detail::TensorHelper::reduce_tensor_to_indexes<T>(
+        *tensor._impl->tf_tensor, txeo::detail::to_int64(axis),
+        [](const tf::Scope &scope, tf::Input input, int64_t axis) -> tf::Output {
           return tf::ops::ArgMin(scope, input, axis);
         });
     return resp;
@@ -173,10 +175,10 @@ T TensorAgg<T>::variance(const txeo::Tensor<T> &tensor) {
     axes.emplace_back(i);
 
   auto mean = TensorAgg<T>::reduce_mean(tensor, axes);
-  txeo::Tensor<T> sq_dif = (tensor - mean(0)).power_elem_by(2);
+  txeo::Tensor<T> sq_dif{(tensor - mean()).square()};
   auto mean_sqdif = TensorAgg<T>::reduce_mean(sq_dif, axes);
 
-  return mean_sqdif(0);
+  return mean_sqdif();
 }
 
 template <typename T>
@@ -191,5 +193,6 @@ template class TensorAgg<long>;
 template class TensorAgg<long long>;
 template class TensorAgg<float>;
 template class TensorAgg<double>;
+template class TensorAgg<size_t>;
 
 } // namespace txeo

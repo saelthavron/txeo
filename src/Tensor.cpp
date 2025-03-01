@@ -477,6 +477,13 @@ Tensor<T> &Tensor<T>::power_elem_by(const T &exponent) {
 }
 
 template <typename T>
+inline Tensor<T> &Tensor<T>::square() {
+  txeo::TensorOp<T>::square_by(*this);
+
+  return *this;
+}
+
+template <typename T>
 txeo::TensorIterator<T> Tensor<T>::begin() {
   return txeo::TensorIterator<T>{this->data()};
 }
@@ -505,6 +512,7 @@ template class Tensor<long>;
 template class Tensor<long long>;
 template class Tensor<float>;
 template class Tensor<double>;
+template class Tensor<size_t>;
 
 template std::ostream &operator<<(std::ostream &, const Tensor<short> &);
 template std::ostream &operator<<(std::ostream &, const Tensor<int> &);
@@ -513,6 +521,7 @@ template std::ostream &operator<<(std::ostream &, const Tensor<long> &);
 template std::ostream &operator<<(std::ostream &, const Tensor<long long> &);
 template std::ostream &operator<<(std::ostream &, const Tensor<float> &);
 template std::ostream &operator<<(std::ostream &, const Tensor<double> &);
+template std::ostream &operator<<(std::ostream &, const Tensor<size_t> &);
 
 template txeo::Tensor<short> operator+(const txeo::Tensor<short> &, const txeo::Tensor<short> &);
 template txeo::Tensor<int> operator+(const txeo::Tensor<int> &, const txeo::Tensor<int> &);
@@ -522,6 +531,7 @@ template txeo::Tensor<long long> operator+(const txeo::Tensor<long long> &,
                                            const txeo::Tensor<long long> &);
 template txeo::Tensor<float> operator+(const txeo::Tensor<float> &, const txeo::Tensor<float> &);
 template txeo::Tensor<double> operator+(const txeo::Tensor<double> &, const txeo::Tensor<double> &);
+template txeo::Tensor<size_t> operator+(const txeo::Tensor<size_t> &, const txeo::Tensor<size_t> &);
 
 template txeo::Tensor<short> operator+(const txeo::Tensor<short> &, const short &);
 template txeo::Tensor<int> operator+(const txeo::Tensor<int> &, const int &);
@@ -530,6 +540,7 @@ template txeo::Tensor<long> operator+(const txeo::Tensor<long> &, const long &);
 template txeo::Tensor<long long> operator+(const txeo::Tensor<long long> &, const long long &);
 template txeo::Tensor<float> operator+(const txeo::Tensor<float> &, const float &);
 template txeo::Tensor<double> operator+(const txeo::Tensor<double> &, const double &);
+template txeo::Tensor<size_t> operator+(const txeo::Tensor<size_t> &, const size_t &);
 
 template txeo::Tensor<short> operator-(const txeo::Tensor<short> &, const txeo::Tensor<short> &);
 template txeo::Tensor<int> operator-(const txeo::Tensor<int> &, const txeo::Tensor<int> &);
@@ -539,6 +550,7 @@ template txeo::Tensor<long long> operator-(const txeo::Tensor<long long> &,
                                            const txeo::Tensor<long long> &);
 template txeo::Tensor<float> operator-(const txeo::Tensor<float> &, const txeo::Tensor<float> &);
 template txeo::Tensor<double> operator-(const txeo::Tensor<double> &, const txeo::Tensor<double> &);
+template txeo::Tensor<size_t> operator-(const txeo::Tensor<size_t> &, const txeo::Tensor<size_t> &);
 
 template txeo::Tensor<short> operator-(const txeo::Tensor<short> &, const short &);
 template txeo::Tensor<int> operator-(const txeo::Tensor<int> &, const int &);
@@ -547,6 +559,7 @@ template txeo::Tensor<long> operator-(const txeo::Tensor<long> &, const long &);
 template txeo::Tensor<long long> operator-(const txeo::Tensor<long long> &, const long long &);
 template txeo::Tensor<float> operator-(const txeo::Tensor<float> &, const float &);
 template txeo::Tensor<double> operator-(const txeo::Tensor<double> &, const double &);
+template txeo::Tensor<size_t> operator-(const txeo::Tensor<size_t> &, const size_t &);
 
 template txeo::Tensor<short> operator-(const short &, const txeo::Tensor<short> &);
 template txeo::Tensor<int> operator-(const int &, const txeo::Tensor<int> &);
@@ -555,6 +568,7 @@ template txeo::Tensor<long> operator-(const long &, const txeo::Tensor<long> &);
 template txeo::Tensor<long long> operator-(const long long &, const txeo::Tensor<long long> &);
 template txeo::Tensor<float> operator-(const float &, const txeo::Tensor<float> &);
 template txeo::Tensor<double> operator-(const double &, const txeo::Tensor<double> &);
+template txeo::Tensor<size_t> operator-(const size_t &, const txeo::Tensor<size_t> &);
 
 template txeo::Tensor<short> operator*(const txeo::Tensor<short> &, const short &);
 template txeo::Tensor<int> operator*(const txeo::Tensor<int> &, const int &);
@@ -563,6 +577,7 @@ template txeo::Tensor<long> operator*(const txeo::Tensor<long> &, const long &);
 template txeo::Tensor<long long> operator*(const txeo::Tensor<long long> &, const long long &);
 template txeo::Tensor<float> operator*(const txeo::Tensor<float> &, const float &);
 template txeo::Tensor<double> operator*(const txeo::Tensor<double> &, const double &);
+template txeo::Tensor<size_t> operator*(const txeo::Tensor<size_t> &, const size_t &);
 
 template txeo::Tensor<short> operator/(const txeo::Tensor<short> &, const short &);
 template txeo::Tensor<int> operator/(const txeo::Tensor<int> &, const int &);
@@ -571,6 +586,7 @@ template txeo::Tensor<long> operator/(const txeo::Tensor<long> &, const long &);
 template txeo::Tensor<long long> operator/(const txeo::Tensor<long long> &, const long long &);
 template txeo::Tensor<float> operator/(const txeo::Tensor<float> &, const float &);
 template txeo::Tensor<double> operator/(const txeo::Tensor<double> &, const double &);
+template txeo::Tensor<size_t> operator/(const txeo::Tensor<size_t> &, const size_t &);
 
 template txeo::Tensor<short> operator/(const short &, const txeo::Tensor<short> &);
 template txeo::Tensor<int> operator/(const int &, const txeo::Tensor<int> &);
@@ -579,5 +595,6 @@ template txeo::Tensor<long> operator/(const long &, const txeo::Tensor<long> &);
 template txeo::Tensor<long long> operator/(const long long &, const txeo::Tensor<long long> &);
 template txeo::Tensor<float> operator/(const float &, const txeo::Tensor<float> &);
 template txeo::Tensor<double> operator/(const double &, const txeo::Tensor<double> &);
+template txeo::Tensor<size_t> operator/(const size_t &, const txeo::Tensor<size_t> &);
 
 } // namespace txeo

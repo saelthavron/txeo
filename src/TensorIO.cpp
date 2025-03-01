@@ -131,6 +131,7 @@ template txeo::Tensor<long> TensorIO::read_text_file<long>(bool has_header) cons
 template txeo::Tensor<long long> TensorIO::read_text_file<long long>(bool has_header) const;
 template txeo::Tensor<float> TensorIO::read_text_file<float>(bool has_header) const;
 template txeo::Tensor<double> TensorIO::read_text_file<double>(bool has_header) const;
+template txeo::Tensor<size_t> TensorIO::read_text_file<size_t>(bool has_header) const;
 
 template void TensorIO::write_text_file(const txeo::Tensor<short> &tensor) const;
 template void TensorIO::write_text_file(const txeo::Tensor<int> &tensor) const;
@@ -139,6 +140,7 @@ template void TensorIO::write_text_file(const txeo::Tensor<long> &tensor) const;
 template void TensorIO::write_text_file(const txeo::Tensor<long long> &tensor) const;
 template void TensorIO::write_text_file(const txeo::Tensor<float> &tensor) const;
 template void TensorIO::write_text_file(const txeo::Tensor<double> &tensor) const;
+template void TensorIO::write_text_file(const txeo::Tensor<size_t> &tensor) const;
 
 template void TensorIO::write_text_file(const txeo::Tensor<float> &tensor, size_t precision) const;
 template void TensorIO::write_text_file(const txeo::Tensor<double> &tensor, size_t precision) const;

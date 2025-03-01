@@ -1087,6 +1087,8 @@ class Tensor {
      */
     Tensor<T> &power_elem_by(const T &exponent);
 
+    Tensor<T> &square();
+
     Tensor<T> &operator+=(const Tensor<T> &tensor);
     Tensor<T> &operator+=(const T &tensor);
     Tensor<T> &operator-=(const Tensor<T> &tensor);
