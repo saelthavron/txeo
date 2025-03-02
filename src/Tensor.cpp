@@ -477,8 +477,15 @@ Tensor<T> &Tensor<T>::power_elem_by(const T &exponent) {
 }
 
 template <typename T>
-inline Tensor<T> &Tensor<T>::square() {
+Tensor<T> &Tensor<T>::square() {
   txeo::TensorOp<T>::square_by(*this);
+
+  return *this;
+}
+
+template <typename T>
+Tensor<T> &Tensor<T>::sqrt() {
+  txeo::TensorOp<T>::sqrt_by(*this);
 
   return *this;
 }

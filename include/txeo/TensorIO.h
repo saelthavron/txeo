@@ -16,10 +16,6 @@ namespace txeo {
  *
  */
 class TensorIO {
-  private:
-    std::filesystem::path _path;
-    char _separator;
-
   public:
     /**
      * @brief Constructs Tensor IO object
@@ -156,6 +152,10 @@ class TensorIO {
       txeo::TensorIO io{path, separator};
       io.write_text_file(tensor, precision);
     };
+
+  private:
+    std::filesystem::path _path;
+    char _separator;
 };
 
 /**

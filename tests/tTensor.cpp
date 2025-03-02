@@ -768,4 +768,20 @@ TEST(TensorTest, Immutability) {
   EXPECT_EQ(result.data()[1], 13);
 }
 
+TEST(TensorTest, Squares) {
+  txeo::Tensor<int> t1({2, 2}, {2, 5, 10, 7});
+  auto result1 = t1.square();
+  EXPECT_EQ(result1.data()[0], 4);
+  EXPECT_EQ(result1.data()[1], 25);
+  EXPECT_EQ(result1.data()[2], 100);
+  EXPECT_EQ(result1.data()[3], 49);
+
+  txeo::Tensor<double> t2({2, 2}, {4.0, 25.0, 81.0, 64.0});
+  auto result2 = t2.sqrt();
+  EXPECT_EQ(result2.data()[0], 2.0);
+  EXPECT_EQ(result2.data()[1], 5.0);
+  EXPECT_EQ(result2.data()[2], 9.0);
+  EXPECT_EQ(result2.data()[3], 8.0);
+}
+
 } // namespace txeo

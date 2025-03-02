@@ -37,28 +37,6 @@ class TensorAgg;
  */
 template <typename T>
 class Tensor {
-  private:
-    struct Impl;
-    std::unique_ptr<Impl> _impl{nullptr};
-
-    friend class txeo::Predictor<T>;
-    friend class txeo::TensorAgg<T>;
-    friend class txeo::detail::TensorHelper;
-
-    template <typename P>
-    void create_from_shape(P &&shape);
-
-    void fill_data_shape(const std::initializer_list<std::initializer_list<T>> &list,
-                         std::vector<T> &flat_data, std::vector<size_t> &shape);
-
-    void fill_data_shape(
-        const std::initializer_list<std::initializer_list<std::initializer_list<T>>> &list,
-        std::vector<T> &flat_data, std::vector<size_t> &shape);
-
-    void check_indexes(const std::vector<size_t> &indexes);
-
-    explicit Tensor();
-
   public:
     /**
      * @note This copy constructor performs a deep copy, behaving differently from TensorFlow C++.
@@ -485,7 +463,7 @@ class Tensor {
      *     txeo::Tensor<int> tensor{{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
      *     txeo::Tensor<int> sliced_tensor = tensor.slice(0, 2); // Extract rows 0 and 1
      *
-     *     std::cout << "Sliced Tensor: " << sliced_tensor << std::endl;
+     *     std::cout << "Sliced Tensor: " << sliced_tensor << std::endl; // {{1, 2}, {4, 5}, {7, 8}}
      *     return 0;
      * }
      * @endcode
@@ -1087,7 +1065,48 @@ class Tensor {
      */
     Tensor<T> &power_elem_by(const T &exponent);
 
+    /**
+     * @brief Computes the element-wise square of this tensor.
+     *
+     * @return Tensor<T>& A reference to this tensor after squaring its elements.
+     *
+     * **Example Usage:**
+     * @code
+     * #include "txeo/Tensor.h"
+     * #include <iostream>
+     *
+     * int main() {
+     *     txeo::Tensor<int> tensor({3}, {1, 2, 3});
+     *     tensor.square();
+     *
+     *     std::cout << "Squared Tensor: " << tensor << std::endl; // Output: [1, 4, 9]
+     *     return 0;
+     * }
+     * @endcode
+     */
     Tensor<T> &square();
+
+    /**
+     * @brief Computes the element-wise square root of this tensor.
+     *
+     * @return Tensor<T>& A reference to this tensor after computing the square root of its
+     * elements.
+     *
+     * **Example Usage:**
+     * @code
+     * #include "txeo/Tensor.h"
+     * #include <iostream>
+     *
+     * int main() {
+     *     txeo::Tensor<double> tensor({3}, {1.0, 4.0, 9.0});
+     *     tensor.sqrt();
+     *
+     *     std::cout << "Square Root Tensor: " << tensor << std::endl; // Output: [1.0, 2.0, 3.0]
+     *     return 0;
+     * }
+     * @endcode
+     */
+    Tensor<T> &sqrt();
 
     Tensor<T> &operator+=(const Tensor<T> &tensor);
     Tensor<T> &operator+=(const T &tensor);
@@ -1100,6 +1119,28 @@ class Tensor {
     txeo::TensorIterator<T> end();
     txeo::TensorIterator<const T> begin() const;
     txeo::TensorIterator<const T> end() const;
+
+  private:
+    struct Impl;
+    std::unique_ptr<Impl> _impl{nullptr};
+
+    friend class txeo::Predictor<T>;
+    friend class txeo::TensorAgg<T>;
+    friend class txeo::detail::TensorHelper;
+
+    template <typename P>
+    void create_from_shape(P &&shape);
+
+    void fill_data_shape(const std::initializer_list<std::initializer_list<T>> &list,
+                         std::vector<T> &flat_data, std::vector<size_t> &shape);
+
+    void fill_data_shape(
+        const std::initializer_list<std::initializer_list<std::initializer_list<T>>> &list,
+        std::vector<T> &flat_data, std::vector<size_t> &shape);
+
+    void check_indexes(const std::vector<size_t> &indexes);
+
+    explicit Tensor();
 };
 
 /**

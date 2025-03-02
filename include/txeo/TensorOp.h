@@ -14,7 +14,6 @@ namespace txeo {
  */
 template <typename T>
 class TensorOp {
-
   public:
     TensorOp() = delete;
     TensorOp(const TensorOp &) = delete;

@@ -129,4 +129,97 @@ TEST(TensorAggTest, StandardDeviation) {
   EXPECT_NEAR(result, std::sqrt(2.0), 1e-5);
 }
 
+TEST(TensorAggTest, ReduceProd) {
+  Tensor<int> tensor1D({3}, {2, 3, 4});
+  auto result1D = TensorAgg<int>::reduce_prod(tensor1D, {0});
+  EXPECT_EQ(result1D.shape(), TensorShape({}));
+  EXPECT_EQ(result1D(), 24);
+
+  Tensor<int> tensor2D({{2, 3}, {4, 5}});
+  auto result2D_axis0 = TensorAgg<int>::reduce_prod(tensor2D, {0});
+  EXPECT_EQ(result2D_axis0.shape(), TensorShape({2}));
+  EXPECT_EQ(result2D_axis0(0), 8);
+  EXPECT_EQ(result2D_axis0(1), 15);
+
+  auto result2D_axis1 = TensorAgg<int>::reduce_prod(tensor2D, {1});
+  EXPECT_EQ(result2D_axis1.shape(), TensorShape({2}));
+  EXPECT_EQ(result2D_axis1(0), 6);
+  EXPECT_EQ(result2D_axis1(1), 20);
+}
+
+TEST(TensorAggTest, ReduceEuclideanNorm) {
+  Tensor<double> tensor1D({3}, {3.0, 4.0, 0.0});
+  auto result1D = TensorAgg<double>::reduce_euclidean_norm(tensor1D, {0});
+  EXPECT_EQ(result1D.shape(), TensorShape({}));
+  EXPECT_NEAR(result1D(), 5.0, 1e-5);
+
+  Tensor<double> tensor2D({{3.0, 4.0}, {0.0, 5.0}});
+  auto result2D_axis0 = TensorAgg<double>::reduce_euclidean_norm(tensor2D, {0});
+  EXPECT_EQ(result2D_axis0.shape(), TensorShape({2}));
+  EXPECT_NEAR(result2D_axis0(0), 3.0, 1e-5);
+  EXPECT_NEAR(result2D_axis0(1), 6.40312, 1e-5);
+}
+
+TEST(TensorAggTest, ReduceAll) {
+  Tensor<bool> tensor1D({3}, {true, true, false});
+  auto result1D = TensorAgg<bool>::reduce_all(tensor1D, {0});
+  EXPECT_EQ(result1D.shape(), TensorShape({}));
+  EXPECT_EQ(result1D(), false);
+
+  Tensor<bool> tensor2D({{true, true}, {false, true}});
+  auto result2D_axis1 = TensorAgg<bool>::reduce_all(tensor2D, {1});
+  EXPECT_EQ(result2D_axis1.shape(), TensorShape({2}));
+  EXPECT_EQ(result2D_axis1(0), true);
+  EXPECT_EQ(result2D_axis1(1), false);
+}
+
+TEST(TensorAggTest, ReduceAny) {
+  Tensor<bool> tensor1D({3}, {false, false, true});
+  auto result1D = TensorAgg<bool>::reduce_any(tensor1D, {0});
+  EXPECT_EQ(result1D.shape(), TensorShape({}));
+  EXPECT_EQ(result1D(), true);
+
+  Tensor<bool> tensor2D({{false, false}, {true, false}});
+  auto result2D_axis0 = TensorAgg<bool>::reduce_any(tensor2D, {0});
+  EXPECT_EQ(result2D_axis0.shape(), TensorShape({2}));
+  EXPECT_EQ(result2D_axis0(0), true);
+  EXPECT_EQ(result2D_axis0(1), false);
+}
+
+TEST(TensorAggTest, CumulativeSum) {
+  Tensor<int> tensor1D({4}, {1, 2, 3, 4});
+  auto result1D = TensorAgg<int>::cumulative_sum(tensor1D, 0);
+  EXPECT_EQ(result1D.shape(), TensorShape({4}));
+  EXPECT_EQ(result1D(0), 1);
+  EXPECT_EQ(result1D(1), 3);
+  EXPECT_EQ(result1D(2), 6);
+  EXPECT_EQ(result1D(3), 10);
+
+  Tensor<int> tensor2D({{1, 2}, {3, 4}});
+  auto result2D_axis1 = TensorAgg<int>::cumulative_sum(tensor2D, 1);
+  EXPECT_EQ(result2D_axis1.shape(), TensorShape({2, 2}));
+  EXPECT_EQ(result2D_axis1(0, 0), 1);
+  EXPECT_EQ(result2D_axis1(0, 1), 3);
+  EXPECT_EQ(result2D_axis1(1, 0), 3);
+  EXPECT_EQ(result2D_axis1(1, 1), 7);
+}
+
+TEST(TensorAggTest, CumulativeProd) {
+  Tensor<int> tensor1D({4}, {1, 2, 3, 4});
+  auto result1D = TensorAgg<int>::cumulative_prod(tensor1D, 0);
+  EXPECT_EQ(result1D.shape(), TensorShape({4}));
+  EXPECT_EQ(result1D(0), 1);
+  EXPECT_EQ(result1D(1), 2);
+  EXPECT_EQ(result1D(2), 6);
+  EXPECT_EQ(result1D(3), 24);
+
+  Tensor<int> tensor2D({{1, 2}, {3, 4}});
+  auto result2D_axis0 = TensorAgg<int>::cumulative_prod(tensor2D, 0);
+  EXPECT_EQ(result2D_axis0.shape(), TensorShape({2, 2}));
+  EXPECT_EQ(result2D_axis0(0, 0), 1);
+  EXPECT_EQ(result2D_axis0(0, 1), 2);
+  EXPECT_EQ(result2D_axis0(1, 0), 3);
+  EXPECT_EQ(result2D_axis0(1, 1), 8);
+}
+
 } // namespace txeo

@@ -40,68 +40,103 @@ class TensorHelper {
     using ReduFunc2 = std::function<tf::Output(const tf::Scope &scope, tf::Input input)>;
 
     template <typename T, typename U>
-    static txeo::Tensor<T> to_txeo_tensor(U &&tf_tensor) {
-      txeo::Tensor<T> resp;
-      resp._impl->tf_tensor = std::make_unique<tensorflow::Tensor>(std::forward<U>(tf_tensor));
-      resp._impl->txeo_shape._impl->ext_tf_shape = &resp._impl->tf_tensor->shape();
-      resp._impl->txeo_shape._impl->stride =
-          txeo::detail::calc_stride(*resp._impl->txeo_shape._impl->ext_tf_shape);
-
-      return resp;
-    }
+    static txeo::Tensor<T> to_txeo_tensor(U &&tf_tensor);
 
     template <typename T>
     static txeo::Tensor<T> reduce_tensor(const tf::Tensor &M, const std::vector<size_t> &axes,
-                                         ReduFunc3 func) {
-      tf::Scope root = tf::Scope::NewRootScope();
-
-      auto vec = txeo::detail::to_int64(axes);
-      tf::Tensor axes_tensor(tf::DT_INT64, tf::TensorShape({txeo::detail::to_int64(vec.size())}));
-      auto axes_tensor_flat = axes_tensor.flat<int64_t>();
-      for (size_t i = 0; i < vec.size(); ++i)
-        axes_tensor_flat(i) = vec[i];
-
-      auto ope = func(root, M, axes_tensor);
-
-      tf::ClientSession session(root);
-      std::vector<tf::Tensor> outputs;
-      auto status = session.Run({ope}, &outputs);
-      if (!status.ok())
-        throw std::runtime_error(status.ToString());
-      return txeo::detail::TensorHelper::to_txeo_tensor<T>(std::move(outputs[0]));
-    }
+                                         ReduFunc3 func);
 
     template <typename T>
-    static txeo::Tensor<T> reduce_tensor(const tf::Tensor &M, ReduFunc2 func) {
-      tf::Scope root = tf::Scope::NewRootScope();
-
-      auto ope = func(root, M);
-
-      tf::ClientSession session(root);
-      std::vector<tf::Tensor> outputs;
-      auto status = session.Run({ope}, &outputs);
-      if (!status.ok())
-        throw std::runtime_error(status.ToString());
-      return txeo::detail::TensorHelper::to_txeo_tensor<T>(std::move(outputs[0]));
-    }
+    static txeo::Tensor<T> reduce_tensor(const tf::Tensor &M, ReduFunc2 func);
 
     template <typename T>
     static txeo::Tensor<size_t> reduce_tensor_to_indexes(const tf::Tensor &M, int64_t index,
-                                                         ReduFunc31 func) {
-      tf::Scope root = tf::Scope::NewRootScope();
+                                                         ReduFunc31 func);
 
-      auto ope = func(root, M, index);
-
-      tf::ClientSession session(root);
-      std::vector<tf::Tensor> outputs;
-      auto status = session.Run({ope}, &outputs);
-      if (!status.ok())
-        throw std::runtime_error(status.ToString());
-
-      auto resp = txeo::detail::TensorHelper::to_txeo_tensor<size_t>(std::move(outputs[0]));
-
-      return resp;
-    }
+    template <typename T>
+    static txeo::Tensor<T> reduce_tensor(const tf::Tensor &M, const int64_t &axis, ReduFunc31 func);
 };
+
+template <typename T, typename U>
+inline txeo::Tensor<T> TensorHelper::to_txeo_tensor(U &&tf_tensor) {
+  txeo::Tensor<T> resp;
+  resp._impl->tf_tensor = std::make_unique<tensorflow::Tensor>(std::forward<U>(tf_tensor));
+  resp._impl->txeo_shape._impl->ext_tf_shape = &resp._impl->tf_tensor->shape();
+  resp._impl->txeo_shape._impl->stride =
+      txeo::detail::calc_stride(*resp._impl->txeo_shape._impl->ext_tf_shape);
+
+  return resp;
+}
+
+template <typename T>
+inline txeo::Tensor<T>
+TensorHelper::reduce_tensor(const tf::Tensor &M, const std::vector<size_t> &axes, ReduFunc3 func) {
+  tf::Scope root = tf::Scope::NewRootScope();
+
+  auto vec = txeo::detail::to_int64(axes);
+  tf::Tensor axes_tensor(tf::DT_INT64, tf::TensorShape({txeo::detail::to_int64(vec.size())}));
+  auto axes_tensor_flat = axes_tensor.flat<int64_t>();
+  for (size_t i = 0; i < vec.size(); ++i)
+    axes_tensor_flat(i) = vec[i];
+
+  auto ope = func(root, M, axes_tensor);
+
+  tf::ClientSession session(root);
+  std::vector<tf::Tensor> outputs;
+  auto status = session.Run({ope}, &outputs);
+  if (!status.ok())
+    throw std::runtime_error(status.ToString());
+  return txeo::detail::TensorHelper::to_txeo_tensor<T>(std::move(outputs[0]));
+}
+
+template <typename T>
+inline txeo::Tensor<T> TensorHelper::reduce_tensor(const tf::Tensor &M, ReduFunc2 func) {
+  tf::Scope root = tf::Scope::NewRootScope();
+
+  auto ope = func(root, M);
+
+  tf::ClientSession session(root);
+  std::vector<tf::Tensor> outputs;
+  auto status = session.Run({ope}, &outputs);
+  if (!status.ok())
+    throw std::runtime_error(status.ToString());
+  return txeo::detail::TensorHelper::to_txeo_tensor<T>(std::move(outputs[0]));
+}
+
+template <typename T>
+inline txeo::Tensor<size_t> TensorHelper::reduce_tensor_to_indexes(const tf::Tensor &M,
+                                                                   int64_t index, ReduFunc31 func) {
+  tf::Scope root = tf::Scope::NewRootScope();
+
+  auto ope = func(root, M, index);
+
+  tf::ClientSession session(root);
+  std::vector<tf::Tensor> outputs;
+  auto status = session.Run({ope}, &outputs);
+  if (!status.ok())
+    throw std::runtime_error(status.ToString());
+
+  auto resp = txeo::detail::TensorHelper::to_txeo_tensor<size_t>(std::move(outputs[0]));
+
+  return resp;
+}
+
+template <typename T>
+inline txeo::Tensor<T> TensorHelper::reduce_tensor(const tf::Tensor &M, const int64_t &axis,
+                                                   ReduFunc31 func) {
+  tf::Scope root = tf::Scope::NewRootScope();
+
+  auto ope = func(root, M, axis);
+
+  tf::ClientSession session(root);
+  std::vector<tf::Tensor> outputs;
+  auto status = session.Run({ope}, &outputs);
+  if (!status.ok())
+    throw std::runtime_error(status.ToString());
+
+  auto resp = txeo::detail::TensorHelper::to_txeo_tensor<T>(std::move(outputs[0]));
+
+  return resp;
+}
 } // namespace txeo::detail
 #endif

@@ -25,26 +25,6 @@ class TensorHelper;
  *
  */
 class TensorShape {
-  private:
-    struct Impl;
-    std::unique_ptr<Impl> _impl{nullptr};
-
-    template <typename T>
-    friend class Tensor;
-
-    template <typename T>
-    friend class Predictor;
-
-    template <typename T>
-    friend class TensorAgg;
-
-    friend class txeo::detail::TensorHelper;
-
-    template <typename P>
-    void create_from_vector(P &&shape);
-
-    explicit TensorShape();
-
   public:
     TensorShape(const TensorShape &shape);
     TensorShape(TensorShape &&shape) noexcept;
@@ -319,6 +299,26 @@ class TensorShape {
      * @return TensorShape Clone of this tensor
      */
     [[nodiscard]] TensorShape clone() const;
+
+  private:
+    struct Impl;
+    std::unique_ptr<Impl> _impl{nullptr};
+
+    template <typename T>
+    friend class Tensor;
+
+    template <typename T>
+    friend class Predictor;
+
+    template <typename T>
+    friend class TensorAgg;
+
+    friend class txeo::detail::TensorHelper;
+
+    template <typename P>
+    void create_from_vector(P &&shape);
+
+    explicit TensorShape();
 };
 
 /**

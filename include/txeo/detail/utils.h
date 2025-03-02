@@ -54,16 +54,6 @@ txeo::TensorShape to_txeo_tensor_shape(const tf::TensorShape &shape);
 
 txeo::TensorShape proto_to_txeo_tensor_shape(const tf::TensorShapeProto &shape);
 
-// template <typename T>
-// txeo::Tensor<T> to_txeo_tensor(const tf::Tensor &tensor) {
-//   txeo::Tensor<T> resp(to_txeo_tensor_shape(tensor.shape()));
-//   auto t_data = static_cast<T *>(tensor.data());
-//   for (size_t i{0}; i < resp.dim(); ++i)
-//     resp.data()[i] = t_data[i];
-
-//   return resp;
-// };
-
 std::vector<size_t> calc_stride(const tf::TensorShape &shape);
 
 template <typename T>
