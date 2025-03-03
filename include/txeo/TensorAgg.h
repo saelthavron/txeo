@@ -51,6 +51,8 @@ class TensorAgg {
 
     static T standard_deviation(const txeo::Tensor<T> &tensor);
 
+    static txeo::Tensor<T> median(const txeo::Tensor<T> &tensor, std::vector<size_t> axes);
+
     static T sum_all(const txeo::Tensor<T> &tensor);
 
   private:

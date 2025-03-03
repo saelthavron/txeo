@@ -13,6 +13,7 @@ add_executable(
   tPredictor.cpp
   tTensorOp.cpp
   tTensorAgg.cpp
+  tTensorPart.cpp
 )  
 
 target_link_libraries(

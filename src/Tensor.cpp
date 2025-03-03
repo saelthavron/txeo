@@ -1,6 +1,7 @@
 
 #include "txeo/Tensor.h"
 #include "txeo/TensorOp.h"
+#include "txeo/TensorPart.h"
 #include "txeo/TensorShape.h"
 #include "txeo/detail/TensorHelper.h"
 #include "txeo/detail/TensorPrivate.h"
@@ -12,15 +13,6 @@
 #include <initializer_list>
 #include <iterator>
 #include <memory>
-#include <tensorflow/cc/client/client_session.h>
-#include <tensorflow/cc/framework/ops.h>
-#include <tensorflow/cc/framework/scope.h>
-#include <tensorflow/cc/ops/math_ops.h>
-#include <tensorflow/cc/ops/standard_ops.h>
-#include <tensorflow/core/framework/tensor.h>
-#include <tensorflow/core/framework/tensor_shape.h>
-#include <tensorflow/core/platform/env.h>
-#include <tensorflow/core/public/session.h>
 #include <utility>
 #include <vector>
 
@@ -265,43 +257,16 @@ void Tensor<T>::reshape(const std::vector<size_t> &shape) {
 
 template <typename T>
 Tensor<T> Tensor<T>::slice(size_t first_axis_begin, size_t first_axis_end) const {
-  if (first_axis_end < first_axis_begin)
-    throw txeo::TensorError("The end index can not be less than the initial index!");
-  if (txeo::detail::to_int64(first_axis_end) >= _impl->txeo_shape.axis_dim(0))
-    throw txeo::TensorError(
-        "The end index can not be greater than or equal to the dimension of first axis!");
-
-  auto t_slice = _impl->tf_tensor->Slice(first_axis_begin, first_axis_end);
-  Tensor<T> resp{txeo::detail::to_txeo_tensor_shape(t_slice.shape())};
-  if (!resp._impl->tf_tensor->CopyFrom(t_slice, t_slice.shape()))
-    throw txeo::TensorError("This tensor could not be sliced!");
-
-  return resp;
+  try {
+    return txeo::TensorPart<T>::slice(*this, first_axis_begin, first_axis_end);
+  } catch (txeo::TensorPartError e) {
+    throw txeo::TensorError(e.what());
+  }
 }
 
 template <typename T>
 std::vector<Tensor<T>> Tensor<T>::unstack(size_t axis) const {
-  if (axis >= txeo::detail::to_size_t(this->order()))
-    throw txeo::TensorError("Axis inconsistent with the order of this tensor!");
-
-  auto shp = this->shape();
-
-  auto root = tf::Scope::NewRootScope();
-
-  auto aux = tf::ops::Unstack(root, *this->_impl->tf_tensor, shp.axis_dim(axis),
-                              tf::ops::Unstack::Attrs().Axis(txeo::detail::to_int64(axis)));
-
-  tf::ClientSession session(root);
-  std::vector<tf::Tensor> outputs;
-  auto status = session.Run({aux.output}, &outputs);
-  if (!status.ok())
-    throw txeo::TensorError("This tensor could not be unstacked: " + status.ToString());
-
-  std::vector<Tensor<T>> resp;
-  for (auto &item : outputs)
-    resp.emplace_back(txeo::detail::TensorHelper::to_txeo_tensor<T>(std::move(item)));
-
-  return resp;
+  return txeo::TensorPart<T>::unstack(*this, axis);
 }
 
 template <typename T>
@@ -490,21 +455,21 @@ inline Tensor<T> &Tensor<T>::operator-=(const T &scalar) {
 }
 
 template <typename T>
-Tensor<T> &Tensor<T>::hadamard_prod_by(const Tensor<T> &tensor) {
+Tensor<T> &Tensor<T>::hadamard_prod(const Tensor<T> &tensor) {
   txeo::TensorOp<T>::hadamard_prod_by(*this, tensor);
 
   return *this;
 }
 
 template <typename T>
-Tensor<T> &Tensor<T>::hadamard_div_by(const Tensor<T> &tensor) {
+Tensor<T> &Tensor<T>::hadamard_div(const Tensor<T> &tensor) {
   txeo::TensorOp<T>::hadamard_div_by(*this, tensor);
 
   return *this;
 }
 
 template <typename T>
-Tensor<T> &Tensor<T>::power_elem_by(const T &exponent) {
+Tensor<T> &Tensor<T>::power_elem(const T &exponent) {
   txeo::TensorOp<T>::power_elem_by(*this, exponent);
 
   return *this;

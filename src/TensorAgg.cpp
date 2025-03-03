@@ -1,5 +1,6 @@
 #include "txeo/TensorAgg.h"
 #include "txeo/Tensor.h"
+#include "txeo/TensorPart.h"
 #include "txeo/detail/TensorHelper.h"
 #include "txeo/detail/TensorPrivate.h"
 #include "txeo/detail/utils.h"
@@ -279,6 +280,14 @@ inline T TensorAgg<T>::sum_all(const txeo::Tensor<T> &tensor) {
 
   return resp;
 }
+
+// template <typename T>
+// inline txeo::Tensor<T> TensorAgg<T>::median(const txeo::Tensor<T> &tensor,
+//                                             std::vector<size_t> axes) {
+//   TensorAgg<T>::verify_parameters(tensor, axes);
+
+//   auto unstackeds = txeo::TensorPart<T>::unstack(tensor, axes);
+// }
 
 template class TensorAgg<short>;
 template class TensorAgg<int>;

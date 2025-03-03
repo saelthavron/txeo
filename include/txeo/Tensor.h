@@ -28,6 +28,9 @@ class Predictor;
 template <typename T>
 class TensorAgg;
 
+template <typename T>
+class TensorPart;
+
 /**
  * @brief Implements the mathematical concept of tensor, which is a magnitude of multiple order. A
  * tensor of order zero is defined to be a scalar, of order one a vector, of order two a matrix and
@@ -1032,7 +1035,7 @@ class Tensor {
      * @endcode
      *
      */
-    Tensor<T> &hadamard_prod_by(const Tensor<T> &tensor);
+    Tensor<T> &hadamard_prod(const Tensor<T> &tensor);
 
     /**
      * @brief In-place element-wise Hadamard division (chainable)
@@ -1048,7 +1051,7 @@ class Tensor {
      * // a now contains [5, 4, 3, 5]
      * @endcode
      */
-    Tensor<T> &hadamard_div_by(const Tensor<T> &tensor);
+    Tensor<T> &hadamard_div(const Tensor<T> &tensor);
 
     /**
      * @brief Performs the element-wise potentiation of this tensor
@@ -1065,7 +1068,7 @@ class Tensor {
      * @note Handles negative exponents through reciprocal calculation*
      *
      */
-    Tensor<T> &power_elem_by(const T &exponent);
+    Tensor<T> &power_elem(const T &exponent);
 
     /**
      * @brief Computes the element-wise square of this tensor.
@@ -1128,6 +1131,7 @@ class Tensor {
 
     friend class txeo::Predictor<T>;
     friend class txeo::TensorAgg<T>;
+    friend class txeo::TensorPart<T>;
     friend class txeo::detail::TensorHelper;
 
     template <typename P>

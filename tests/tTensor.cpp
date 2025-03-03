@@ -487,7 +487,7 @@ TEST(TensorTest, HadamardProdValidShapes) {
   Tensor<float> t1({2, 2}, {1.0f, 2.0f, 3.0f, 4.0f});
   Tensor<float> t2({2, 2}, {2.0f, 3.0f, 4.0f, 5.0f});
 
-  t1.hadamard_prod_by(t2);
+  t1.hadamard_prod(t2);
 
   ASSERT_EQ(t1.shape(), txeo::TensorShape({2, 2}));
   EXPECT_FLOAT_EQ(t1(0, 0), 2.0f);
@@ -498,13 +498,13 @@ TEST(TensorTest, HadamardProdDifferentShapes) {
   Tensor<double> t1({3}, {1.0, 2.0, 3.0});
   Tensor<double> t2({2, 2}, {1.0, 2.0, 3.0, 4.0});
 
-  EXPECT_THROW(t1.hadamard_prod_by(t2), TensorOpError);
+  EXPECT_THROW(t1.hadamard_prod(t2), TensorOpError);
 }
 
 TEST(TensorTest, PowerElemPositiveExponent) {
   Tensor<float> t({2, 2}, {2.0f, 3.0f, 4.0f, 5.0f});
 
-  t.power_elem_by(2.0f);
+  t.power_elem(2.0f);
 
   EXPECT_FLOAT_EQ(t(0, 0), 4.0f);
   EXPECT_FLOAT_EQ(t(1, 1), 25.0f);
@@ -513,7 +513,7 @@ TEST(TensorTest, PowerElemPositiveExponent) {
 TEST(TensorTest, PowerElemZeroExponent) {
   Tensor<double> t({3}, {2.0, 3.0, 4.0});
 
-  t.power_elem_by(0.0);
+  t.power_elem(0.0);
 
   EXPECT_DOUBLE_EQ(t(0), 1.0);
   EXPECT_DOUBLE_EQ(t(1), 1.0);
@@ -523,7 +523,7 @@ TEST(TensorTest, PowerElemZeroExponent) {
 TEST(TensorTest, PowerElemNegativeExponent) {
   Tensor<float> t({2}, {2.0f, 4.0f});
 
-  t.power_elem_by(-1.0f);
+  t.power_elem(-1.0f);
 
   EXPECT_FLOAT_EQ(t(0), 0.5f);
   EXPECT_FLOAT_EQ(t(1), 0.25f);
@@ -533,13 +533,13 @@ TEST(TensorTest, EmptyTensorHadamard) {
   Tensor<float> empty({0});
   Tensor<float> t({2}, {1.0f, 2.0f});
 
-  EXPECT_THROW(empty.hadamard_prod_by(t), TensorOpError);
+  EXPECT_THROW(empty.hadamard_prod(t), TensorOpError);
 }
 
 TEST(TensorTest, ChainedOperations) {
   Tensor<double> t({2, 2}, {2.0, 3.0, 4.0, 5.0});
 
-  t.hadamard_prod_by(Tensor<double>({2, 2}, {1.0, 2.0, 3.0, 4.0})).power_elem_by(2.0);
+  t.hadamard_prod(Tensor<double>({2, 2}, {1.0, 2.0, 3.0, 4.0})).power_elem(2.0);
 
   EXPECT_DOUBLE_EQ(t(0, 0), 4.0);   // (2*1)^2
   EXPECT_DOUBLE_EQ(t(1, 1), 400.0); // (5*4)^2
@@ -549,7 +549,7 @@ TEST(TensorTest, MixedDataTypes) {
   Tensor<int> t1({3}, {2, 3, 4});
   Tensor<int> t2({3}, {5, 6, 7});
 
-  t1.hadamard_prod_by(t2).power_elem_by(2);
+  t1.hadamard_prod(t2).power_elem(2);
 
   EXPECT_EQ(t1(0), 100); // (2*5)^2
   EXPECT_EQ(t1(2), 784); // (4*7)^2
@@ -558,7 +558,7 @@ TEST(TensorTest, MixedDataTypes) {
 TEST(TensorTest, SelfAssignmentHadamard) {
   Tensor<float> t({2}, {3.0f, 4.0f});
 
-  t.hadamard_prod_by(t);
+  t.hadamard_prod(t);
 
   EXPECT_FLOAT_EQ(t(0), 9.0f);
   EXPECT_FLOAT_EQ(t(1), 16.0f);
@@ -568,7 +568,7 @@ TEST(TensorTest, NonDestructiveShape) {
   Tensor<double> t({2, 3}, {1.0, 2.0, 3.0, 4.0, 5.0, 6.0});
   auto original_shape = t.shape();
 
-  t.power_elem_by(1.5);
+  t.power_elem(1.5);
 
   ASSERT_EQ(t.shape(), original_shape);
   EXPECT_DOUBLE_EQ(t(1, 2), std::pow(6.0, 1.5));
@@ -624,7 +624,7 @@ TEST(TensorTest, DivideByScalarAndOperator) {
 TEST(TensorTest, HadamardDivision) {
   Tensor<int> t1({3}, {20, 50, 100});
   Tensor<int> t2({3}, {4, 5, 10});
-  t1.hadamard_div_by(t2);
+  t1.hadamard_div(t2);
   EXPECT_EQ(t1.data()[0], 5);
   EXPECT_EQ(t1.data()[1], 10);
   EXPECT_EQ(t1.data()[2], 10);
@@ -633,7 +633,7 @@ TEST(TensorTest, HadamardDivision) {
 TEST(TensorTest, HadamardDivPrecision) {
   Tensor<float> t1({2}, {15.0f, 24.0f});
   Tensor<float> t2({2}, {4.0f, 6.0f});
-  t1.hadamard_div_by(t2);
+  t1.hadamard_div(t2);
   ASSERT_FLOAT_EQ(t1.data()[0], 3.75f);
   ASSERT_FLOAT_EQ(t1.data()[1], 4.0f);
 }
