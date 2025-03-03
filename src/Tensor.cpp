@@ -1,6 +1,8 @@
 
+#include "txeo/Tensor.h"
 #include "txeo/TensorOp.h"
 #include "txeo/TensorShape.h"
+#include "txeo/detail/TensorHelper.h"
 #include "txeo/detail/TensorPrivate.h"
 #include "txeo/detail/TensorShapePrivate.h"
 #include "txeo/detail/utils.h"
@@ -10,8 +12,15 @@
 #include <initializer_list>
 #include <iterator>
 #include <memory>
+#include <tensorflow/cc/client/client_session.h>
+#include <tensorflow/cc/framework/ops.h>
+#include <tensorflow/cc/framework/scope.h>
+#include <tensorflow/cc/ops/math_ops.h>
+#include <tensorflow/cc/ops/standard_ops.h>
 #include <tensorflow/core/framework/tensor.h>
 #include <tensorflow/core/framework/tensor_shape.h>
+#include <tensorflow/core/platform/env.h>
+#include <tensorflow/core/public/session.h>
 #include <utility>
 #include <vector>
 
@@ -266,6 +275,31 @@ Tensor<T> Tensor<T>::slice(size_t first_axis_begin, size_t first_axis_end) const
   Tensor<T> resp{txeo::detail::to_txeo_tensor_shape(t_slice.shape())};
   if (!resp._impl->tf_tensor->CopyFrom(t_slice, t_slice.shape()))
     throw txeo::TensorError("This tensor could not be sliced!");
+
+  return resp;
+}
+
+template <typename T>
+std::vector<Tensor<T>> Tensor<T>::unstack(size_t axis) const {
+  if (axis >= txeo::detail::to_size_t(this->order()))
+    throw txeo::TensorError("Axis inconsistent with the order of this tensor!");
+
+  auto shp = this->shape();
+
+  auto root = tf::Scope::NewRootScope();
+
+  auto aux = tf::ops::Unstack(root, *this->_impl->tf_tensor, shp.axis_dim(axis),
+                              tf::ops::Unstack::Attrs().Axis(txeo::detail::to_int64(axis)));
+
+  tf::ClientSession session(root);
+  std::vector<tf::Tensor> outputs;
+  auto status = session.Run({aux.output}, &outputs);
+  if (!status.ok())
+    throw txeo::TensorError("This tensor could not be unstacked: " + status.ToString());
+
+  std::vector<Tensor<T>> resp;
+  for (auto &item : outputs)
+    resp.emplace_back(txeo::detail::TensorHelper::to_txeo_tensor<T>(std::move(item)));
 
   return resp;
 }

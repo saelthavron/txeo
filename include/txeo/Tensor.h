@@ -470,6 +470,8 @@ class Tensor {
      */
     Tensor<T> slice(size_t first_axis_begin, size_t first_axis_end) const;
 
+    [[nodiscard]] std::vector<Tensor<T>> unstack(size_t axis) const;
+
     /**
      * @brief Views the content of the specified tensor according to the specified shape. There is
      * no element copying.
