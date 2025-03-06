@@ -31,6 +31,9 @@ class TensorAgg;
 template <typename T>
 class TensorPart;
 
+template <typename T>
+class TensorOp;
+
 /**
  * @brief Implements the mathematical concept of tensor, which is a magnitude of multiple order. A
  * tensor of order zero is defined to be a scalar, of order one a vector, of order two a matrix and
@@ -1132,6 +1135,7 @@ class Tensor {
     friend class txeo::Predictor<T>;
     friend class txeo::TensorAgg<T>;
     friend class txeo::TensorPart<T>;
+    friend class txeo::TensorOp<T>;
     friend class txeo::detail::TensorHelper;
 
     template <typename P>

@@ -1,6 +1,5 @@
 #ifndef TENSOROP_H
 #define TENSOROP_H
-
 #pragma once
 
 #include "txeo/Tensor.h"
@@ -378,6 +377,8 @@ class TensorOp {
     static txeo::Tensor<T> sqrt(const txeo::Tensor<T> &tensor);
 
     static void sqrt_by(txeo::Tensor<T> &tensor);
+
+    static txeo::Tensor<T> abs(const txeo::Tensor<T> &tensor);
 };
 
 /**

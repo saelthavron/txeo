@@ -346,4 +346,14 @@ TEST(TensorOpTest, SubtractInvalidShapes) {
   EXPECT_THROW(txeo::TensorOp<int>::subtract(a, b), txeo::TensorOpError);
 }
 
+TEST(TensorOpTest, Abs) {
+  Tensor<int> tensor({4}, {-1, 2, -3, 4});
+  auto result = TensorOp<int>::abs(tensor);
+  EXPECT_EQ(result.shape(), TensorShape({4}));
+  EXPECT_EQ(result(0), 1);
+  EXPECT_EQ(result(1), 2);
+  EXPECT_EQ(result(2), 3);
+  EXPECT_EQ(result(3), 4);
+}
+
 } // namespace txeo

@@ -1,6 +1,7 @@
 #include "txeo/TensorOp.h"
-
+#include "txeo/detail/TensorHelper.h"
 #include "txeo/detail/utils.h"
+
 #include <cmath>
 
 namespace txeo {
@@ -300,6 +301,22 @@ inline void TensorOp<T>::sqrt_by(txeo::Tensor<T> &tensor) {
 
   for (size_t i{0}; i < tensor.dim(); ++i)
     tensor.data()[i] = static_cast<T>(std::sqrt(tensor.data()[i]));
+}
+
+template <typename T>
+inline txeo::Tensor<T> TensorOp<T>::abs(const txeo::Tensor<T> &tensor) {
+  if (tensor.dim() == 0)
+    throw txeo::TensorOpError("Tensor has dimension zero.");
+
+  try {
+    auto resp = txeo::detail::TensorHelper::reduce_tensor<T>(
+        *tensor._impl->tf_tensor, [](const tf::Scope &scope, tf::Input input) -> tf::Output {
+          return tf::ops::Abs(scope, input);
+        });
+    return resp;
+  } catch (std::runtime_error e) {
+    throw txeo::TensorOpError("Reduction error: " + std::string{e.what()});
+  }
 }
 
 // Required for templated elements in cpp files

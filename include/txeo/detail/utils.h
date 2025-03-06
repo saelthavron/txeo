@@ -2,7 +2,6 @@
 #define TXEO_UTILS_H
 #pragma once
 
-#include "txeo/Tensor.h"
 #include "txeo/TensorShape.h"
 
 #include <cstddef>
@@ -62,20 +61,6 @@ bool is_zero(T value) {
     return std::abs(value) < std::numeric_limits<T>::epsilon();
 
   return value == 0;
-}
-
-template <typename T>
-T median(std::vector<T> values) {
-  if (values.size() == 1)
-    return values[0];
-
-  std::sort(std::begin(values), std::end(values));
-
-  auto index = values.size() / 2;
-  if (values.size() % 2 != 0)
-    return values[index];
-
-  return (values[index] + values[index - 1]) / 2;
 }
 
 } // namespace txeo::detail

@@ -113,7 +113,7 @@ std::vector<int64_t> TensorShape::axes_dims() const noexcept {
   const auto &aux =
       _impl->tf_shape != nullptr ? _impl->tf_shape->dim_sizes() : _impl->ext_tf_shape->dim_sizes();
   std::vector<int64_t> res;
-  std::ranges::copy(std::begin(aux), std::end(aux), std::back_inserter(res));
+  std::ranges::copy(aux, std::back_inserter(res));
 
   return res;
 }

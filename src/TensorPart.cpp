@@ -59,15 +59,6 @@ inline txeo::Tensor<T> TensorPart<T>::slice(const txeo::Tensor<T> &tensor, size_
   return resp;
 }
 
-template <typename T>
-inline std::vector<txeo::Tensor<T>> TensorPart<T>::unstack(const txeo::Tensor<T> &tensor,
-                                                           std::vector<size_t> axes) {
-
-  auto unstacked = TensorPart<T>::unstack(tensor, axes[0]);
-  for (size_t j{0}; j < unstacked.size(); ++j) {
-  }
-}
-
 template class TensorPart<short>;
 template class TensorPart<int>;
 template class TensorPart<bool>;

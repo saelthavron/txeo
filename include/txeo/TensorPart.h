@@ -90,9 +90,6 @@ class TensorPart {
      */
     static txeo::Tensor<T> slice(const txeo::Tensor<T> &tensor, size_t first_axis_begin,
                                  size_t first_axis_end);
-
-    static std::vector<txeo::Tensor<T>> unstack(const txeo::Tensor<T> &tensor,
-                                                std::vector<size_t> axis);
 };
 
 /**

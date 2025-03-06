@@ -1,6 +1,5 @@
 #ifndef TENSORHELPER_H
 #define TENSORHELPER_H
-#include <cstdint>
 #pragma once
 
 #include "txeo/detail/TensorPrivate.h"
@@ -8,6 +7,7 @@
 #include "txeo/detail/utils.h"
 
 #include <cstddef>
+#include <cstdint>
 #include <initializer_list>
 #include <stdexcept>
 #include <tensorflow/cc/client/client_session.h>
