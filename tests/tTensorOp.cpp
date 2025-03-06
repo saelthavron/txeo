@@ -356,4 +356,83 @@ TEST(TensorOpTest, Abs) {
   EXPECT_EQ(result(3), 4);
 }
 
+TEST(TensorOpTest, Square) {
+  txeo::Tensor<int> tensor1D({3}, {1, 2, 3});
+  auto result1D = TensorOp<int>::square(tensor1D);
+  EXPECT_EQ(result1D.shape(), txeo::TensorShape({3}));
+  EXPECT_EQ(result1D(0), 1);
+  EXPECT_EQ(result1D(1), 4);
+  EXPECT_EQ(result1D(2), 9);
+
+  txeo::Tensor<double> tensor2D({2, 2}, {1.0, 2.0, 3.0, 4.0});
+  auto result2D = TensorOp<double>::square(tensor2D);
+  EXPECT_EQ(result2D.shape(), txeo::TensorShape({2, 2}));
+  EXPECT_DOUBLE_EQ(result2D(0, 0), 1.0);
+  EXPECT_DOUBLE_EQ(result2D(0, 1), 4.0);
+  EXPECT_DOUBLE_EQ(result2D(1, 0), 9.0);
+  EXPECT_DOUBLE_EQ(result2D(1, 1), 16.0);
+}
+
+TEST(TensorOpTest, SquareBy) {
+  txeo::Tensor<int> tensor1D({3}, {1, 2, 3});
+  TensorOp<int>::square_by(tensor1D);
+  EXPECT_EQ(tensor1D(0), 1);
+  EXPECT_EQ(tensor1D(1), 4);
+  EXPECT_EQ(tensor1D(2), 9);
+
+  txeo::Tensor<double> tensor2D({2, 2}, {1.0, 2.0, 3.0, 4.0});
+  TensorOp<double>::square_by(tensor2D);
+  EXPECT_DOUBLE_EQ(tensor2D(0, 0), 1.0);
+  EXPECT_DOUBLE_EQ(tensor2D(0, 1), 4.0);
+  EXPECT_DOUBLE_EQ(tensor2D(1, 0), 9.0);
+  EXPECT_DOUBLE_EQ(tensor2D(1, 1), 16.0);
+}
+
+TEST(TensorOpTest, Sqrt) {
+  txeo::Tensor<double> tensor1D({3}, {1.0, 4.0, 9.0});
+  auto result1D = TensorOp<double>::sqrt(tensor1D);
+  EXPECT_EQ(result1D.shape(), txeo::TensorShape({3}));
+  EXPECT_DOUBLE_EQ(result1D(0), 1.0);
+  EXPECT_DOUBLE_EQ(result1D(1), 2.0);
+  EXPECT_DOUBLE_EQ(result1D(2), 3.0);
+
+  txeo::Tensor<double> tensor2D({2, 2}, {16.0, 25.0, 36.0, 49.0});
+  auto result2D = TensorOp<double>::sqrt(tensor2D);
+  EXPECT_EQ(result2D.shape(), txeo::TensorShape({2, 2}));
+  EXPECT_DOUBLE_EQ(result2D(0, 0), 4.0);
+  EXPECT_DOUBLE_EQ(result2D(0, 1), 5.0);
+  EXPECT_DOUBLE_EQ(result2D(1, 0), 6.0);
+  EXPECT_DOUBLE_EQ(result2D(1, 1), 7.0);
+}
+
+TEST(TensorOpTest, SqrtBy) {
+  txeo::Tensor<double> tensor1D({3}, {1.0, 4.0, 9.0});
+  TensorOp<double>::sqrt_by(tensor1D);
+  EXPECT_DOUBLE_EQ(tensor1D(0), 1.0);
+  EXPECT_DOUBLE_EQ(tensor1D(1), 2.0);
+  EXPECT_DOUBLE_EQ(tensor1D(2), 3.0);
+
+  txeo::Tensor<double> tensor2D({2, 2}, {16.0, 25.0, 36.0, 49.0});
+  TensorOp<double>::sqrt_by(tensor2D);
+  EXPECT_DOUBLE_EQ(tensor2D(0, 0), 4.0);
+  EXPECT_DOUBLE_EQ(tensor2D(0, 1), 5.0);
+  EXPECT_DOUBLE_EQ(tensor2D(1, 0), 6.0);
+  EXPECT_DOUBLE_EQ(tensor2D(1, 1), 7.0);
+}
+
+TEST(TensorOpTest, AbsBy) {
+  txeo::Tensor<int> tensor1D({3}, {-1, 2, -3});
+  TensorOp<int>::abs_by(tensor1D);
+  EXPECT_EQ(tensor1D(0), 1);
+  EXPECT_EQ(tensor1D(1), 2);
+  EXPECT_EQ(tensor1D(2), 3);
+
+  txeo::Tensor<double> tensor2D({2, 2}, {-1.0, 2.0, -3.0, 4.0});
+  TensorOp<double>::abs_by(tensor2D);
+  EXPECT_DOUBLE_EQ(tensor2D(0, 0), 1.0);
+  EXPECT_DOUBLE_EQ(tensor2D(0, 1), 2.0);
+  EXPECT_DOUBLE_EQ(tensor2D(1, 0), 3.0);
+  EXPECT_DOUBLE_EQ(tensor2D(1, 1), 4.0);
+}
+
 } // namespace txeo

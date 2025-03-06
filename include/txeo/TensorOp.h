@@ -54,7 +54,7 @@ class TensorOp {
      * TensorOp<double>::sum_by(a, b);  // a becomes [5.0, 7.0, 9.0]
      * @endcode
      */
-    static void sum_by(txeo::Tensor<T> &left, const txeo::Tensor<T> &right);
+    static txeo::Tensor<T> &sum_by(txeo::Tensor<T> &left, const txeo::Tensor<T> &right);
 
     /**
      * @brief Element-wise sum of tensor and scalar (out-of-place)
@@ -84,7 +84,7 @@ class TensorOp {
      * // t now contains [6, 7, 8, 9] with shape [2,2]
      * @endcode
      */
-    static void sum_by(txeo::Tensor<T> &left, const T &right);
+    static txeo::Tensor<T> &sum_by(txeo::Tensor<T> &left, const T &right);
 
     /**
      * @brief Returns the subtraction of two tensors
@@ -119,7 +119,7 @@ class TensorOp {
      * TensorOp<float>::subtract_by(a, b);  // a becomes [[4,8],[12,16]]
      * @endcode
      */
-    static void subtract_by(txeo::Tensor<T> &left, const txeo::Tensor<T> &right);
+    static txeo::Tensor<T> &subtract_by(txeo::Tensor<T> &left, const txeo::Tensor<T> &right);
 
     /**
      * @brief Element-wise subtraction of scalar from tensor (out-of-place)
@@ -149,7 +149,7 @@ class TensorOp {
      * // t now contains [3.3, 4.4, 5.5]
      *@endcode
      */
-    static void subtract_by(txeo::Tensor<T> &left, const T &right);
+    static txeo::Tensor<T> &subtract_by(txeo::Tensor<T> &left, const T &right);
 
     /**
      * @brief Element-wise subtraction of tensor from scalar (out-of-place)
@@ -180,7 +180,7 @@ class TensorOp {
      * // t now contains [8, 7, 6]
      *@endcode
      */
-    static void subtract_by(const T &left, txeo::Tensor<T> &right);
+    static const T &subtract_by(const T &left, txeo::Tensor<T> &right);
 
     /**
      * @brief Returns the multiplication of a tensor and a scalar
@@ -209,7 +209,7 @@ class TensorOp {
      * TensorOp<int>::multiply_by(a, 3);  // a becomes [[3,6],[9,12]]
      * @endcode
      */
-    static void multiply_by(txeo::Tensor<T> &left, const T &right);
+    static txeo::Tensor<T> &multiply_by(txeo::Tensor<T> &left, const T &right);
 
     /**
      * @brief Element-wise division of tensor by scalar (out-of-place)
@@ -239,7 +239,7 @@ class TensorOp {
      * // t now contains [5.0, 10.0, 15.0]
      *@endcode
      */
-    static void divide_by(txeo::Tensor<T> &left, const T &right);
+    static txeo::Tensor<T> &divide_by(txeo::Tensor<T> &left, const T &right);
 
     /**
      * @brief Element-wise division of scalar by tensor (out-of-place)
@@ -260,8 +260,8 @@ class TensorOp {
     /**
      * @brief In-place element-wise division of scalar by tensor elements
      *
-     * @param left Scalar dividend
-     * @param right Tensor divisor (modified with results)
+     * @param scalar Scalar dividend
+     * @param tensor Tensor divisor (modified with results)
      *
      * **Example Usage:**
      *@code
@@ -270,7 +270,7 @@ class TensorOp {
      * // t now contains [50, 20, 10, 4]
      * @endcode
      */
-    static void divide_by(const T &left, txeo::Tensor<T> &right);
+    static txeo::Tensor<T> &divide_by(const T &scalar, txeo::Tensor<T> &tensor);
 
     /**
      * @brief Returns the element-wise product (Hadamard Product) of two tensors
@@ -306,7 +306,7 @@ class TensorOp {
      * TensorOp<double>::hadamard_prod_by(a, b);  // a becomes [10.0, 18.0, 28.0]
      * @endcode
      */
-    static void hadamard_prod_by(txeo::Tensor<T> &left, const txeo::Tensor<T> &right);
+    static txeo::Tensor<T> &hadamard_prod_by(txeo::Tensor<T> &left, const txeo::Tensor<T> &right);
 
     /**
      * @brief Element-wise Hadamard division (out-of-place)
@@ -339,7 +339,7 @@ class TensorOp {
      * // a now contains [5.0, 4.0, 3.0]
      * @endcode
      */
-    static void hadamard_div_by(txeo::Tensor<T> &left, const txeo::Tensor<T> &right);
+    static txeo::Tensor<T> &hadamard_div_by(txeo::Tensor<T> &left, const txeo::Tensor<T> &right);
 
     /**
      * @brief Returns the element-wise potentiation of a tensor
@@ -368,17 +368,93 @@ class TensorOp {
      * TensorOp<double>::power_elem_by(a, 3.0);  // a becomes [27.0, 64.0]
      * @endcode
      */
-    static void power_elem_by(txeo::Tensor<T> &tensor, const T &exponent);
+    static txeo::Tensor<T> power_elem_by(txeo::Tensor<T> &tensor, const T &exponent);
 
+    /**
+     * @brief Computes the element-wise square of a tensor.
+     *
+     * @param tensor The input tensor.
+     * @return A new tensor containing the squared values.
+     *
+     * **Example Usage:**
+     * @code
+     * txeo::Tensor<int> tensor({3}, {1, 2, 3});
+     * auto result = TensorOp<int>::square(tensor);
+     * // result = [1, 4, 9]
+     * @endcode
+     */
     static txeo::Tensor<T> square(const txeo::Tensor<T> &tensor);
 
-    static void square_by(txeo::Tensor<T> &tensor);
+    /**
+     * @brief Computes the element-wise square of a tensor in-place.
+     *
+     * @param tensor The input tensor to be modified.
+     *
+     * **Example Usage:**
+     * @code
+     * txeo::Tensor<int> tensor({3}, {1, 2, 3});
+     * TensorOp<int>::square_by(tensor);
+     * // tensor = [1, 4, 9]
+     * @endcode
+     */
+    static txeo::Tensor<T> &square_by(txeo::Tensor<T> &tensor);
 
+    /**
+     * @brief Computes the element-wise square root of a tensor.
+     *
+     * @param tensor The input tensor.
+     * @return A new tensor containing the square root values.
+     *
+     * **Example Usage:**
+     * @code
+     * txeo::Tensor<double> tensor({3}, {1.0, 4.0, 9.0});
+     * auto result = TensorOp<double>::sqrt(tensor);
+     * // result = [1.0, 2.0, 3.0]
+     * @endcode
+     */
     static txeo::Tensor<T> sqrt(const txeo::Tensor<T> &tensor);
 
-    static void sqrt_by(txeo::Tensor<T> &tensor);
+    /**
+     * @brief Computes the element-wise square root of a tensor in-place.
+     *
+     * @param tensor The input tensor to be modified.
+     *
+     * **Example Usage:**
+     * @code
+     * txeo::Tensor<double> tensor({3}, {1.0, 4.0, 9.0});
+     * TensorOp<double>::sqrt_by(tensor);
+     * // tensor = [1.0, 2.0, 3.0]
+     * @endcode
+     */
+    static txeo::Tensor<T> &sqrt_by(txeo::Tensor<T> &tensor);
 
+    /**
+     * @brief Computes the element-wise absolute value of a tensor.
+     *
+     * @param tensor The input tensor to be modified.
+     *
+     * **Example Usage:**
+     * @code
+     * txeo::Tensor<int> tensor({3}, {-1, 2, -3});
+     * TensorOp<int>::abs_by(tensor);
+     * // tensor = [1, 2, 3]
+     * @endcode
+     */
     static txeo::Tensor<T> abs(const txeo::Tensor<T> &tensor);
+
+    /**
+     * @brief Computes the element-wise absolute value of a tensor in-place.
+     *
+     * @param tensor The input tensor to be modified.
+     *
+     * **Example Usage:**
+     * @code
+     * txeo::Tensor<int> tensor({3}, {-1, 2, -3});
+     * TensorOp<int>::abs_by(tensor);
+     * // tensor = [1, 2, 3]
+     * @endcode
+     */
+    static txeo::Tensor<T> &abs_by(txeo::Tensor<T> &tensor);
 };
 
 /**

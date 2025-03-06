@@ -21,7 +21,7 @@ txeo::Tensor<T> TensorOp<T>::sum(const txeo::Tensor<T> &left, const txeo::Tensor
 }
 
 template <typename T>
-void TensorOp<T>::sum_by(txeo::Tensor<T> &left, const txeo::Tensor<T> &right) {
+txeo::Tensor<T> &TensorOp<T>::sum_by(txeo::Tensor<T> &left, const txeo::Tensor<T> &right) {
   if (left.dim() == 0 || right.dim() == 0)
     throw txeo::TensorOpError("One of the operands has dimension zero.");
   if (left.shape() != right.shape())
@@ -29,6 +29,8 @@ void TensorOp<T>::sum_by(txeo::Tensor<T> &left, const txeo::Tensor<T> &right) {
 
   for (size_t i{0}; i < left.dim(); ++i)
     left.data()[i] += right.data()[i];
+
+  return left;
 }
 
 template <typename T>
@@ -44,12 +46,14 @@ txeo::Tensor<T> TensorOp<T>::sum(const txeo::Tensor<T> &left, const T &right) {
 }
 
 template <typename T>
-void TensorOp<T>::sum_by(txeo::Tensor<T> &left, const T &right) {
+txeo::Tensor<T> &TensorOp<T>::sum_by(txeo::Tensor<T> &left, const T &right) {
   if (left.dim() == 0)
     throw txeo::TensorOpError("Left operand has dimension zero.");
 
   for (size_t i{0}; i < left.dim(); ++i)
     left.data()[i] += right;
+
+  return left;
 }
 
 template <typename T>
@@ -67,7 +71,7 @@ txeo::Tensor<T> TensorOp<T>::subtract(const txeo::Tensor<T> &left, const txeo::T
 }
 
 template <typename T>
-void TensorOp<T>::subtract_by(txeo::Tensor<T> &left, const txeo::Tensor<T> &right) {
+txeo::Tensor<T> &TensorOp<T>::subtract_by(txeo::Tensor<T> &left, const txeo::Tensor<T> &right) {
   if (left.dim() == 0 || right.dim() == 0)
     throw txeo::TensorOpError("One of the operands has dimension zero.");
   if (left.shape() != right.shape())
@@ -75,6 +79,8 @@ void TensorOp<T>::subtract_by(txeo::Tensor<T> &left, const txeo::Tensor<T> &righ
 
   for (size_t i{0}; i < left.dim(); ++i)
     left.data()[i] -= right.data()[i];
+
+  return left;
 }
 
 template <typename T>
@@ -90,12 +96,14 @@ txeo::Tensor<T> TensorOp<T>::subtract(const txeo::Tensor<T> &left, const T &righ
 }
 
 template <typename T>
-void TensorOp<T>::subtract_by(txeo::Tensor<T> &left, const T &right) {
+txeo::Tensor<T> &TensorOp<T>::subtract_by(txeo::Tensor<T> &left, const T &right) {
   if (left.dim() == 0)
     throw txeo::TensorOpError("Left operand has dimension zero.");
 
   for (size_t i{0}; i < left.dim(); ++i)
     left.data()[i] -= right;
+
+  return left;
 }
 
 template <typename T>
@@ -111,12 +119,14 @@ txeo::Tensor<T> TensorOp<T>::subtract(const T &left, const txeo::Tensor<T> &righ
 }
 
 template <typename T>
-void TensorOp<T>::subtract_by(const T &left, txeo::Tensor<T> &right) {
+const T &TensorOp<T>::subtract_by(const T &left, txeo::Tensor<T> &right) {
   if (right.dim() == 0)
     throw txeo::TensorOpError("Right operand has dimension zero.");
 
   for (size_t i{0}; i < right.dim(); ++i)
     right.data()[i] = left - right.data()[i];
+
+  return left;
 }
 
 template <typename T>
@@ -132,12 +142,14 @@ txeo::Tensor<T> TensorOp<T>::multiply(const txeo::Tensor<T> &tensor, const T &sc
 }
 
 template <typename T>
-void TensorOp<T>::multiply_by(txeo::Tensor<T> &tensor, const T &scalar) {
+txeo::Tensor<T> &TensorOp<T>::multiply_by(txeo::Tensor<T> &tensor, const T &scalar) {
   if (tensor.dim() == 0)
     throw txeo::TensorOpError("Tensor has dimension zero.");
 
   for (size_t i{0}; i < tensor.dim(); ++i)
     tensor.data()[i] *= scalar;
+
+  return tensor;
 }
 
 template <typename T>
@@ -155,7 +167,7 @@ txeo::Tensor<T> TensorOp<T>::divide(const txeo::Tensor<T> &tensor, const T &scal
 }
 
 template <typename T>
-void TensorOp<T>::divide_by(txeo::Tensor<T> &tensor, const T &scalar) {
+txeo::Tensor<T> &TensorOp<T>::divide_by(txeo::Tensor<T> &tensor, const T &scalar) {
   if (txeo::detail::is_zero(scalar))
     throw txeo::TensorOpError("Denominator is zero.");
   if (tensor.dim() == 0)
@@ -163,6 +175,8 @@ void TensorOp<T>::divide_by(txeo::Tensor<T> &tensor, const T &scalar) {
 
   for (size_t i{0}; i < tensor.dim(); ++i)
     tensor.data()[i] /= scalar;
+
+  return tensor;
 }
 
 template <typename T>
@@ -181,7 +195,7 @@ inline txeo::Tensor<T> TensorOp<T>::divide(const T &scalar, const txeo::Tensor<T
 }
 
 template <typename T>
-inline void TensorOp<T>::divide_by(const T &scalar, txeo::Tensor<T> &tensor) {
+inline txeo::Tensor<T> &TensorOp<T>::divide_by(const T &scalar, txeo::Tensor<T> &tensor) {
   if (tensor.dim() == 0)
     throw txeo::TensorOpError("Tensor has dimension zero.");
 
@@ -190,6 +204,8 @@ inline void TensorOp<T>::divide_by(const T &scalar, txeo::Tensor<T> &tensor) {
       throw txeo::TensorOpError("Zero element in right operand.");
     tensor.data()[i] = scalar / tensor.data()[i];
   }
+
+  return tensor;
 }
 
 template <typename T>
@@ -208,7 +224,8 @@ txeo::Tensor<T> TensorOp<T>::hadamard_prod(const txeo::Tensor<T> &left,
 }
 
 template <typename T>
-void TensorOp<T>::hadamard_prod_by(txeo::Tensor<T> &left, const txeo::Tensor<T> &right) {
+txeo::Tensor<T> &TensorOp<T>::hadamard_prod_by(txeo::Tensor<T> &left,
+                                               const txeo::Tensor<T> &right) {
   if (left.dim() == 0 || right.dim() == 0)
     throw txeo::TensorOpError("One of the operands has dimension zero.");
   if (left.shape() != right.shape())
@@ -216,6 +233,8 @@ void TensorOp<T>::hadamard_prod_by(txeo::Tensor<T> &left, const txeo::Tensor<T> 
 
   for (size_t i{0}; i < left.dim(); ++i)
     left.data()[i] *= right.data()[i];
+
+  return left;
 }
 
 template <typename T>
@@ -237,7 +256,8 @@ inline txeo::Tensor<T> TensorOp<T>::hadamard_div(const txeo::Tensor<T> &left,
 }
 
 template <typename T>
-inline void TensorOp<T>::hadamard_div_by(txeo::Tensor<T> &left, const txeo::Tensor<T> &right) {
+inline txeo::Tensor<T> &TensorOp<T>::hadamard_div_by(txeo::Tensor<T> &left,
+                                                     const txeo::Tensor<T> &right) {
   if (left.dim() == 0 || right.dim() == 0)
     throw txeo::TensorOpError("One of the operands has dimension zero.");
   if (left.shape() != right.shape())
@@ -248,6 +268,8 @@ inline void TensorOp<T>::hadamard_div_by(txeo::Tensor<T> &left, const txeo::Tens
       throw txeo::TensorOpError("Zero element in right operand.");
     left.data()[i] /= right.data()[i];
   }
+
+  return left;
 }
 
 template <typename T>
@@ -263,12 +285,14 @@ txeo::Tensor<T> TensorOp<T>::power_elem(const txeo::Tensor<T> &tensor, const T &
 }
 
 template <typename T>
-void TensorOp<T>::power_elem_by(txeo::Tensor<T> &tensor, const T &exponent) {
+txeo::Tensor<T> TensorOp<T>::power_elem_by(txeo::Tensor<T> &tensor, const T &exponent) {
   if (tensor.dim() == 0)
     throw txeo::TensorOpError("Tensor has dimension zero.");
 
   for (size_t i{0}; i < tensor.dim(); ++i)
     tensor.data()[i] = static_cast<T>(std::pow(tensor.data()[i], exponent));
+
+  return tensor;
 }
 
 template <typename T>
@@ -278,8 +302,9 @@ txeo::Tensor<T> TensorOp<T>::square(const txeo::Tensor<T> &tensor) {
 }
 
 template <typename T>
-void TensorOp<T>::square_by(txeo::Tensor<T> &tensor) {
+txeo::Tensor<T> &TensorOp<T>::square_by(txeo::Tensor<T> &tensor) {
   TensorOp<T>::hadamard_prod_by(tensor, tensor);
+  return tensor;
 }
 
 template <typename T>
@@ -295,12 +320,14 @@ txeo::Tensor<T> TensorOp<T>::sqrt(const txeo::Tensor<T> &tensor) {
 }
 
 template <typename T>
-inline void TensorOp<T>::sqrt_by(txeo::Tensor<T> &tensor) {
+inline txeo::Tensor<T> &TensorOp<T>::sqrt_by(txeo::Tensor<T> &tensor) {
   if (tensor.dim() == 0)
     throw txeo::TensorOpError("Tensor has dimension zero.");
 
   for (size_t i{0}; i < tensor.dim(); ++i)
     tensor.data()[i] = static_cast<T>(std::sqrt(tensor.data()[i]));
+
+  return tensor;
 }
 
 template <typename T>
@@ -319,8 +346,34 @@ inline txeo::Tensor<T> TensorOp<T>::abs(const txeo::Tensor<T> &tensor) {
   }
 }
 
-// Required for templated elements in cpp files
+template <typename T>
+inline txeo::Tensor<T> &TensorOp<T>::abs_by(txeo::Tensor<T> &tensor) {
+  if (tensor.dim() == 0)
+    throw txeo::TensorOpError("Tensor has dimension zero.");
 
+  for (size_t i{0}; i < tensor.dim(); ++i)
+    tensor.data()[i] = static_cast<T>(std::abs(tensor.data()[i]));
+
+  return tensor;
+}
+
+// Type specialization to avoid calling abs for unsigned types
+template <>
+inline txeo::Tensor<bool> &TensorOp<bool>::abs_by(txeo::Tensor<bool> &tensor) {
+  if (tensor.dim() == 0)
+    throw txeo::TensorOpError("Tensor has dimension zero.");
+  return tensor;
+}
+
+// Type specialization to avoid calling abs for unsigned types
+template <>
+inline txeo::Tensor<size_t> &TensorOp<size_t>::abs_by(txeo::Tensor<size_t> &tensor) {
+  if (tensor.dim() == 0)
+    throw txeo::TensorOpError("Tensor has dimension zero.");
+  return tensor;
+}
+
+// Required for templated elements in cpp files
 template class TensorOp<short>;
 template class TensorOp<int>;
 template class TensorOp<bool>;

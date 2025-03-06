@@ -1,6 +1,8 @@
 #include "txeo/Tensor.h"
 #include "txeo/TensorAgg.h"
+#include "txeo/TensorShape.h"
 #include <cmath>
+#include <cstdint>
 #include <gtest/gtest.h>
 
 namespace txeo {
@@ -85,8 +87,6 @@ TEST(TensorAggTest, ArgMax) {
   Tensor<int> tensor2D({{1, 2, 3}, {4, 5, 6}});
   auto result2D_axis1 = TensorAgg<int>::arg_max(tensor2D, 1);
 
-  std::cout << "Tensor After T: \n";
-  std::cout << result2D_axis1(1) << std::endl;
   EXPECT_EQ(result2D_axis1.shape(), TensorShape({2}));
   EXPECT_EQ(result2D_axis1(0), 2);
   EXPECT_EQ(result2D_axis1(1), 2);
@@ -106,18 +106,6 @@ TEST(TensorAggTest, ArgMin) {
   EXPECT_EQ(result2D_axis0(1), 0);
   EXPECT_EQ(result2D_axis0(2), 0);
 }
-
-// TEST(TensorAggTest, Variance) {
-//   Tensor<double> tensor({5}, {1, 2, 3, 4, 5});
-//   auto result = TensorAgg<double>::variance(tensor);
-//   EXPECT_NEAR(result, 2.0, 1e-5);
-// }
-
-// TEST(TensorAggTest, StandardDeviation) {
-//   Tensor<double> tensor({5}, {1, 2, 3, 4, 5});
-//   auto result = TensorAgg<double>::standard_deviation(tensor);
-//   EXPECT_NEAR(result, std::sqrt(2.0), 1e-5);
-// }
 
 TEST(TensorAggTest, ReduceProd) {
   Tensor<int> tensor1D({3}, {2, 3, 4});
@@ -210,6 +198,100 @@ TEST(TensorAggTest, CumulativeProd) {
   EXPECT_EQ(result2D_axis0(0, 1), 2);
   EXPECT_EQ(result2D_axis0(1, 0), 3);
   EXPECT_EQ(result2D_axis0(1, 1), 8);
+}
+
+TEST(TensorAggTest, ReduceMaximumNorm) {
+  txeo::Tensor<int> tensor1D({5}, {1, 2, 3, 4, 5});
+  auto result1D = TensorAgg<int>::reduce_maximum_norm(tensor1D, 0);
+  EXPECT_EQ(result1D.shape(), txeo::TensorShape({}));
+  EXPECT_EQ(result1D(), 5);
+
+  txeo::Tensor<int> tensor2D({3, 3}, {1, 2, 3, 4, 5, 6, 7, 8, 9});
+  auto result2D = TensorAgg<int>::reduce_maximum_norm(tensor2D, 0);
+  EXPECT_EQ(result2D.shape().axes_dims(), std::vector<int64_t>({3}));
+  EXPECT_EQ(result2D(0), 7);
+  EXPECT_EQ(result2D(1), 8);
+  EXPECT_EQ(result2D(2), 9);
+}
+
+TEST(TensorAggTest, ReduceVariance) {
+  txeo::Tensor<double> tensor1D({5}, {1.0, 2.0, 3.0, 4.0, 5.0});
+  auto result1D = TensorAgg<double>::reduce_variance(tensor1D, 0);
+  EXPECT_EQ(result1D.shape(), txeo::TensorShape({}));
+  EXPECT_NEAR(result1D(), 2.5, 1e-6);
+
+  txeo::Tensor<double> tensor2D({2, 3}, {1.0, 2.0, 3.0, 4.0, 5.0, 6.0});
+  auto result2D = TensorAgg<double>::reduce_variance(tensor2D, 1);
+  EXPECT_EQ(result2D.shape().axes_dims(), std::vector<int64_t>({2}));
+  EXPECT_NEAR(result2D(0), 1.0, 1e-6);
+  EXPECT_NEAR(result2D(1), 1.0, 1e-6);
+}
+
+TEST(TensorAggTest, ReduceStandardDeviation) {
+  txeo::Tensor<double> tensor1D({5}, {1.0, 2.0, 3.0, 4.0, 5.0});
+  auto result1D = TensorAgg<double>::reduce_standard_deviation(tensor1D, 0);
+  EXPECT_EQ(result1D.shape(), txeo::TensorShape({}));
+  EXPECT_NEAR(result1D(), std::sqrt(2.5), 1e-6);
+
+  txeo::Tensor<double> tensor2D({2, 3}, {1.0, 2.0, 3.0, 4.0, 5.0, 6.0});
+  auto result2D = TensorAgg<double>::reduce_standard_deviation(tensor2D, 1);
+  EXPECT_EQ(result2D.shape().axes_dims(), std::vector<int64_t>({2}));
+  EXPECT_NEAR(result2D(0), 1.0, 1e-6);
+  EXPECT_NEAR(result2D(1), 1.0, 1e-6);
+}
+
+TEST(TensorAggTest, ReduceMedian) {
+  txeo::Tensor<int> tensor1D({5}, {1, 2, 3, 4, 5});
+  auto result1D = TensorAgg<int>::reduce_median(tensor1D, 0);
+  EXPECT_EQ(result1D.shape(), txeo::TensorShape({}));
+  EXPECT_EQ(result1D(), 3);
+
+  txeo::Tensor<int> tensor2D({2, 3}, {1, 2, 3, 4, 5, 6});
+  auto result2D = TensorAgg<int>::reduce_median(tensor2D, 1);
+  EXPECT_EQ(result2D.shape().axes_dims(), std::vector<int64_t>({2}));
+  EXPECT_EQ(result2D(0), 2);
+  EXPECT_EQ(result2D(1), 5);
+}
+
+TEST(TensorAggTest, ReduceGeometricMean) {
+  txeo::Tensor<double> tensor1D({4}, {1.0, 2.0, 3.0, 4.0});
+  auto result1D = TensorAgg<double>::reduce_geometric_mean(tensor1D, 0);
+  EXPECT_EQ(result1D.shape(), txeo::TensorShape({}));
+  EXPECT_NEAR(result1D(), std::pow(1.0 * 2.0 * 3.0 * 4.0, 1.0 / 4.0), 1e-6);
+
+  txeo::Tensor<double> tensor2D({2, 2}, {1.0, 2.0, 3.0, 4.0});
+  auto result2D = TensorAgg<double>::reduce_geometric_mean(tensor2D, 1);
+  EXPECT_EQ(result2D.shape().axes_dims(), std::vector<int64_t>({2}));
+  EXPECT_NEAR(result2D(0), std::sqrt(1.0 * 2.0), 1e-6);
+  EXPECT_NEAR(result2D(1), std::sqrt(3.0 * 4.0), 1e-6);
+}
+
+TEST(TensorAggTest, CountNonZero) {
+  txeo::Tensor<int> tensor1D({5}, {0, 1, 0, 2, 0});
+  auto result1D = TensorAgg<int>::count_non_zero(tensor1D, 0);
+  EXPECT_EQ(result1D.shape(), txeo::TensorShape({}));
+  EXPECT_EQ(result1D(), 2);
+
+  txeo::Tensor<int> tensor2D({2, 3}, {0, 1, 0, 2, 0, 3});
+  auto result2D = TensorAgg<int>::count_non_zero(tensor2D, 1);
+  EXPECT_EQ(result2D.shape().axes_dims(), std::vector<int64_t>({2}));
+  EXPECT_EQ(result2D(0), 1);
+  EXPECT_EQ(result2D(1), 2);
+}
+
+TEST(TensorAggTest, SumAll) {
+  txeo::Tensor<int> tensor1D({5}, {1, 2, 3, 4, 5});
+  auto result1D = TensorAgg<int>::sum_all(tensor1D);
+  EXPECT_EQ(result1D, 15);
+
+  txeo::Tensor<int> tensor2D({2, 3}, {1, 2, 3, 4, 5, 6});
+  auto result2D = TensorAgg<int>::sum_all(tensor2D);
+  EXPECT_EQ(result2D, 21);
+}
+
+TEST(TensorAggTest, TensorAggError) {
+  txeo::Tensor<int> emptyTensor({0});
+  EXPECT_THROW(TensorAgg<int>::reduce_maximum_norm(emptyTensor, 0), TensorAggError);
 }
 
 } // namespace txeo

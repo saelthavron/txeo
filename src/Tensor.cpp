@@ -454,41 +454,6 @@ inline Tensor<T> &Tensor<T>::operator-=(const T &scalar) {
 }
 
 template <typename T>
-Tensor<T> &Tensor<T>::hadamard_prod(const Tensor<T> &tensor) {
-  txeo::TensorOp<T>::hadamard_prod_by(*this, tensor);
-
-  return *this;
-}
-
-template <typename T>
-Tensor<T> &Tensor<T>::hadamard_div(const Tensor<T> &tensor) {
-  txeo::TensorOp<T>::hadamard_div_by(*this, tensor);
-
-  return *this;
-}
-
-template <typename T>
-Tensor<T> &Tensor<T>::power_elem(const T &exponent) {
-  txeo::TensorOp<T>::power_elem_by(*this, exponent);
-
-  return *this;
-}
-
-template <typename T>
-Tensor<T> &Tensor<T>::square() {
-  txeo::TensorOp<T>::square_by(*this);
-
-  return *this;
-}
-
-template <typename T>
-Tensor<T> &Tensor<T>::sqrt() {
-  txeo::TensorOp<T>::sqrt_by(*this);
-
-  return *this;
-}
-
-template <typename T>
 txeo::TensorIterator<T> Tensor<T>::begin() {
   return txeo::TensorIterator<T>{this->data()};
 }

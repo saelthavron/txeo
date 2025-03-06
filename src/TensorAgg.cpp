@@ -1,5 +1,6 @@
 #include "txeo/TensorAgg.h"
 #include "txeo/Tensor.h"
+#include "txeo/TensorOp.h"
 #include "txeo/detail/TensorHelper.h"
 #include "txeo/detail/TensorPrivate.h"
 #include "txeo/detail/utils.h"
@@ -235,6 +236,13 @@ inline txeo::Tensor<T> TensorAgg<T>::reduce_euclidean_norm(const txeo::Tensor<T>
 }
 
 template <typename T>
+inline txeo::Tensor<T> TensorAgg<T>::reduce_maximum_norm(const txeo::Tensor<T> &tensor,
+                                                         size_t axis) {
+  return TensorAgg<T>::accumulate(
+      tensor, axis, [](std::vector<T> &values) { return TensorAgg<T>::maximum_norm(values); });
+}
+
+template <typename T>
 txeo::Tensor<T> TensorAgg<T>::cumulative_prod(const txeo::Tensor<T> &tensor, size_t axis) {
   if (tensor.dim() == 0)
     throw txeo::TensorAggError("Tensor has dimension zero.");
@@ -362,7 +370,8 @@ txeo::Tensor<T> TensorAgg<T>::reduce_variance(const txeo::Tensor<T> &tensor, siz
 template <typename T>
 txeo::Tensor<T> TensorAgg<T>::reduce_standard_deviation(const txeo::Tensor<T> &tensor,
                                                         size_t axis) {
-  return txeo::TensorAgg<T>::reduce_variance(tensor, axis).sqrt();
+  auto aux = TensorAgg<T>::reduce_variance(tensor, axis);
+  return txeo::TensorOp<T>::sqrt_by(aux);
 }
 
 template <typename T>
@@ -410,11 +419,11 @@ inline T TensorAgg<T>::geometric_mean(std::vector<T> &values) {
   if (values.size() == 1)
     return values[0];
 
-  T mean = 0;
+  T mean = 1.0;
   for (const auto &item : values)
     mean *= item;
 
-  return std::pow(mean, 1 / values.size());
+  return std::pow(mean, 1.0 / values.size());
 }
 
 template <typename T>
@@ -422,18 +431,18 @@ T TensorAgg<T>::variance(std::vector<T> &values) {
   if (values.size() == 1)
     return values[0];
 
-  T mean = 0;
+  T mean = 0.0;
   for (const auto &item : values)
     mean += item;
   mean /= values.size();
 
-  T resp = 0;
+  T resp = 0.0;
   for (const auto &item : values) {
     auto dif = (item - mean);
     resp += dif * dif;
   }
 
-  return resp / values.size();
+  return resp / (values.size() - 1.);
 }
 
 template <typename T>
