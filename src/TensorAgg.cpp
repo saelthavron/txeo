@@ -1,5 +1,6 @@
 #include "txeo/TensorAgg.h"
 #include "txeo/Tensor.h"
+#include "txeo/TensorFunc.h"
 #include "txeo/TensorOp.h"
 #include "txeo/detail/TensorHelper.h"
 #include "txeo/detail/TensorPrivate.h"
@@ -371,7 +372,7 @@ template <typename T>
 txeo::Tensor<T> TensorAgg<T>::reduce_standard_deviation(const txeo::Tensor<T> &tensor,
                                                         size_t axis) {
   auto aux = TensorAgg<T>::reduce_variance(tensor, axis);
-  return txeo::TensorOp<T>::sqrt_by(aux);
+  return txeo::TensorFunc<T>::sqrt_by(aux);
 }
 
 template <typename T>

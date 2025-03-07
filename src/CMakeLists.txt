@@ -1,5 +1,14 @@
 
-set(TXEO_SOURCES utils.cpp TensorShape.cpp TensorOp.cpp TensorAgg.cpp Tensor.cpp TensorIO.cpp TensorPart.cpp Predictor.cpp)
+set(TXEO_SOURCES utils.cpp 
+                 TensorShape.cpp 
+                 TensorOp.cpp 
+                 TensorAgg.cpp 
+                 Tensor.cpp 
+                 TensorIO.cpp 
+                 TensorPart.cpp 
+                 TensorFunc.cpp
+                 Matrix.cpp
+                 Predictor.cpp)
 
 
 #################################################### Finding Tensorflow ####################################################

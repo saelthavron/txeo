@@ -1,8 +1,11 @@
 #include "txeo/TensorOp.h"
+#include "txeo/Matrix.h"
+#include "txeo/Tensor.h"
 #include "txeo/detail/TensorHelper.h"
 #include "txeo/detail/utils.h"
 
 #include <cmath>
+#include <tensorflow/cc/ops/math_ops.h>
 
 namespace txeo {
 
@@ -273,104 +276,22 @@ inline txeo::Tensor<T> &TensorOp<T>::hadamard_div_by(txeo::Tensor<T> &left,
 }
 
 template <typename T>
-txeo::Tensor<T> TensorOp<T>::power_elem(const txeo::Tensor<T> &tensor, const T &exponent) {
-  if (tensor.dim() == 0)
-    throw txeo::TensorOpError("Tensor has dimension zero.");
+inline txeo::Matrix<T> TensorOp<T>::product(const txeo::Matrix<T> &left,
+                                            const txeo::Matrix<T> &right) {
 
-  txeo::Tensor<T> resp(tensor.shape());
-  for (size_t i{0}; i < resp.dim(); ++i)
-    resp.data()[i] = static_cast<T>(std::pow(tensor.data()[i], exponent));
+  if (left.dim() == 0 || right.dim() == 0)
+    throw txeo::TensorOpError("One of the operands has dimension zero.");
 
-  return resp;
-}
+  if (left.shape().axis_dim(1) != right.shape().axis_dim(0))
+    throw txeo::TensorOpError("Operands are incompatible.");
 
-template <typename T>
-txeo::Tensor<T> TensorOp<T>::power_elem_by(txeo::Tensor<T> &tensor, const T &exponent) {
-  if (tensor.dim() == 0)
-    throw txeo::TensorOpError("Tensor has dimension zero.");
+  auto aux = txeo::detail::TensorHelper::ope_tensors<T>(
+      *left._impl->tf_tensor, *right._impl->tf_tensor,
+      [](const tf::Scope &scope, tf::Input left, tf::Input right) {
+        return tf::ops::MatMul(scope, left, right);
+      });
 
-  for (size_t i{0}; i < tensor.dim(); ++i)
-    tensor.data()[i] = static_cast<T>(std::pow(tensor.data()[i], exponent));
-
-  return tensor;
-}
-
-template <typename T>
-txeo::Tensor<T> TensorOp<T>::square(const txeo::Tensor<T> &tensor) {
-  auto resp = TensorOp<T>::hadamard_prod(tensor, tensor);
-  return resp;
-}
-
-template <typename T>
-txeo::Tensor<T> &TensorOp<T>::square_by(txeo::Tensor<T> &tensor) {
-  TensorOp<T>::hadamard_prod_by(tensor, tensor);
-  return tensor;
-}
-
-template <typename T>
-txeo::Tensor<T> TensorOp<T>::sqrt(const txeo::Tensor<T> &tensor) {
-  if (tensor.dim() == 0)
-    throw txeo::TensorOpError("Tensor has dimension zero.");
-
-  txeo::Tensor<T> resp(tensor.shape());
-  for (size_t i{0}; i < resp.dim(); ++i)
-    resp.data()[i] = static_cast<T>(std::sqrt(tensor.data()[i]));
-
-  return resp;
-}
-
-template <typename T>
-inline txeo::Tensor<T> &TensorOp<T>::sqrt_by(txeo::Tensor<T> &tensor) {
-  if (tensor.dim() == 0)
-    throw txeo::TensorOpError("Tensor has dimension zero.");
-
-  for (size_t i{0}; i < tensor.dim(); ++i)
-    tensor.data()[i] = static_cast<T>(std::sqrt(tensor.data()[i]));
-
-  return tensor;
-}
-
-template <typename T>
-inline txeo::Tensor<T> TensorOp<T>::abs(const txeo::Tensor<T> &tensor) {
-  if (tensor.dim() == 0)
-    throw txeo::TensorOpError("Tensor has dimension zero.");
-
-  try {
-    auto resp = txeo::detail::TensorHelper::reduce_tensor<T>(
-        *tensor._impl->tf_tensor, [](const tf::Scope &scope, tf::Input input) -> tf::Output {
-          return tf::ops::Abs(scope, input);
-        });
-    return resp;
-  } catch (std::runtime_error e) {
-    throw txeo::TensorOpError("Reduction error: " + std::string{e.what()});
-  }
-}
-
-template <typename T>
-inline txeo::Tensor<T> &TensorOp<T>::abs_by(txeo::Tensor<T> &tensor) {
-  if (tensor.dim() == 0)
-    throw txeo::TensorOpError("Tensor has dimension zero.");
-
-  for (size_t i{0}; i < tensor.dim(); ++i)
-    tensor.data()[i] = static_cast<T>(std::abs(tensor.data()[i]));
-
-  return tensor;
-}
-
-// Type specialization to avoid calling abs for unsigned types
-template <>
-inline txeo::Tensor<bool> &TensorOp<bool>::abs_by(txeo::Tensor<bool> &tensor) {
-  if (tensor.dim() == 0)
-    throw txeo::TensorOpError("Tensor has dimension zero.");
-  return tensor;
-}
-
-// Type specialization to avoid calling abs for unsigned types
-template <>
-inline txeo::Tensor<size_t> &TensorOp<size_t>::abs_by(txeo::Tensor<size_t> &tensor) {
-  if (tensor.dim() == 0)
-    throw txeo::TensorOpError("Tensor has dimension zero.");
-  return tensor;
+  return txeo::Matrix<T>(std::move(aux));
 }
 
 // Required for templated elements in cpp files

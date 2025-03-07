@@ -264,11 +264,6 @@ Tensor<T> Tensor<T>::slice(size_t first_axis_begin, size_t first_axis_end) const
 }
 
 template <typename T>
-std::vector<Tensor<T>> Tensor<T>::unstack(size_t axis) const {
-  return txeo::TensorPart<T>::unstack(*this, axis);
-}
-
-template <typename T>
 void Tensor<T>::view_of(const Tensor<T> &tensor, const txeo::TensorShape &shape) {
   if (this->dim() == 0)
     return;

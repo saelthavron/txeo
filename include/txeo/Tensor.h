@@ -34,6 +34,9 @@ class TensorPart;
 template <typename T>
 class TensorOp;
 
+template <typename T>
+class TensorFunc;
+
 /**
  * @brief Implements the mathematical concept of tensor, which is a magnitude of multiple order. A
  * tensor of order zero is defined to be a scalar, of order one a vector, of order two a matrix and
@@ -96,8 +99,8 @@ class Tensor {
      * #include "txeo/TensorShape.h"
      *
      * int main() {
-     *     txeo::Tensor<int> tensor(txeo::TensorShape({3, 4})); // Move-construct a tensor with
-     * shape 3x4
+     *      // Move-construct a tensor with shape 3x4
+     *      txeo::Tensor<int> tensor(txeo::TensorShape({3, 4}));
      *
      *     std::cout << "Tensor created with shape: " << tensor.shape() << std::endl;
      *     return 0;
@@ -475,8 +478,6 @@ class Tensor {
      * @endcode
      */
     Tensor<T> slice(size_t first_axis_begin, size_t first_axis_end) const;
-
-    [[nodiscard]] std::vector<Tensor<T>> unstack(size_t axis) const;
 
     /**
      * @brief Views the content of the specified tensor according to the specified shape. There is
@@ -1035,7 +1036,7 @@ class Tensor {
     txeo::TensorIterator<const T> begin() const;
     txeo::TensorIterator<const T> end() const;
 
-  private:
+  protected:
     struct Impl;
     std::unique_ptr<Impl> _impl{nullptr};
 
@@ -1043,6 +1044,7 @@ class Tensor {
     friend class txeo::TensorAgg<T>;
     friend class txeo::TensorPart<T>;
     friend class txeo::TensorOp<T>;
+    friend class txeo::TensorFunc<T>;
     friend class txeo::detail::TensorHelper;
 
     template <typename P>

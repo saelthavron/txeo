@@ -28,6 +28,17 @@ TEST(TensorTest, ShapeConstructor) {
   EXPECT_EQ(ttt.order(), 3);
   EXPECT_EQ(ttt.shape().axes_dims(), std::vector<int64_t>({4, 5, 6}));
 
+  auto shp = std::vector<size_t>({4, 5, 6});
+  Tensor<int> tttt(shp);
+  EXPECT_EQ(tttt.dim(), 120);
+  EXPECT_EQ(tttt.order(), 3);
+  EXPECT_EQ(tttt.shape().axes_dims(), std::vector<int64_t>({4, 5, 6}));
+
+  auto shp1 = std::vector<size_t>({4, 5, 6});
+  Tensor<int> tv(shp1, 5);
+  for (size_t i{0}; i < tv.dim(); ++i)
+    EXPECT_EQ(tv.data()[i], 5);
+
   txeo::TensorShape x({100});
   Tensor<int> source(x, 5);
   for (size_t i{0}; i < source.dim(); ++i)
