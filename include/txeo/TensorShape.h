@@ -16,8 +16,11 @@ class TensorHelper;
 }
 
 /**
+ * @class TensorShape
+ *
  * @brief The shape of a tensor is an ordered collection of dimensions of mathematical vector
  * spaces.
+ *
  * @details Each position of the tensor shape is an "axis", labeled starting from zero, and the
  * value in this position is a "dimension". An empty tensor shape is the shape of a scalar value. In
  * some some conditions, a negative dimension represents an undefined dimension, but this

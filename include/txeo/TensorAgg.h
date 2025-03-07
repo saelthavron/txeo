@@ -1,18 +1,26 @@
 #ifndef TENSORAGG_H
 #define TENSORAGG_H
-#include <functional>
 #pragma once
 
 #include "txeo/Tensor.h"
 
 #include <cstddef>
+#include <functional>
 
 namespace txeo {
 
+/**
+ * @class TensorAgg
+ * @brief A utility class for aggregation functions on tensors.
+ *
+ * This class provides static methods for aggregation functions on tensors,
+ * such reduce_mean.
+ *
+ * @tparam T The data type of the tensor/vector elements (e.g., int, double).
+ */
 template <typename T>
 class TensorAgg {
   public:
-    TensorAgg() = delete;
     TensorAgg(const TensorAgg &) = delete;
     TensorAgg(TensorAgg &&) = delete;
     TensorAgg &operator=(const TensorAgg &) = delete;
@@ -333,6 +341,8 @@ class TensorAgg {
     static T sum_all(const txeo::Tensor<T> &tensor);
 
   private:
+    TensorAgg() = default;
+
     static void verify_parameters(const txeo::Tensor<T> &tensor, const std::vector<size_t> &axes);
 
     static txeo::Tensor<T> accumulate(const txeo::Tensor<T> &tensor, size_t axis,

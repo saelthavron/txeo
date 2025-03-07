@@ -29,6 +29,15 @@ class TensorOp;
 template <typename T>
 class TensorFunc;
 
+/**
+ * @class Matrix
+ * @brief A class representing a matrix, derived from Tensor.
+ *
+ * This class provides constructors for creating matrices with various initialization methods.
+ * It inherits from `txeo::Tensor<T>` and specializes it for 2nd-order data.
+ *
+ * @tparam T The data type of the matrix elements (e.g., int, double).
+ */
 template <typename T>
 class Matrix : public txeo::Tensor<T> {
   public:
@@ -47,25 +56,107 @@ class Matrix : public txeo::Tensor<T> {
       return *this;
     };
 
+    /**
+     * @brief Constructs a matrix with the specified row and column sizes.
+     *
+     * This constructor creates a matrix of the specified row and column sizes, with uninitialized
+     * elements.
+     *
+     * @param row_size The number of rows in the matrix.
+     * @param col_size The number of columns in the matrix.
+     *
+     * @code
+     * txeo::Matrix<int> matrix(2, 3);  // Creates a 2x3 matrix
+     * @endcode
+     */
     explicit Matrix(size_t row_size, size_t col_size)
         : txeo::Tensor<T>{txeo::TensorShape({row_size, col_size})} {};
 
+    /**
+     * @brief Constructs a matrix with the specified row and column sizes and a fill value.
+     *
+     * @param row_size The number of rows in the matrix.
+     * @param col_size The number of columns in the matrix.
+     * @param fill_value The value to fill the matrix with.
+     *
+     * **Example Usage:**
+     * @code
+     * txeo::Matrix<int> matrix(2, 3, 5);  // Creates a 2x3 matrix filled with 5
+     * @endcode
+     */
     explicit Matrix(size_t row_size, size_t col_size, const T &fill_value)
         : txeo::Tensor<T>({row_size, col_size}, fill_value) {};
 
+    /**
+     * @brief Constructs a matrix with the specified row and column sizes and values.
+     *
+     * @param row_size The number of rows in the matrix.
+     * @param col_size The number of columns in the matrix.
+     * @param values The values to initialize the matrix with.
+     *
+     * **Example Usage:**
+     * @code
+     * txeo::Matrix<int> matrix(2, 3, {1, 2, 3, 4, 5, 6});  // Creates a 2x3 matrix with values [1,
+     * 2, 3, 4, 5, 6]
+     * @endcode
+     */
     explicit Matrix(size_t row_size, size_t col_size, const std::vector<T> &values)
         : txeo::Tensor<T>({row_size, col_size}, values) {};
 
+    /**
+     * @brief Constructs a matrix with the specified row and column sizes and initializer list.
+     *
+     * @param row_size The number of rows in the matrix.
+     * @param col_size The number of columns in the matrix.
+     * @param values The values to initialize the matrix with.
+     *
+     * **Example Usage:**
+     * @code
+     * txeo::Matrix<int> matrix(2, 3, {1, 2, 3, 4, 5, 6});  // Creates a 2x3 matrix with values [1,
+     * 2, 3, 4, 5, 6]
+     * @endcode
+     */
     explicit Matrix(size_t row_size, size_t col_size, const std::initializer_list<T> &values)
         : txeo::Tensor<T>({row_size, col_size}, std::vector<T>(values)) {};
 
+    /**
+     * @brief Constructs a matrix from a nested initializer list.
+     *
+     * @param values The values to initialize the matrix with.
+     *
+     * **Example Usage:**
+     * @code
+     * txeo::Matrix<int> matrix({{1, 2, 3}, {4, 5, 6}});  // Creates a 2x3 matrix with values [1, 2,
+     * 3, 4, 5, 6]
+     * @endcode
+     */
     explicit Matrix(const std::initializer_list<std::initializer_list<T>> &values)
         : txeo::Tensor<T>(values) {};
 
-    explicit Matrix(const txeo::Tensor<T> &tensor);
-
+    /**
+     * @brief Constructs a matrix by moving data from a Tensor.
+     *
+     * @param tensor The Tensor to move data from.
+     *
+     * **Example Usage:**
+     * @code
+     * txeo::Tensor<int> tensor({2, 3}, {1, 2, 3, 4, 5, 6});
+     * txeo::Matrix<int> matrix(std::move(tensor));  // Moves data from tensor to matrix
+     * @endcode
+     */
     explicit Matrix(txeo::Tensor<T> &&tensor);
 
+    /**
+     * @brief Returns the size of the matrix.
+     *
+     * @return The total number of elements in the matrix.
+     *
+     * **Example Usage:**
+     * @code
+     * txeo::Matrix<int> matrix(2, 3);
+     * size_t size = matrix.size();  // size = 6
+     * @endcode
+     */
     [[nodiscard]] size_t size() const { return txeo::Tensor<T>::dim(); };
 
   private:

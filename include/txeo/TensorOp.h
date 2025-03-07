@@ -1,21 +1,25 @@
 #ifndef TENSOROP_H
 #define TENSOROP_H
-#include "txeo/Matrix.h"
 #pragma once
 
+#include "txeo/Matrix.h"
 #include "txeo/Tensor.h"
+#include "txeo/Vector.h"
 
 namespace txeo {
 
 /**
- * @brief Class that centralizes mathematical operations and functions on tensors
+ * @class TensorOp
+ * @brief A utility class for performing operations on tensors and vectors.
  *
- * @tparam T type of the tensor or tensors involved
+ * This class provides static methods for common tensor and vector operations,
+ * such as dot product.
+ *
+ * @tparam T The data type of the tensor/vector elements (e.g., int, double).
  */
 template <typename T>
 class TensorOp {
   public:
-    TensorOp() = delete;
     TensorOp(const TensorOp &) = delete;
     TensorOp(TensorOp &&) = delete;
     TensorOp &operator=(const TensorOp &) = delete;
@@ -360,6 +364,28 @@ class TensorOp {
      * @endcode
      */
     static txeo::Matrix<T> product(const txeo::Matrix<T> &left, const txeo::Matrix<T> &right);
+
+    /**
+     * @brief Computes the dot product of two vectors.
+     *
+     * @param left The first vector.
+     * @param right The second vector.
+     * @return The dot product of the two vectors.
+     *
+     * @throws txeo::TensorOpError
+     *
+     * **Example Usage:**
+     * @code
+     * txeo::Vector<int> left({1, 2, 3});  // Vector [1, 2, 3]
+     * txeo::Vector<int> right({4, 5, 6}); // Vector [4, 5, 6]
+     * auto result = TensorOp<int>::dot(left, right);
+     * // result = 1*4 + 2*5 + 3*6 = 32
+     * @endcode
+     */
+    static T dot(const txeo::Vector<T> &left, const txeo::Vector<T> &right);
+
+  private:
+    TensorOp() = default;
 };
 
 /**

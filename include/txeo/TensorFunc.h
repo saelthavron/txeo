@@ -1,10 +1,20 @@
 #ifndef TENSORFUNC_H
 #define TENSORFUNC_H
-
-#include "txeo/Tensor.h"
 #pragma once
 
+#include "txeo/Tensor.h"
+
 namespace txeo {
+
+/**
+ * @class TensorFunc
+ * @brief A utility class for common math functions on tensors.
+ *
+ * This class provides static methods for common tensor functions,
+ * such as square.
+ *
+ * @tparam T The data type of the tensor elements (e.g., int, double).
+ */
 
 template <typename T>
 class TensorFunc {

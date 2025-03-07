@@ -294,6 +294,24 @@ inline txeo::Matrix<T> TensorOp<T>::product(const txeo::Matrix<T> &left,
   return txeo::Matrix<T>(std::move(aux));
 }
 
+template <typename T>
+T TensorOp<T>::dot(const txeo::Vector<T> &left, const txeo::Vector<T> &right) {
+  if (left.dim() == 0 || right.dim() == 0)
+    throw txeo::TensorOpError("One of the operands has dimension zero.");
+
+  if (left.dim() != right.dim())
+    throw txeo::TensorOpError("Operands are incompatible.");
+
+  auto l_data = left.data();
+  auto r_data = right.data();
+
+  T resp = 0.0;
+  for (size_t i{0}; i < left.dim(); ++i)
+    resp += l_data[i] * r_data[i];
+
+  return resp;
+}
+
 // Required for templated elements in cpp files
 template class TensorOp<short>;
 template class TensorOp<int>;

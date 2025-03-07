@@ -16,6 +16,7 @@ add_executable(
   tTensorPart.cpp
   tTensorFunc.cpp
   tMatrix.cpp
+  tVector.cpp
 )  
 
 target_link_libraries(

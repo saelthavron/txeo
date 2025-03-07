@@ -6,10 +6,18 @@
 
 namespace txeo {
 
+/**
+ * @class TensorPart
+ * @brief A utility class for partitioning tensors.
+ *
+ * This class provides static methods for operations such as unstacking tensors along
+ * a specified axis and slicing tensors along the first axis.
+ *
+ * @tparam T The data type of the tensor elements (e.g., int, double).
+ */
 template <typename T>
 class TensorPart {
   public:
-    TensorPart() = delete;
     TensorPart(const TensorPart &) = delete;
     TensorPart(TensorPart &&) = delete;
     TensorPart &operator=(const TensorPart &) = delete;
@@ -90,6 +98,9 @@ class TensorPart {
      */
     static txeo::Tensor<T> slice(const txeo::Tensor<T> &tensor, size_t first_axis_begin,
                                  size_t first_axis_end);
+
+  private:
+    TensorPart() = default;
 };
 
 /**
