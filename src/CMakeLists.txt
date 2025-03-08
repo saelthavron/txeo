@@ -7,7 +7,8 @@ set(TXEO_SOURCES
     Vector.cpp
     TensorOp.cpp 
     TensorAgg.cpp 
-    TensorIO.cpp 
+    TensorIO.cpp
+    MatrixIO.cpp
     TensorPart.cpp 
     TensorFunc.cpp
     Predictor.cpp)

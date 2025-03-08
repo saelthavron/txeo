@@ -9,7 +9,7 @@ add_executable(
   tUtils.cpp
   tTensorShape.cpp
   tTensor.cpp
-  tTensorIO.cpp
+  tMatrixIO.cpp
   tPredictor.cpp
   tTensorOp.cpp
   tTensorAgg.cpp

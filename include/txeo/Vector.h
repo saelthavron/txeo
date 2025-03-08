@@ -137,6 +137,16 @@ class Vector : public txeo::Tensor<T> {
 
     void reshape(const txeo::TensorShape &shape);
 
+    void reshape(const std::vector<size_t> &shape) { this->reshape(txeo::TensorShape(shape)); };
+
+    void reshape(const std::initializer_list<size_t> &shape) {
+      this->reshape(std::vector<size_t>(shape));
+    };
+
+    static Vector<T> to_vector(txeo::Tensor<T> &&tensor);
+
+    static Vector<T> to_vector(const txeo::Tensor<T> &tensor);
+
   private:
     Vector() = default;
 

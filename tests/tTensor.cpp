@@ -60,7 +60,7 @@ TEST(TensorTest, CopyConstructor) {
   EXPECT_EQ(copy(1, 1), 4);
 
   original(1, 1) = 5;
-  EXPECT_EQ(copy(1, 1), 4); // Deep copy verification
+  EXPECT_EQ(copy(1, 1), 4);
 }
 
 TEST(TensorTest, MoveConstructor) {
@@ -78,21 +78,18 @@ TEST(TensorTest, AssignmentOperator) {
   EXPECT_EQ(t2(0, 1), 2);
 
   t1(0, 1) = 5;
-  EXPECT_EQ(t2(0, 1), 2); // Deep copy verification
+  EXPECT_EQ(t2(0, 1), 2);
 }
 
 TEST(TensorTest, ElementAccess) {
   Tensor<int> t({{1, 2}, {3, 4}});
 
-  // Valid access
   EXPECT_EQ(t(0, 0), 1);
   EXPECT_EQ(t(1, 1), 4);
 
-  // Modification
   t(1, 0) = 5;
   EXPECT_EQ(t(1, 0), 5);
 
-  // Const access
   const auto &ct = t;
   EXPECT_EQ(ct(0, 1), 2);
 }
@@ -109,13 +106,11 @@ TEST(TensorTest, InvalidElementAccess) {
 TEST(TensorTest, Reshape) {
   Tensor<int> t({{1, 2}, {3, 4}});
 
-  // Valid reshape
   t.reshape({4});
   EXPECT_EQ(t.order(), 1);
   EXPECT_EQ(t.dim(), 4);
   EXPECT_EQ(t(3), 4);
 
-  // Invalid reshape
   EXPECT_THROW(t.reshape({5}), TensorError);
 }
 
@@ -298,14 +293,6 @@ TEST(TensorTest, ValidMove) {
   EXPECT_EQ(target(0), 1);
 }
 
-// TEST(TensorTest, SelfAssignment) {
-//   Tensor<int> tensor(txeo::TensorShape({2}), {4, 5});
-//   tensor = std::move(tensor); // Should handle gracefully
-
-//   EXPECT_EQ(tensor.dim(), 2);
-//   EXPECT_EQ(tensor(1), 5);
-// }
-
 TEST(TensorTest, ValidConstruction) {
   Tensor<int> t({{{1, 2}, {3, 4}}, {{5, 6}, {7, 8}}});
 
@@ -473,7 +460,7 @@ TEST(TensorTest, EmptyTensorOperations) {
   Tensor<float> t1({0});
 
   EXPECT_THROW(empty + t1, TensorOpError);
-  EXPECT_THROW(t1 *= 2.0f, TensorOpError); // Should fail if empty
+  EXPECT_THROW(t1 *= 2.0f, TensorOpError);
 }
 
 TEST(TensorTest, ScalarMultiplicationDouble) {

@@ -161,6 +161,46 @@ class Matrix : public txeo::Tensor<T> {
 
     void reshape(const txeo::TensorShape &shape);
 
+    void reshape(const std::vector<size_t> &shape) { this->reshape(txeo::TensorShape(shape)); };
+
+    void reshape(const std::initializer_list<size_t> &shape) {
+      this->reshape(std::vector<size_t>(shape));
+    };
+
+    /**
+     * @brief Converts a tensor to a matrix by moving data.
+     *
+     * @param tensor The input tensor to convert. Must be 2-dimensional.
+     * @return A matrix created from the input tensor.
+     *
+     * @throws std::MatrixError
+     *
+     * **Example Usage:**
+     * @code
+     * txeo::Tensor<int> tensor({2, 3}, {1, 2, 3, 4, 5, 6});  // 2D tensor with shape (2, 3)
+     * auto matrix = Matrix<int>::to_matrix(std::move(tensor));  // Convert to matrix
+     * // matrix shape: (2, 3)
+     * @endcode
+     */
+    static Matrix<T> to_matrix(txeo::Tensor<T> &&tensor);
+
+    /**
+     * @brief Creates a matrix from a tensor (preforms copy).
+     *
+     * @param tensor The input tensor to copied. Must be 2-dimensional.
+     * @return A matrix created from the input tensor.
+     *
+     * @throws std::MatrixError
+     *
+     * **Example Usage:**
+     * @code
+     * txeo::Tensor<int> tensor({2, 3}, {1, 2, 3, 4, 5, 6});  // 2D tensor with shape (2, 3)
+     * auto matrix = Matrix<int>::to_matrix(std::move(tensor));  //
+     * // matrix shape: (2, 3)
+     * @endcode
+     */
+    static Matrix<T> to_matrix(const txeo::Tensor<T> &tensor);
+
   private:
     Matrix() = default;
 

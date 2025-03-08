@@ -5,7 +5,6 @@
 #pragma once
 
 #include "txeo/Tensor.h"
-#include "txeo/Vector.h"
 
 namespace txeo {
 
@@ -143,13 +142,80 @@ class TensorFunc {
      */
     static txeo::Tensor<T> &abs_by(txeo::Tensor<T> &tensor);
 
-    // axis specifies the old axes in their new positions
+    /**
+     * @brief Permutes the axes of a tensor.
+     *
+     *
+     * @param tensor The input tensor.
+     * @param axes The new order of the tensor axes. Must be a valid permutation of the tensor's
+     * dimensions.
+     * @return A new tensor with the axes permuted.
+     *
+     * @throws std::invalid_argument If the axes are invalid (e.g., size mismatch or out of range).
+     *
+     * **Example Usage:**
+     * @code
+     * txeo::Tensor<int> tensor({2, 3, 4}, {
+     *     1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
+     *     13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24
+     * });
+     *  // The new postion of axis 1 is zero, of axis 2 is one and of axis zero is 2
+     * auto result = TensorFunc<int>::permute(tensor, {1, 2, 0});
+     * // result shape: (3, 4, 2)
+     * @endcode
+     */
     static txeo::Tensor<T> permute(const txeo::Tensor<T> &tensor, const std::vector<size_t> &axes);
 
+    /**
+     * @brief Permutes the axes of a tensor in-place.
+     *
+     * @param tensor The input tensor to be modified.
+     * @param axes The new order of axes. Must be a valid permutation of the tensor's dimensions.
+     * @return A reference to the modified tensor.
+     *
+     * @throws std::invalid_argument If the axes are invalid (e.g., size mismatch or out of range).
+     *
+     * **Example Usage:**
+     * @code
+     * txeo::Tensor<int> tensor({2, 3, 4}, {
+     *     1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
+     *     13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24
+     * });
+     *  // The new postion of axis 1 is zero, of axis 2 is one and of axis zero is 2
+     * TensorFunc<int>::permute_by(tensor, {1, 2, 0});
+     * // tensor shape after permutation: (3, 4, 2)
+     * @endcode
+     */
     static txeo::Tensor<T> &permute_by(txeo::Tensor<T> &tensor, const std::vector<size_t> &axes);
 
+    /**
+     * @brief Transposes a matrix.
+     *
+     * @param matrix The input matrix.
+     * @return A new matrix that is the transpose of the input matrix.
+     *
+     * **Example Usage:**
+     * @code
+     * txeo::Matrix<int> matrix(2, 3, {1, 2, 3, 4, 5, 6});
+     * auto result = TensorFunc<int>::transpose(matrix);
+     * // result shape: (3, 2)
+     * @endcode
+     */
     static txeo::Matrix<T> transpose(const txeo::Matrix<T> &matrix);
 
+    /**
+     * @brief Transposes a matrix in-place.
+     *
+     * @param matrix The input matrix to be modified.
+     * @return A reference to the modified matrix.
+     *
+     * **Example Usage:**
+     * @code
+     * txeo::Matrix<int> matrix(2, 3, {1, 2, 3, 4, 5, 6});
+     * TensorFunc<int>::transpose_by(matrix);
+     * // matrix shape after transpose: (3, 2)
+     * @endcode
+     */
     static txeo::Matrix<T> &transpose_by(txeo::Matrix<T> &matrix);
 
   private:

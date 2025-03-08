@@ -88,3 +88,54 @@ TEST(MatrixTest, MoveConstructorFromTensor) {
   txeo::Tensor<int> cube({1, 1, 1}, {1});
   EXPECT_THROW(txeo::Matrix<int>(std::move(cube)), txeo::MatrixError);
 }
+
+TEST(MatrixTest, ToMatrixValid2DTensor) {
+
+  txeo::Tensor<int> tensor({2, 3}, {1, 2, 3, 4, 5, 6});
+  txeo::Tensor<int> tensor2({2, 3}, {1, 2, 3, 4, 5, 6});
+
+  auto result = txeo::Matrix<int>::to_matrix(std::move(tensor));
+  auto result2 = txeo::Matrix<int>::to_matrix(tensor2);
+
+  EXPECT_EQ(result.shape(), txeo::TensorShape({2, 3}));
+  EXPECT_EQ(result2.shape(), txeo::TensorShape({2, 3}));
+
+  EXPECT_EQ(result(0, 0), 1);
+  EXPECT_EQ(result(1, 2), 6);
+  EXPECT_EQ(result(0, 1), 2);
+  EXPECT_EQ(result2(0, 0), 1);
+  EXPECT_EQ(result2(1, 2), 6);
+  EXPECT_EQ(result2(0, 1), 2);
+}
+
+TEST(MatrixTest, ToMatrixReshape) {
+
+  txeo::Matrix<int> matrix(2, 3, {1, 2, 3, 4, 5, 6});
+
+  matrix.reshape({3, 2});
+  EXPECT_EQ(matrix(2, 1), 6);
+  EXPECT_EQ(matrix(1, 1), 4);
+  EXPECT_THROW(matrix.reshape({1, 2, 3}), txeo::MatrixError);
+}
+
+TEST(MatrixTest, ToMatrixInvalid1DTensor) {
+
+  txeo::Tensor<int> tensor({6}, {1, 2, 3, 4, 5, 6});
+
+  EXPECT_THROW(txeo::Matrix<int>::to_matrix(std::move(tensor)), txeo::MatrixError);
+}
+
+TEST(MatrixTest, ToMatrixInvalid3DTensor) {
+
+  txeo::Tensor<int> tensor({2, 3, 4}, {1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12,
+                                       13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24});
+
+  EXPECT_THROW(txeo::Matrix<int>::to_matrix(std::move(tensor)), txeo::MatrixError);
+}
+
+TEST(MatrixTest, ToMatrixEmptyTensor) {
+
+  txeo::Tensor<int> tensor(txeo::TensorShape({}));
+
+  EXPECT_THROW(txeo::Matrix<int>::to_matrix(std::move(tensor)), txeo::MatrixError);
+}
