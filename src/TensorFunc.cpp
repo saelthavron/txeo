@@ -1,8 +1,15 @@
 #include "txeo/TensorFunc.h"
+#include "txeo/Tensor.h"
 #include "txeo/TensorOp.h"
 #include "txeo/detail/TensorHelper.h"
+#include "txeo/detail/TensorPrivate.h"
+#include "txeo/detail/utils.h"
 
 #include <cmath>
+#include <cstddef>
+#include <cstdint>
+#include <tensorflow/cc/ops/array_ops.h>
+#include <utility>
 
 namespace txeo {
 
@@ -91,6 +98,48 @@ inline txeo::Tensor<T> &TensorFunc<T>::abs_by(txeo::Tensor<T> &tensor) {
   return tensor;
 }
 
+template <typename T>
+txeo::Tensor<T> TensorFunc<T>::permute(const txeo::Tensor<T> &tensor,
+                                       const std::vector<size_t> &axes) {
+  if (tensor.dim() == 0)
+    throw txeo::TensorFuncError("Tensor has dimension zero.");
+
+  if (tensor.order() != txeo::detail::to_int(axes.size()))
+    throw txeo::TensorFuncError("Tensor order and number of axes are different.");
+
+  for (auto &item : axes)
+    if (item >= txeo::detail::to_size_t(tensor.order()))
+      throw txeo::TensorFuncError("Inconsistent axes.");
+
+  tf::Tensor perm(tf::DT_INT64, tf::TensorShape({txeo::detail::to_int64(axes.size())}));
+  auto perm_flat = perm.flat<int64_t>();
+  for (int64_t i{0}; i < txeo::detail::to_int64(axes.size()); ++i)
+    perm_flat(i) = txeo::detail::to_int64((axes[i]));
+
+  return txeo::detail::TensorHelper::ope_tensors<T>(
+      *tensor._impl->tf_tensor, perm, [](const tf::Scope &scope, tf::Input left, tf::Input right) {
+        return tf::ops::Transpose(scope, left, right);
+      });
+}
+
+template <typename T>
+txeo::Tensor<T> &TensorFunc<T>::permute_by(txeo::Tensor<T> &tensor,
+                                           const std::vector<size_t> &axes) {
+  tensor = std::move(TensorFunc<T>::permute(tensor, axes));
+  return tensor;
+}
+
+template <typename T>
+txeo::Matrix<T> TensorFunc<T>::transpose(const txeo::Matrix<T> &matrix) {
+  return txeo::Matrix(TensorFunc<T>::permute(matrix, {1, 0}));
+}
+
+template <typename T>
+inline txeo::Matrix<T> &TensorFunc<T>::transpose_by(txeo::Matrix<T> &matrix) {
+  matrix = std::move(TensorFunc<T>::transpose(matrix));
+  return matrix;
+}
+
 // Type specialization to avoid calling abs for unsigned types
 template <>
 inline txeo::Tensor<bool> &TensorFunc<bool>::abs_by(txeo::Tensor<bool> &tensor) {
@@ -107,6 +156,7 @@ inline txeo::Tensor<size_t> &TensorFunc<size_t>::abs_by(txeo::Tensor<size_t> &te
   return tensor;
 }
 
+template class TensorFunc<size_t>;
 template class TensorFunc<short>;
 template class TensorFunc<int>;
 template class TensorFunc<bool>;
@@ -114,6 +164,5 @@ template class TensorFunc<long>;
 template class TensorFunc<long long>;
 template class TensorFunc<float>;
 template class TensorFunc<double>;
-template class TensorFunc<size_t>;
 
 } // namespace txeo

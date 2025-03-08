@@ -146,4 +146,29 @@ TEST(TensorFuncTest, EmptyTensorHandling) {
   EXPECT_THROW(TensorFunc<float>::power_elem(empty, 2.0f), TensorFuncError);
 }
 
+TEST(TensorFuncTest, PermuteValidAxes) {
+
+  txeo::Tensor<int> tensor({2, 3, 4}, {1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12,
+                                       13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24});
+
+  auto result = TensorFunc<int>::permute(tensor, {1, 2, 0});
+
+  EXPECT_EQ(result.shape(), txeo::TensorShape({3, 4, 2}));
+
+  EXPECT_EQ(result(0, 0, 0), 1);
+  EXPECT_EQ(result(2, 3, 1), 24);
+  EXPECT_EQ(result(1, 2, 1), 19);
+  EXPECT_EQ(result(1, 0, 0), 5);
+}
+
+TEST(TensorFuncTest, PermuteInvalidAxes) {
+
+  txeo::Tensor<int> tensor({2, 3, 4}, {1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12,
+                                       13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24});
+
+  EXPECT_THROW(TensorFunc<int>::permute(tensor, {1, 2}), txeo::TensorFuncError);
+
+  EXPECT_THROW(TensorFunc<int>::permute(tensor, {1, 2, 3}), txeo::TensorFuncError);
+}
+
 } // namespace txeo

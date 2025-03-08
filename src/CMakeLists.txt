@@ -2,14 +2,14 @@
 set(TXEO_SOURCES 
     utils.cpp 
     TensorShape.cpp 
+    Tensor.cpp 
+    Matrix.cpp
+    Vector.cpp
     TensorOp.cpp 
     TensorAgg.cpp 
-    Tensor.cpp 
     TensorIO.cpp 
     TensorPart.cpp 
     TensorFunc.cpp
-    Matrix.cpp
-    Vector.cpp
     Predictor.cpp)
 
 

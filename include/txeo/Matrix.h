@@ -159,6 +159,8 @@ class Matrix : public txeo::Tensor<T> {
      */
     [[nodiscard]] size_t size() const { return txeo::Tensor<T>::dim(); };
 
+    void reshape(const txeo::TensorShape &shape);
+
   private:
     Matrix() = default;
 

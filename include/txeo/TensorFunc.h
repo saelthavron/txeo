@@ -1,8 +1,11 @@
 #ifndef TENSORFUNC_H
 #define TENSORFUNC_H
+#include "txeo/Matrix.h"
+#include <cstddef>
 #pragma once
 
 #include "txeo/Tensor.h"
+#include "txeo/Vector.h"
 
 namespace txeo {
 
@@ -139,6 +142,15 @@ class TensorFunc {
      * @endcode
      */
     static txeo::Tensor<T> &abs_by(txeo::Tensor<T> &tensor);
+
+    // axis specifies the old axes in their new positions
+    static txeo::Tensor<T> permute(const txeo::Tensor<T> &tensor, const std::vector<size_t> &axes);
+
+    static txeo::Tensor<T> &permute_by(txeo::Tensor<T> &tensor, const std::vector<size_t> &axes);
+
+    static txeo::Matrix<T> transpose(const txeo::Matrix<T> &matrix);
+
+    static txeo::Matrix<T> &transpose_by(txeo::Matrix<T> &matrix);
 
   private:
     TensorFunc() = default;

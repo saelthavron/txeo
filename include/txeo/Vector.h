@@ -135,6 +135,8 @@ class Vector : public txeo::Tensor<T> {
      */
     explicit Vector(txeo::Tensor<T> &&tensor);
 
+    void reshape(const txeo::TensorShape &shape);
+
   private:
     Vector() = default;
 

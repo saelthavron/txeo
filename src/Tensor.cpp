@@ -470,6 +470,7 @@ txeo::TensorIterator<const T> Tensor<T>::end() const {
 
 // Avoiding problems in linking
 
+template class Tensor<size_t>;
 template class Tensor<short>;
 template class Tensor<int>;
 template class Tensor<bool>;
@@ -477,7 +478,6 @@ template class Tensor<long>;
 template class Tensor<long long>;
 template class Tensor<float>;
 template class Tensor<double>;
-template class Tensor<size_t>;
 
 template std::ostream &operator<<(std::ostream &, const Tensor<short> &);
 template std::ostream &operator<<(std::ostream &, const Tensor<int> &);
