@@ -239,9 +239,6 @@ int main() {
   // Load tensor from file
   auto loaded_tensor = TensorIO::read_textfile<double>("matrix.txt");
 
-  // Reshapes the loaded tensor to one order (one axis)   
-  loaded_tensor.reshape({9});
-
   // Display loaded tensor
   cout << loaded_tensor << endl;
 
