@@ -217,7 +217,7 @@ set_target_properties(hello_txeo PROPERTIES INSTALL_RPATH "/opt/txeo/lib;/opt/te
 
 ### 🔢 **Example 1: Tensor Basics**
 
-Here is a code sample where a 3x3 `txeo::Tensor` is defined, written to a file and then another instance is created from the saved file.
+Here is a code sample where a 3x3 `txeo::Matrix` is defined, written to a file and then another instance is created from the saved file.
 
 ```cpp
 //main.cpp
@@ -230,14 +230,14 @@ using namespace std;
 
 int main() {
 
-  // 3×3 tensor created from a list of double values in row-major order
-  Tensor<double> tensor({3, 3}, {1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f});
+  // 3×3 matrix created from a list of double values in row-major order
+  Matrix<double> matrix({3, 3}, {1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f});
 
   // Save tensor to file
-  MatrixIO::write_textfile(tensor, "tensor.txt");
+  MatrixIO::write_textfile(matrix, "matrix.txt");
 
   // Load tensor from file
-  auto loaded_tensor = TensorIO::read_textfile<double>("tensor.txt");
+  auto loaded_tensor = TensorIO::read_textfile<double>("matrix.txt");
 
   // Reshapes the loaded tensor to one order (one axis)   
   loaded_tensor.reshape({9});
