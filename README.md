@@ -213,7 +213,7 @@ set_target_properties(hello_txeo PROPERTIES INSTALL_RPATH "/opt/txeo/lib;/opt/te
 
 ### 🔢 **Example 1: Tensor Basics**
 
-Here is a code sample where a 3x3 `txeo::Tensor` is defined, written to a file and then another instance is created from the saved file.
+Here is a code sample where a 3x3 `txeo::Matrix` is defined, written to a file and then another instance is created from the saved file.
 
 ```cpp
 //main.cpp
