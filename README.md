@@ -1,3 +1,4 @@
+<link rel="shortcut icon" type="image/png" href="logo_txeo.png">
 <p align="center">
   <img src="txeo.png" alt="txeo logo">
 </p>
