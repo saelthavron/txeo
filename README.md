@@ -5,7 +5,7 @@
 [![License: Apache 2.0](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 [![GitHub release](https://img.shields.io/github/v/release/rdabra/txeo)](https://github.com/rdabra/txeo/releases)
 [![GitHub issues](https://img.shields.io/github/issues/rdabra/txeo)](https://github.com/rdabra/txeo/issues)
-[![Docs](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://rdabra.github.io/txeo/)
+[![Docs](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://txeo-doc.netlify.app/)
 [![Last Commit](https://img.shields.io/github/last-commit/rdabra/txeo)](https://github.com/rdabra/txeo/commits/main)
 [![Star Badge](https://img.shields.io/github/stars/rdabra/txeo-tf?style=social)]
 
