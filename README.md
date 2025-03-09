@@ -237,7 +237,7 @@ int main() {
   MatrixIO::write_textfile(matrix, "matrix.txt");
 
   // Load matrix from file
-  auto loaded_matrix = TensorIO::read_textfile<double>("matrix.txt");
+  auto loaded_matrix = MatrixIO::read_textfile<double>("matrix.txt");
 
   // Convert matrix to second-order tensor
   auto loaded_tensor = Matrix::to_tensor(loaded_matrix);
