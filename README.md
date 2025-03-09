@@ -299,9 +299,6 @@ int main() {
 
 ### 🔢 Advanced Tensor Operations
 
-- **Matrix Multiplication (`matmul`)** - Perform tensor dot products.
-- **Broadcasting Support** - Support element-wise operations on different shapes.
-- **Reduction Operations (`sum`, `mean`, `max`)** - Compute statistics on tensors.
 - **Linear Algebra Functions (SVD, QR decomposition)** - Matrix Computations on tensors.
 
 ### 📊 Model Saving & Loading Enhancements
