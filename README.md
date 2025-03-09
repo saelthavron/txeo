@@ -218,7 +218,7 @@ Here is a code sample where a 3x3 `txeo::Tensor` is defined, written to a file a
 ```cpp
 //main.cpp
 #include "txeo/Tensor.h"
-#include "txeo/TensorIO.h"
+#include "txeo/MatrixIO.h"
 #include <iostream>
 
 using namespace txeo;
@@ -230,7 +230,7 @@ int main() {
   Tensor<double> tensor({3, 3}, {1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f});
 
   // Save tensor to file
-  TensorIO::write_textfile(tensor, "tensor.txt");
+  MatrixIO::write_textfile(tensor, "tensor.txt");
 
   // Load tensor from file
   auto loaded_tensor = TensorIO::read_textfile<double>("tensor.txt");
@@ -253,7 +253,7 @@ This example loads a saved TensorFlow model, performs inference on an input tens
 //main.cpp
 #include "txeo/Predictor.h"
 #include "txeo/Tensor.h"
-#include "txeo/TensorIO.h"
+#include "txeo/MatrixIO.h"
 
 using namespace txeo;
 using namespace std;
@@ -269,13 +269,13 @@ int main() {
   Predictor<float> predictor{model_path};
   
   // Read input tensor from file
-  auto input = TensorIO::read_textfile<float>(input_path);
+  auto input = MatrixIO::read_textfile<float>(input_path);
   
   // Run inference
   auto output = predictor.predict(input);
   
   // Save output tensor to file
-  TensorIO::write_textfile(output, output_path);
+  MatrixIO::write_textfile(output, output_path);
 
   return 0;
 }
