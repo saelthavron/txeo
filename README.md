@@ -1,6 +1,5 @@
-<link rel="shortcut icon" type="image/png" href="logo_txeo.png">
 <p align="center">
-  <img src="txeo.png" alt="txeo logo">
+  <img src="images/txeo.png" alt="txeo logo">
 </p>
 
 [![License: Apache 2.0](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
