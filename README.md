@@ -289,7 +289,7 @@ int main() {
 
 📁 For more samples, please visit the [examples folder](https://github.com/rdabra/txeo/tree/main/examples).
 
-👓 Documentation with extensive usage examples is hosted at [Netlify](https://gregarious-frangipane-6769f8.netlify.app).
+👓 Documentation with extensive usage examples is hosted at [Netlify](https://txeo-doc.netlify.app/).
 
 ## 📆 Roadmap
 
