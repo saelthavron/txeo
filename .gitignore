@@ -37,7 +37,7 @@
 .xmake
 .my-xmake
 build
-docs
+/docs
 
 # Files
 CMakeUserPresets.json
