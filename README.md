@@ -1,5 +1,3 @@
-# txeo: a Modern C++ Wrapper for TensorFlow
-
 <p align="center">
   <img src="txeo.png" alt="txeo logo">
 </p>
@@ -10,6 +8,8 @@
 [![Docs](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://rdabra.github.io/txeo/)
 [![Last Commit](https://img.shields.io/github/last-commit/rdabra/txeo)](https://github.com/rdabra/txeo/commits/main)
 [![Star Badge](https://img.shields.io/github/stars/rdabra/txeo-tf?style=social)]
+
+# txeo: a Modern C++ Wrapper for TensorFlow
 
 ## 📝 Overview
 
