@@ -137,60 +137,12 @@ TEST(TensorOpTest, HadamardProdByInPlace) {
   EXPECT_DOUBLE_EQ(t1(2), 18.0);
 }
 
-TEST(TensorOpTest, PowerElemOperation) {
-  Tensor<float> t1({2, 2}, {2.0f, 3.0f, 4.0f, 5.0f});
-
-  auto result = TensorOp<float>::power_elem(t1, 2.0f);
-
-  ASSERT_EQ(result.shape(), txeo::TensorShape({2, 2}));
-  EXPECT_FLOAT_EQ(result(0, 0), 4.0f);
-  EXPECT_FLOAT_EQ(result(1, 1), 25.0f);
-}
-
-TEST(TensorOpTest, PowerElemByOperation) {
-  Tensor<double> t1({3}, {2.0, 3.0, 4.0});
-
-  TensorOp<double>::power_elem_by(t1, 3.0);
-
-  EXPECT_DOUBLE_EQ(t1(0), 8.0);
-  EXPECT_DOUBLE_EQ(t1(1), 27.0);
-  EXPECT_DOUBLE_EQ(t1(2), 64.0);
-}
-
 TEST(TensorOpTest, ShapeMismatchHadamard) {
   Tensor<float> t1({2, 2}, {1.0f, 2.0f, 3.0f, 4.0f});
   Tensor<float> t2({2, 3}, {1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f});
 
   EXPECT_THROW(TensorOp<float>::hadamard_prod(t1, t2), TensorOpError);
   EXPECT_THROW(TensorOp<float>::hadamard_prod_by(t1, t2), TensorOpError);
-}
-
-TEST(TensorOpTest, PowerElemSpecialCases) {
-  Tensor<float> t1({2}, {4.0f, 9.0f});
-
-  auto result1 = TensorOp<float>::power_elem(t1, 0.0f);
-  EXPECT_FLOAT_EQ(result1(0), 1.0f);
-  EXPECT_FLOAT_EQ(result1(1), 1.0f);
-
-  auto result2 = TensorOp<float>::power_elem(t1, 0.5f);
-  EXPECT_FLOAT_EQ(result2(0), 2.0f);
-  EXPECT_FLOAT_EQ(result2(1), 3.0f);
-}
-
-TEST(TensorOpTest, EmptyTensorHandling) {
-  Tensor<float> empty({0});
-  Tensor<float> t1({2}, {1.0f, 2.0f});
-
-  EXPECT_THROW(TensorOp<float>::hadamard_prod(empty, t1), TensorOpError);
-  EXPECT_THROW(TensorOp<float>::power_elem(empty, 2.0f), TensorOpError);
-}
-
-TEST(TensorOpTest, NegativeExponent) {
-  Tensor<double> t1({2}, {2.0, 3.0});
-
-  auto result = TensorOp<double>::power_elem(t1, -1.0);
-  EXPECT_DOUBLE_EQ(result(0), 0.5);
-  EXPECT_DOUBLE_EQ(result(1), 1.0 / 3.0);
 }
 
 TEST(TensorOpTest, InPlaceModificationCheck) {
@@ -319,11 +271,6 @@ TEST(TensorOpTest, HadamardProd) {
   EXPECT_NO_THROW(txeo::TensorOp<int>::hadamard_prod(a, b));
 }
 
-TEST(TensorOpTest, PowerElem) {
-  txeo::Tensor<int> tensor({2}, {2, 3});
-  EXPECT_NO_THROW(txeo::TensorOp<int>::power_elem(tensor, 2));
-}
-
 TEST(TensorOpTest, Multiply) {
   txeo::Tensor<long long> tensor({2}, {5LL, 6LL});
   EXPECT_NO_THROW(txeo::TensorOp<long long>::multiply(tensor, 2LL));
@@ -344,6 +291,67 @@ TEST(TensorOpTest, SubtractInvalidShapes) {
   txeo::Tensor<int> a({2}, {1, 2});
   txeo::Tensor<int> b({3}, {1, 2, 3});
   EXPECT_THROW(txeo::TensorOp<int>::subtract(a, b), txeo::TensorOpError);
+}
+
+TEST(TensorOpTest, EmptyTensorHandling) {
+  Tensor<float> empty({0});
+  Tensor<float> t1({2}, {1.0f, 2.0f});
+
+  EXPECT_THROW(TensorOp<float>::hadamard_prod(empty, t1), TensorOpError);
+}
+
+TEST(TensorOpTest, MatrixProduct) {
+
+  txeo::Matrix<int> left(2, 3, {1, 2, 3, 4, 5, 6});
+  txeo::Matrix<int> right(3, 2, {7, 8, 9, 10, 11, 12});
+
+  auto result = TensorOp<int>::product(left, right);
+
+  EXPECT_EQ(result.shape(), txeo::TensorShape({2, 2}));
+
+  EXPECT_EQ(result(0, 0), 1 * 7 + 2 * 9 + 3 * 11);
+  EXPECT_EQ(result(0, 1), 1 * 8 + 2 * 10 + 3 * 12);
+  EXPECT_EQ(result(1, 0), 4 * 7 + 5 * 9 + 6 * 11);
+  EXPECT_EQ(result(1, 1), 4 * 8 + 5 * 10 + 6 * 12);
+}
+
+TEST(TensorOpTest, MatrixProductIncompatibleDimensions) {
+
+  txeo::Matrix<int> left(2, 3, {1, 2, 3, 4, 5, 6});
+  txeo::Matrix<int> right(2, 3, {7, 8, 9, 10, 11, 12});
+
+  EXPECT_THROW(TensorOp<int>::product(left, right), txeo::TensorOpError);
+}
+
+TEST(TensorOpTest, MatrixProductEmptyMatrices) {
+
+  txeo::Matrix<int> left(0, 0);
+  txeo::Matrix<int> right(0, 0);
+
+  EXPECT_THROW(TensorOp<int>::product(left, right), txeo::TensorOpError);
+}
+
+TEST(TensorOpTest, DotProduct) {
+  txeo::Vector<int> left({1, 2, 3});
+  txeo::Vector<int> right({4, 5, 6});
+
+  auto result = TensorOp<int>::dot(left, right);
+
+  EXPECT_EQ(result, 1 * 4 + 2 * 5 + 3 * 6);
+}
+
+TEST(TensorOpTest, DotProductDifferentSizes) {
+  txeo::Vector<int> left({1, 2, 3});
+  txeo::Vector<int> right({4, 5});
+
+  EXPECT_THROW(TensorOp<int>::dot(left, right), txeo::TensorOpError);
+}
+
+TEST(TensorOpTest, DotProductEmptyVectors) {
+  txeo::Vector<int> left({});
+  txeo::Vector<int> right({});
+
+  EXPECT_THROW(TensorOp<int>::dot(left, right), txeo::TensorOpError);
 }
 
 } // namespace txeo

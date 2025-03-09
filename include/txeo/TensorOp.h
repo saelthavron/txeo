@@ -1,27 +1,30 @@
 #ifndef TENSOROP_H
 #define TENSOROP_H
-
 #pragma once
 
+#include "txeo/Matrix.h"
 #include "txeo/Tensor.h"
+#include "txeo/Vector.h"
 
 namespace txeo {
 
 /**
- * @brief Class that centralizes mathematical operations and functions on tensors
+ * @class TensorOp
+ * @brief A utility class for performing operations on tensors and vectors.
  *
- * @tparam T type of the tensor or tensors involved
+ * This class provides static methods for common tensor and vector operations,
+ * such as dot product.
+ *
+ * @tparam T The data type of the tensor/vector elements (e.g., int, double).
  */
 template <typename T>
 class TensorOp {
-
   public:
-    TensorOp() = delete;
     TensorOp(const TensorOp &) = delete;
     TensorOp(TensorOp &&) = delete;
     TensorOp &operator=(const TensorOp &) = delete;
     TensorOp &operator=(TensorOp &&) = delete;
-    ~TensorOp();
+    ~TensorOp() = default;
 
     /**
      * @brief Returns the sum of two tensors
@@ -56,7 +59,7 @@ class TensorOp {
      * TensorOp<double>::sum_by(a, b);  // a becomes [5.0, 7.0, 9.0]
      * @endcode
      */
-    static void sum_by(txeo::Tensor<T> &left, const txeo::Tensor<T> &right);
+    static txeo::Tensor<T> &sum_by(txeo::Tensor<T> &left, const txeo::Tensor<T> &right);
 
     /**
      * @brief Element-wise sum of tensor and scalar (out-of-place)
@@ -86,7 +89,7 @@ class TensorOp {
      * // t now contains [6, 7, 8, 9] with shape [2,2]
      * @endcode
      */
-    static void sum_by(txeo::Tensor<T> &left, const T &right);
+    static txeo::Tensor<T> &sum_by(txeo::Tensor<T> &left, const T &right);
 
     /**
      * @brief Returns the subtraction of two tensors
@@ -121,7 +124,7 @@ class TensorOp {
      * TensorOp<float>::subtract_by(a, b);  // a becomes [[4,8],[12,16]]
      * @endcode
      */
-    static void subtract_by(txeo::Tensor<T> &left, const txeo::Tensor<T> &right);
+    static txeo::Tensor<T> &subtract_by(txeo::Tensor<T> &left, const txeo::Tensor<T> &right);
 
     /**
      * @brief Element-wise subtraction of scalar from tensor (out-of-place)
@@ -151,7 +154,7 @@ class TensorOp {
      * // t now contains [3.3, 4.4, 5.5]
      *@endcode
      */
-    static void subtract_by(txeo::Tensor<T> &left, const T &right);
+    static txeo::Tensor<T> &subtract_by(txeo::Tensor<T> &left, const T &right);
 
     /**
      * @brief Element-wise subtraction of tensor from scalar (out-of-place)
@@ -182,7 +185,7 @@ class TensorOp {
      * // t now contains [8, 7, 6]
      *@endcode
      */
-    static void subtract_by(const T &left, txeo::Tensor<T> &right);
+    static const T &subtract_by(const T &left, txeo::Tensor<T> &right);
 
     /**
      * @brief Returns the multiplication of a tensor and a scalar
@@ -211,7 +214,7 @@ class TensorOp {
      * TensorOp<int>::multiply_by(a, 3);  // a becomes [[3,6],[9,12]]
      * @endcode
      */
-    static void multiply_by(txeo::Tensor<T> &left, const T &right);
+    static txeo::Tensor<T> &multiply_by(txeo::Tensor<T> &left, const T &right);
 
     /**
      * @brief Element-wise division of tensor by scalar (out-of-place)
@@ -241,7 +244,7 @@ class TensorOp {
      * // t now contains [5.0, 10.0, 15.0]
      *@endcode
      */
-    static void divide_by(txeo::Tensor<T> &left, const T &right);
+    static txeo::Tensor<T> &divide_by(txeo::Tensor<T> &left, const T &right);
 
     /**
      * @brief Element-wise division of scalar by tensor (out-of-place)
@@ -262,8 +265,8 @@ class TensorOp {
     /**
      * @brief In-place element-wise division of scalar by tensor elements
      *
-     * @param left Scalar dividend
-     * @param right Tensor divisor (modified with results)
+     * @param scalar Scalar dividend
+     * @param tensor Tensor divisor (modified with results)
      *
      * **Example Usage:**
      *@code
@@ -272,7 +275,7 @@ class TensorOp {
      * // t now contains [50, 20, 10, 4]
      * @endcode
      */
-    static void divide_by(const T &left, txeo::Tensor<T> &right);
+    static txeo::Tensor<T> &divide_by(const T &scalar, txeo::Tensor<T> &tensor);
 
     /**
      * @brief Returns the element-wise product (Hadamard Product) of two tensors
@@ -308,7 +311,7 @@ class TensorOp {
      * TensorOp<double>::hadamard_prod_by(a, b);  // a becomes [10.0, 18.0, 28.0]
      * @endcode
      */
-    static void hadamard_prod_by(txeo::Tensor<T> &left, const txeo::Tensor<T> &right);
+    static txeo::Tensor<T> &hadamard_prod_by(txeo::Tensor<T> &left, const txeo::Tensor<T> &right);
 
     /**
      * @brief Element-wise Hadamard division (out-of-place)
@@ -341,36 +344,48 @@ class TensorOp {
      * // a now contains [5.0, 4.0, 3.0]
      * @endcode
      */
-    static void hadamard_div_by(txeo::Tensor<T> &left, const txeo::Tensor<T> &right);
+    static txeo::Tensor<T> &hadamard_div_by(txeo::Tensor<T> &left, const txeo::Tensor<T> &right);
 
     /**
-     * @brief Returns the element-wise potentiation of a tensor
+     * @brief Computes the matrix product of two matrices.
      *
-     * @param tensor Tensor to be powered
-     * @param exponent Exponent of the potentiation
-     * @return txeo::Tensor<T> Result
+     * @param left The left matrix (m x n).
+     * @param right The right matrix (n x p).
+     * @return A new matrix (m x p) containing the result of the matrix product.
+     *
+     * @throws txeo::TensorOpError
      *
      * **Example Usage:**
      * @code
-     * txeo::Tensor<float> a({3}, {2.0f, 3.0f, 4.0f});
-     * auto b = TensorOp<float>::power_elem(a, 2.0f);  // Result: [4.0f, 9.0f, 16.0f]
+     * txeo::Matrix<int> left(2, 3, {1, 2, 3, 4, 5, 6});  // 2x3 matrix
+     * txeo::Matrix<int> right(3, 2, {7, 8, 9, 10, 11, 12});  // 3x2 matrix
+     * auto result = TensorOp<int>::product(left, right);
+     * // result = [ [58, 64], [139, 154] ]
      * @endcode
      */
-    static txeo::Tensor<T> power_elem(const txeo::Tensor<T> &tensor, const T &exponent);
+    static txeo::Matrix<T> product(const txeo::Matrix<T> &left, const txeo::Matrix<T> &right);
 
     /**
-     * @brief Performs element-wise potentiation of the tensor (in-place)
+     * @brief Computes the dot product of two vectors.
      *
-     * @param tensor Tensor to be modified
-     * @param exponent Exponent of the potentiation
+     * @param left The first vector.
+     * @param right The second vector.
+     * @return The dot product of the two vectors.
+     *
+     * @throws txeo::TensorOpError
      *
      * **Example Usage:**
      * @code
-     * txeo::Tensor<double> a({2}, {3.0, 4.0});
-     * TensorOp<double>::power_elem_by(a, 3.0);  // a becomes [27.0, 64.0]
+     * txeo::Vector<int> left({1, 2, 3});  // Vector [1, 2, 3]
+     * txeo::Vector<int> right({4, 5, 6}); // Vector [4, 5, 6]
+     * auto result = TensorOp<int>::dot(left, right);
+     * // result = 1*4 + 2*5 + 3*6 = 32
      * @endcode
      */
-    static void power_elem_by(txeo::Tensor<T> &tensor, const T &exponent);
+    static T dot(const txeo::Vector<T> &left, const txeo::Vector<T> &right);
+
+  private:
+    TensorOp() = default;
 };
 
 /**

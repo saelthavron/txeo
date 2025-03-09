@@ -9,10 +9,6 @@ namespace txeo {
 
 template <typename T>
 class TensorIterator {
-  private:
-    T *_elements;
-    std::ptrdiff_t _step;
-
   public:
     using value_type = T;
     using pointer = T *;
@@ -90,6 +86,10 @@ class TensorIterator {
     inline bool operator>=(const TensorIterator &other) const {
       return _elements >= other._elements;
     }
+
+  private:
+    T *_elements;
+    std::ptrdiff_t _step;
 };
 
 } // namespace txeo

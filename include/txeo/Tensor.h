@@ -18,8 +18,24 @@ namespace txeo {
 template <typename T>
 concept c_numeric = std::is_arithmetic_v<T> && !std::is_same_v<T, bool>;
 
+namespace detail {
+class TensorHelper;
+}
+
 template <typename T>
 class Predictor;
+
+template <typename T>
+class TensorAgg;
+
+template <typename T>
+class TensorPart;
+
+template <typename T>
+class TensorOp;
+
+template <typename T>
+class TensorFunc;
 
 /**
  * @brief Implements the mathematical concept of tensor, which is a magnitude of multiple order. A
@@ -30,26 +46,6 @@ class Predictor;
  */
 template <typename T>
 class Tensor {
-  private:
-    struct Impl;
-    std::unique_ptr<Impl> _impl{nullptr};
-
-    friend class Predictor<T>;
-
-    template <typename P>
-    void create_from_shape(P &&shape);
-
-    void fill_data_shape(const std::initializer_list<std::initializer_list<T>> &list,
-                         std::vector<T> &flat_data, std::vector<size_t> &shape);
-
-    void fill_data_shape(
-        const std::initializer_list<std::initializer_list<std::initializer_list<T>>> &list,
-        std::vector<T> &flat_data, std::vector<size_t> &shape);
-
-    void check_indexes(const std::vector<size_t> &indexes);
-
-    explicit Tensor();
-
   public:
     /**
      * @note This copy constructor performs a deep copy, behaving differently from TensorFlow C++.
@@ -103,8 +99,8 @@ class Tensor {
      * #include "txeo/TensorShape.h"
      *
      * int main() {
-     *     txeo::Tensor<int> tensor(txeo::TensorShape({3, 4})); // Move-construct a tensor with
-     * shape 3x4
+     *      // Move-construct a tensor with shape 3x4
+     *      txeo::Tensor<int> tensor(txeo::TensorShape({3, 4}));
      *
      *     std::cout << "Tensor created with shape: " << tensor.shape() << std::endl;
      *     return 0;
@@ -476,7 +472,7 @@ class Tensor {
      *     txeo::Tensor<int> tensor{{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
      *     txeo::Tensor<int> sliced_tensor = tensor.slice(0, 2); // Extract rows 0 and 1
      *
-     *     std::cout << "Sliced Tensor: " << sliced_tensor << std::endl;
+     *     std::cout << "Sliced Tensor: " << sliced_tensor << std::endl; // {{1, 2}, {4, 5}, {7, 8}}
      *     return 0;
      * }
      * @endcode
@@ -1028,56 +1024,6 @@ class Tensor {
     template <typename U>
     friend txeo::Tensor<U> operator/(const U &left, const txeo::Tensor<U> &right);
 
-    /**
-     * @brief Performs the element-wise multiplication (Hadamard Product) of this parameter on this
-     * tensor
-     *
-     * @param tensor Tensor that multiplies
-     * @return Tensor<T>& This tensor modified
-     *
-     * **Example Usage:**
-     * @code
-     * txeo::Tensor<float> a({2,2}, {1,2,3,4});
-     * txeo::Tensor<float> b({2,2}, {2,3,4,5});
-     * a.hadamard_prod_by(b);  // a becomes [[2,6],[12,20]]
-     * @endcode
-     *
-     */
-    Tensor<T> &hadamard_prod_by(const Tensor<T> &tensor);
-
-    /**
-     * @brief In-place element-wise Hadamard division (chainable)
-
-     * @param tensor Divisor tensor (must match dimensions)
-     * @return Reference to modified tensor for chaining
-     *
-     * **Example Usage:**
-     * @code
-     * txeo::Tensor<int> a({2, 2}, {10, 20, 30, 40});
-     * txeo::Tensor<int> b({2, 2}, {2, 5, 10, 8});
-     * a.hadamard_div_by(b);
-     * // a now contains [5, 4, 3, 5]
-     * @endcode
-     */
-    Tensor<T> &hadamard_div_by(const Tensor<T> &tensor);
-
-    /**
-     * @brief Performs the element-wise potentiation of this tensor
-     *
-     * @param exponent Exponent of the potentiation
-     * @return Tensor<T>& This tensor modified
-     *
-     * **Example Usage:**
-     * @code
-     * txeo::Tensor<double> a({3}, {2,3,4});
-     * a.power_elem_by(2);  // a becomes [4,9,16]
-     * @endcode
-     *
-     * @note Handles negative exponents through reciprocal calculation*
-     *
-     */
-    Tensor<T> &power_elem_by(const T &exponent);
-
     Tensor<T> &operator+=(const Tensor<T> &tensor);
     Tensor<T> &operator+=(const T &tensor);
     Tensor<T> &operator-=(const Tensor<T> &tensor);
@@ -1089,6 +1035,31 @@ class Tensor {
     txeo::TensorIterator<T> end();
     txeo::TensorIterator<const T> begin() const;
     txeo::TensorIterator<const T> end() const;
+
+  protected:
+    struct Impl;
+    std::unique_ptr<Impl> _impl{nullptr};
+
+    friend class txeo::Predictor<T>;
+    friend class txeo::TensorAgg<T>;
+    friend class txeo::TensorPart<T>;
+    friend class txeo::TensorOp<T>;
+    friend class txeo::TensorFunc<T>;
+    friend class txeo::detail::TensorHelper;
+
+    template <typename P>
+    void create_from_shape(P &&shape);
+
+    void fill_data_shape(const std::initializer_list<std::initializer_list<T>> &list,
+                         std::vector<T> &flat_data, std::vector<size_t> &shape);
+
+    void fill_data_shape(
+        const std::initializer_list<std::initializer_list<std::initializer_list<T>>> &list,
+        std::vector<T> &flat_data, std::vector<size_t> &shape);
+
+    void check_indexes(const std::vector<size_t> &indexes);
+
+    explicit Tensor();
 };
 
 /**

@@ -11,9 +11,16 @@
 
 namespace txeo {
 
+namespace detail {
+class TensorHelper;
+}
+
 /**
+ * @class TensorShape
+ *
  * @brief The shape of a tensor is an ordered collection of dimensions of mathematical vector
  * spaces.
+ *
  * @details Each position of the tensor shape is an "axis", labeled starting from zero, and the
  * value in this position is a "dimension". An empty tensor shape is the shape of a scalar value. In
  * some some conditions, a negative dimension represents an undefined dimension, but this
@@ -21,21 +28,6 @@ namespace txeo {
  *
  */
 class TensorShape {
-  private:
-    struct Impl;
-    std::unique_ptr<Impl> _impl{nullptr};
-
-    template <typename T>
-    friend class Tensor;
-
-    template <typename T>
-    friend class Predictor;
-
-    template <typename P>
-    void create_from_vector(P &&shape);
-
-    explicit TensorShape();
-
   public:
     TensorShape(const TensorShape &shape);
     TensorShape(TensorShape &&shape) noexcept;
@@ -310,6 +302,26 @@ class TensorShape {
      * @return TensorShape Clone of this tensor
      */
     [[nodiscard]] TensorShape clone() const;
+
+  private:
+    struct Impl;
+    std::unique_ptr<Impl> _impl{nullptr};
+
+    template <typename T>
+    friend class Tensor;
+
+    template <typename T>
+    friend class Predictor;
+
+    template <typename T>
+    friend class TensorAgg;
+
+    friend class txeo::detail::TensorHelper;
+
+    template <typename P>
+    void create_from_vector(P &&shape);
+
+    explicit TensorShape();
 };
 
 /**

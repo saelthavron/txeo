@@ -43,12 +43,6 @@ struct DeviceInfo {
  */
 template <typename T = float>
 class Predictor {
-  private:
-    struct Impl;
-    std::unique_ptr<Impl> _impl{nullptr};
-
-    void load_model();
-
   public:
     using TensorInfo = std::vector<std::pair<std::string, txeo::TensorShape>>;
     using TensorIdent = std::vector<std::pair<std::string, txeo::Tensor<T>>>;
@@ -214,6 +208,12 @@ class Predictor {
      * @endcode
      */
     void enable_xla(bool enable);
+
+  private:
+    struct Impl;
+    std::unique_ptr<Impl> _impl{nullptr};
+
+    void load_model();
 };
 
 class PredictorError : public std::runtime_error {

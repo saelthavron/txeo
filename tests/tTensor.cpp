@@ -28,6 +28,17 @@ TEST(TensorTest, ShapeConstructor) {
   EXPECT_EQ(ttt.order(), 3);
   EXPECT_EQ(ttt.shape().axes_dims(), std::vector<int64_t>({4, 5, 6}));
 
+  auto shp = std::vector<size_t>({4, 5, 6});
+  Tensor<int> tttt(shp);
+  EXPECT_EQ(tttt.dim(), 120);
+  EXPECT_EQ(tttt.order(), 3);
+  EXPECT_EQ(tttt.shape().axes_dims(), std::vector<int64_t>({4, 5, 6}));
+
+  auto shp1 = std::vector<size_t>({4, 5, 6});
+  Tensor<int> tv(shp1, 5);
+  for (size_t i{0}; i < tv.dim(); ++i)
+    EXPECT_EQ(tv.data()[i], 5);
+
   txeo::TensorShape x({100});
   Tensor<int> source(x, 5);
   for (size_t i{0}; i < source.dim(); ++i)
@@ -49,7 +60,7 @@ TEST(TensorTest, CopyConstructor) {
   EXPECT_EQ(copy(1, 1), 4);
 
   original(1, 1) = 5;
-  EXPECT_EQ(copy(1, 1), 4); // Deep copy verification
+  EXPECT_EQ(copy(1, 1), 4);
 }
 
 TEST(TensorTest, MoveConstructor) {
@@ -67,21 +78,18 @@ TEST(TensorTest, AssignmentOperator) {
   EXPECT_EQ(t2(0, 1), 2);
 
   t1(0, 1) = 5;
-  EXPECT_EQ(t2(0, 1), 2); // Deep copy verification
+  EXPECT_EQ(t2(0, 1), 2);
 }
 
 TEST(TensorTest, ElementAccess) {
   Tensor<int> t({{1, 2}, {3, 4}});
 
-  // Valid access
   EXPECT_EQ(t(0, 0), 1);
   EXPECT_EQ(t(1, 1), 4);
 
-  // Modification
   t(1, 0) = 5;
   EXPECT_EQ(t(1, 0), 5);
 
-  // Const access
   const auto &ct = t;
   EXPECT_EQ(ct(0, 1), 2);
 }
@@ -98,13 +106,11 @@ TEST(TensorTest, InvalidElementAccess) {
 TEST(TensorTest, Reshape) {
   Tensor<int> t({{1, 2}, {3, 4}});
 
-  // Valid reshape
   t.reshape({4});
   EXPECT_EQ(t.order(), 1);
   EXPECT_EQ(t.dim(), 4);
   EXPECT_EQ(t(3), 4);
 
-  // Invalid reshape
   EXPECT_THROW(t.reshape({5}), TensorError);
 }
 
@@ -287,14 +293,6 @@ TEST(TensorTest, ValidMove) {
   EXPECT_EQ(target(0), 1);
 }
 
-// TEST(TensorTest, SelfAssignment) {
-//   Tensor<int> tensor(txeo::TensorShape({2}), {4, 5});
-//   tensor = std::move(tensor); // Should handle gracefully
-
-//   EXPECT_EQ(tensor.dim(), 2);
-//   EXPECT_EQ(tensor(1), 5);
-// }
-
 TEST(TensorTest, ValidConstruction) {
   Tensor<int> t({{{1, 2}, {3, 4}}, {{5, 6}, {7, 8}}});
 
@@ -462,7 +460,7 @@ TEST(TensorTest, EmptyTensorOperations) {
   Tensor<float> t1({0});
 
   EXPECT_THROW(empty + t1, TensorOpError);
-  EXPECT_THROW(t1 *= 2.0f, TensorOpError); // Should fail if empty
+  EXPECT_THROW(t1 *= 2.0f, TensorOpError);
 }
 
 TEST(TensorTest, ScalarMultiplicationDouble) {
@@ -481,97 +479,6 @@ TEST(TensorTest, NegativeScalarMultiplication) {
   EXPECT_FLOAT_EQ(result(0), -1.0f);
   EXPECT_FLOAT_EQ(result(1), -2.0f);
   EXPECT_FLOAT_EQ(result(2), -3.0f);
-}
-
-TEST(TensorTest, HadamardProdValidShapes) {
-  Tensor<float> t1({2, 2}, {1.0f, 2.0f, 3.0f, 4.0f});
-  Tensor<float> t2({2, 2}, {2.0f, 3.0f, 4.0f, 5.0f});
-
-  t1.hadamard_prod_by(t2);
-
-  ASSERT_EQ(t1.shape(), txeo::TensorShape({2, 2}));
-  EXPECT_FLOAT_EQ(t1(0, 0), 2.0f);
-  EXPECT_FLOAT_EQ(t1(1, 1), 20.0f);
-}
-
-TEST(TensorTest, HadamardProdDifferentShapes) {
-  Tensor<double> t1({3}, {1.0, 2.0, 3.0});
-  Tensor<double> t2({2, 2}, {1.0, 2.0, 3.0, 4.0});
-
-  EXPECT_THROW(t1.hadamard_prod_by(t2), TensorOpError);
-}
-
-TEST(TensorTest, PowerElemPositiveExponent) {
-  Tensor<float> t({2, 2}, {2.0f, 3.0f, 4.0f, 5.0f});
-
-  t.power_elem_by(2.0f);
-
-  EXPECT_FLOAT_EQ(t(0, 0), 4.0f);
-  EXPECT_FLOAT_EQ(t(1, 1), 25.0f);
-}
-
-TEST(TensorTest, PowerElemZeroExponent) {
-  Tensor<double> t({3}, {2.0, 3.0, 4.0});
-
-  t.power_elem_by(0.0);
-
-  EXPECT_DOUBLE_EQ(t(0), 1.0);
-  EXPECT_DOUBLE_EQ(t(1), 1.0);
-  EXPECT_DOUBLE_EQ(t(2), 1.0);
-}
-
-TEST(TensorTest, PowerElemNegativeExponent) {
-  Tensor<float> t({2}, {2.0f, 4.0f});
-
-  t.power_elem_by(-1.0f);
-
-  EXPECT_FLOAT_EQ(t(0), 0.5f);
-  EXPECT_FLOAT_EQ(t(1), 0.25f);
-}
-
-TEST(TensorTest, EmptyTensorHadamard) {
-  Tensor<float> empty({0});
-  Tensor<float> t({2}, {1.0f, 2.0f});
-
-  EXPECT_THROW(empty.hadamard_prod_by(t), TensorOpError);
-}
-
-TEST(TensorTest, ChainedOperations) {
-  Tensor<double> t({2, 2}, {2.0, 3.0, 4.0, 5.0});
-
-  t.hadamard_prod_by(Tensor<double>({2, 2}, {1.0, 2.0, 3.0, 4.0})).power_elem_by(2.0);
-
-  EXPECT_DOUBLE_EQ(t(0, 0), 4.0);   // (2*1)^2
-  EXPECT_DOUBLE_EQ(t(1, 1), 400.0); // (5*4)^2
-}
-
-TEST(TensorTest, MixedDataTypes) {
-  Tensor<int> t1({3}, {2, 3, 4});
-  Tensor<int> t2({3}, {5, 6, 7});
-
-  t1.hadamard_prod_by(t2).power_elem_by(2);
-
-  EXPECT_EQ(t1(0), 100); // (2*5)^2
-  EXPECT_EQ(t1(2), 784); // (4*7)^2
-}
-
-TEST(TensorTest, SelfAssignmentHadamard) {
-  Tensor<float> t({2}, {3.0f, 4.0f});
-
-  t.hadamard_prod_by(t);
-
-  EXPECT_FLOAT_EQ(t(0), 9.0f);
-  EXPECT_FLOAT_EQ(t(1), 16.0f);
-}
-
-TEST(TensorTest, NonDestructiveShape) {
-  Tensor<double> t({2, 3}, {1.0, 2.0, 3.0, 4.0, 5.0, 6.0});
-  auto original_shape = t.shape();
-
-  t.power_elem_by(1.5);
-
-  ASSERT_EQ(t.shape(), original_shape);
-  EXPECT_DOUBLE_EQ(t(1, 2), std::pow(6.0, 1.5));
 }
 
 TEST(TensorTest, DivisionOperatorTensorScalar) {
@@ -619,23 +526,6 @@ TEST(TensorTest, DivideByScalarAndOperator) {
   ASSERT_DOUBLE_EQ(t.data()[0], 1.5);
   ASSERT_DOUBLE_EQ(t.data()[1], 3.5);
   ASSERT_DOUBLE_EQ(t.data()[2], 6.0);
-}
-
-TEST(TensorTest, HadamardDivision) {
-  Tensor<int> t1({3}, {20, 50, 100});
-  Tensor<int> t2({3}, {4, 5, 10});
-  t1.hadamard_div_by(t2);
-  EXPECT_EQ(t1.data()[0], 5);
-  EXPECT_EQ(t1.data()[1], 10);
-  EXPECT_EQ(t1.data()[2], 10);
-}
-
-TEST(TensorTest, HadamardDivPrecision) {
-  Tensor<float> t1({2}, {15.0f, 24.0f});
-  Tensor<float> t2({2}, {4.0f, 6.0f});
-  t1.hadamard_div_by(t2);
-  ASSERT_FLOAT_EQ(t1.data()[0], 3.75f);
-  ASSERT_FLOAT_EQ(t1.data()[1], 4.0f);
 }
 
 TEST(TensorTest, OperationChaining) {

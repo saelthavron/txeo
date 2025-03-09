@@ -9,9 +9,14 @@ add_executable(
   tUtils.cpp
   tTensorShape.cpp
   tTensor.cpp
-  tTensorIO.cpp
+  tMatrixIO.cpp
   tPredictor.cpp
   tTensorOp.cpp
+  tTensorAgg.cpp
+  tTensorPart.cpp
+  tTensorFunc.cpp
+  tMatrix.cpp
+  tVector.cpp
 )  
 
 target_link_libraries(

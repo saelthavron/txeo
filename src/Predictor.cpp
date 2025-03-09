@@ -1,10 +1,11 @@
 #include "txeo/detail/PredictorPrivate.h"
+#include "txeo/detail/TensorHelper.h"
 #include "txeo/detail/TensorPrivate.h"
-#include "txeo/detail/TensorShapePrivate.h"
 
 #include "txeo/detail/utils.h"
 #include <tensorflow/cc/saved_model/tag_constants.h>
 #include <tensorflow/core/framework/tensor.h>
+#include <utility>
 
 namespace tf = tensorflow;
 
@@ -94,11 +95,7 @@ txeo::Tensor<T> Predictor<T>::predict(const txeo::Tensor<T> &input) const {
   if (!status.ok())
     txeo::PredictorError("Error running model: " + status.ToString());
 
-  txeo::Tensor<T> resp;
-  resp._impl->tf_tensor = std::make_unique<tf::Tensor>(std::move(outputs[0]));
-  resp._impl->txeo_shape._impl->ext_tf_shape = &resp._impl->tf_tensor->shape();
-  resp._impl->txeo_shape._impl->stride =
-      txeo::detail::calc_stride(*resp._impl->txeo_shape._impl->ext_tf_shape);
+  auto resp = txeo::detail::TensorHelper::to_txeo_tensor<T>(std::move(outputs[0]));
 
   return resp;
 }
@@ -146,14 +143,8 @@ Predictor<T>::predict_batch(const Predictor<T>::TensorIdent &inputs) const {
     txeo::PredictorError("Error running model: " + status.ToString());
 
   std::vector<txeo::Tensor<T>> resp;
-  for (auto &item : outputs) {
-    txeo::Tensor<T> aux;
-    aux._impl->tf_tensor = std::make_unique<tf::Tensor>(std::move(item));
-    aux._impl->txeo_shape._impl->ext_tf_shape = &aux._impl->tf_tensor->shape();
-    aux._impl->txeo_shape._impl->stride =
-        txeo::detail::calc_stride(*aux._impl->txeo_shape._impl->ext_tf_shape);
-    resp.emplace_back(aux);
-  }
+  for (auto &item : outputs)
+    resp.emplace_back(txeo::detail::TensorHelper::to_txeo_tensor<T>(std::move(item)));
 
   return resp;
 }

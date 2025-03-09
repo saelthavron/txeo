@@ -63,7 +63,7 @@ std::string format(const double &a, int precision) {
 txeo::TensorShape to_txeo_tensor_shape(const tf::TensorShape &shape) {
   std::vector<size_t> aux;
   auto dim_sizes = shape.dim_sizes();
-  std::ranges::copy(std::begin(dim_sizes), std::end(dim_sizes), std::back_inserter(aux));
+  std::ranges::copy(dim_sizes, std::back_inserter(aux));
 
   txeo::TensorShape res(aux);
 

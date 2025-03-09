@@ -78,8 +78,7 @@ TEST_F(PredictorTest, DeviceListing) {
   auto devices = predictor.get_devices();
   ASSERT_FALSE(devices.empty());
 
-  bool has_cpu = std::ranges::any_of(devices.begin(), devices.end(),
-                                     [](const auto &d) { return d.device_type == "CPU"; });
+  bool has_cpu = std::ranges::any_of(devices, [](const auto &d) { return d.device_type == "CPU"; });
   EXPECT_TRUE(has_cpu);
 }
 
