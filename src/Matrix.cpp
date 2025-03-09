@@ -43,6 +43,20 @@ Matrix<T> Matrix<T>::to_matrix(const txeo::Tensor<T> &tensor) {
   return resp;
 }
 
+template <typename T>
+txeo::Tensor<T> Matrix<T>::to_tensor(Matrix<T> &&matrix) {
+  txeo::Tensor<T> resp{std::move(matrix)};
+
+  return resp;
+}
+
+template <typename T>
+txeo::Tensor<T> Matrix<T>::to_tensor(const Matrix<T> &matrix) {
+  txeo::Tensor<T> resp{matrix};
+
+  return resp;
+}
+
 template class Matrix<short>;
 template class Matrix<int>;
 template class Matrix<bool>;

@@ -131,3 +131,47 @@ TEST(VectorTest, ToVectorEmptyTensor) {
 
   EXPECT_THROW(txeo::Vector<int>::to_vector(std::move(tensor)), txeo::VectorError);
 }
+
+TEST(VectorTest, ToVectorRvalue) {
+  txeo::Tensor<int> tensor({4}, {1, 2, 3, 4});
+  txeo::Vector<int> vector = txeo::Vector<int>::to_vector(std::move(tensor));
+
+  ASSERT_EQ(vector.dim(), 4);
+  EXPECT_EQ(vector(0), 1);
+  EXPECT_EQ(vector(1), 2);
+  EXPECT_EQ(vector(2), 3);
+  EXPECT_EQ(vector(3), 4);
+}
+
+TEST(VectorTest, ToVectorConstRef) {
+  const txeo::Tensor<int> tensor({4}, {5, 6, 7, 8});
+  txeo::Vector<int> vector = txeo::Vector<int>::to_vector(tensor);
+
+  ASSERT_EQ(vector.dim(), 4);
+  EXPECT_EQ(vector(0), 5);
+  EXPECT_EQ(vector(1), 6);
+  EXPECT_EQ(vector(2), 7);
+  EXPECT_EQ(vector(3), 8);
+}
+
+TEST(VectorTest, ToTensorRvalue) {
+  txeo::Vector<int> vector(4, {9, 10, 11, 12});
+  txeo::Tensor<int> tensor = txeo::Vector<int>::to_tensor(std::move(vector));
+
+  ASSERT_EQ(tensor.dim(), 4);
+  EXPECT_EQ(tensor(0), 9);
+  EXPECT_EQ(tensor(1), 10);
+  EXPECT_EQ(tensor(2), 11);
+  EXPECT_EQ(tensor(3), 12);
+}
+
+TEST(VectorTest, ToTensorConstRef) {
+  const txeo::Vector<int> vector(4, {13, 14, 15, 16});
+  txeo::Tensor<int> tensor = txeo::Vector<int>::to_tensor(vector);
+
+  ASSERT_EQ(tensor.dim(), 4);
+  EXPECT_EQ(tensor(0), 13);
+  EXPECT_EQ(tensor(1), 14);
+  EXPECT_EQ(tensor(2), 15);
+  EXPECT_EQ(tensor(3), 16);
+}

@@ -201,6 +201,40 @@ class Matrix : public txeo::Tensor<T> {
      */
     static Matrix<T> to_matrix(const txeo::Tensor<T> &tensor);
 
+    /**
+     * @brief Converts a matrix to a tensor by moving data.
+     *
+     * @param matrix The input matrix to convert. Must be second order.
+     * @return A tensor created from the input matrix.
+     *
+     * @throws std::MatrixError
+     *
+     * **Example Usage:**
+     * @code
+     * txeo::Matrix<int> matrix(2, 3, {1, 2, 3, 4, 5, 6});  // 2x3 matrix
+     * auto tensor = Matrix<int>::to_tensor(std::move(matrix));  // Convert to tensor
+     * // tensor shape: (2, 3)
+     * @endcode
+     */
+    static txeo::Tensor<T> to_tensor(Matrix<T> &&matrix);
+
+    /**
+     * @brief Creates a tensor from a matrix (performs copy).
+     *
+     * @param matrix The input matrix to copy. Must be second order.
+     * @return A tensor created from the input matrix.
+     *
+     * @throws std::MatrixError
+     *
+     * **Example Usage:**
+     * @code
+     * txeo::Matrix<int> matrix(2, 3, {1, 2, 3, 4, 5, 6});  // 2x3 matrix
+     * auto tensor = Matrix<int>::to_tensor(matrix);  // Convert to tensor
+     * // tensor shape: (2, 3)
+     * @endcode
+     */
+    static txeo::Tensor<T> to_tensor(const Matrix<T> &matrix);
+
   private:
     Matrix() = default;
 

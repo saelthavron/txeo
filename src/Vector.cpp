@@ -41,6 +41,20 @@ Vector<T> Vector<T>::to_vector(const txeo::Tensor<T> &tensor) {
   return resp;
 }
 
+template <typename T>
+txeo::Tensor<T> Vector<T>::to_tensor(Vector<T> &&vector) {
+  txeo::Tensor<T> resp{std::move(vector)};
+
+  return resp;
+}
+
+template <typename T>
+txeo::Tensor<T> Vector<T>::to_tensor(const Vector<T> &vector) {
+  txeo::Tensor<T> resp{vector};
+
+  return resp;
+}
+
 template class Vector<short>;
 template class Vector<int>;
 template class Vector<bool>;

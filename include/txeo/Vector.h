@@ -143,9 +143,71 @@ class Vector : public txeo::Tensor<T> {
       this->reshape(std::vector<size_t>(shape));
     };
 
+    /**
+     * @brief Converts a tensor to a vector by moving data.
+     *
+     * This function moves the data from the input tensor to a new vector.
+     *
+     * @param tensor The input tensor to convert. Must be 1-dimensional.
+     * @return A vector created from the input tensor.
+     *
+     * @throws std::VectorError if the tensor is not 1-dimensional.
+     *
+     * **Example Usage:**
+     * @code
+     * txeo::Tensor<int> tensor({4}, {1, 2, 3, 4});  // 1D tensor with shape (4)
+     * auto vector = Vector<int>::to_vector(std::move(tensor));  // Convert to vector
+     * // vector contains [1, 2, 3, 4]
+     * @endcode
+     */
     static Vector<T> to_vector(txeo::Tensor<T> &&tensor);
 
+    /**
+     * @brief Creates a vector from a tensor (performs copy).
+     *
+     * @param tensor The input tensor to copy. Must be first order.
+     * @return A vector created from the input tensor.
+     *
+     * @throws std::VectorError.
+     *
+     * **Example Usage:**
+     * @code
+     * txeo::Tensor<int> tensor({4}, {1, 2, 3, 4});  // 1D tensor with shape (4)
+     * auto vector = Vector<int>::to_vector(tensor);  // Convert to vector
+     * // vector contains [1, 2, 3, 4]
+     * @endcode
+     */
     static Vector<T> to_vector(const txeo::Tensor<T> &tensor);
+
+    /**
+     * @brief Converts a vector to a tensor by moving data.
+     *
+     * @param vector The input vector to convert.
+     * @return A tensor created from the input vector.
+     *
+     * **Example Usage:**
+     * @code
+     * txeo::Vector<int> vector({1, 2, 3, 4});  // Vector with 4 elements
+     * auto tensor = Vector<int>::to_tensor(std::move(vector));  // Convert to tensor
+     * // tensor shape: (4)
+     * @endcode
+     */
+    static txeo::Tensor<T> to_tensor(Vector<T> &&vector);
+
+    /**
+     * @brief Creates a tensor from a vector (performs copy).
+     *
+     * @param vector The input vector to copy.
+     * @return A tensor created from the input vector.
+     *
+     * **Example Usage:**
+     * @code
+     * txeo::Vector<int> vector({1, 2, 3, 4});  // Vector with 4 elements
+     * auto tensor = Vector<int>::to_tensor(vector);  // Convert to tensor
+     * // tensor shape: (4)
+     * @endcode
+     */
+    static txeo::Tensor<T> to_tensor(const Vector<T> &vector);
 
   private:
     Vector() = default;

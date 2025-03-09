@@ -139,3 +139,29 @@ TEST(MatrixTest, ToMatrixEmptyTensor) {
 
   EXPECT_THROW(txeo::Matrix<int>::to_matrix(std::move(tensor)), txeo::MatrixError);
 }
+
+TEST(MatrixTest, ToTensorRvalue) {
+  txeo::Matrix<int> matrix(2, 3, {1, 2, 3, 4, 5, 6});
+  txeo::Tensor<int> tensor = txeo::Matrix<int>::to_tensor(std::move(matrix));
+
+  ASSERT_EQ(tensor.shape(), txeo::TensorShape({2, 3}));
+  EXPECT_EQ(tensor(0, 0), 1);
+  EXPECT_EQ(tensor(0, 1), 2);
+  EXPECT_EQ(tensor(0, 2), 3);
+  EXPECT_EQ(tensor(1, 0), 4);
+  EXPECT_EQ(tensor(1, 1), 5);
+  EXPECT_EQ(tensor(1, 2), 6);
+}
+
+TEST(MatrixTest, ToTensorConstRef) {
+  const txeo::Matrix<int> matrix(2, 3, {1, 2, 3, 4, 5, 6});
+  txeo::Tensor<int> tensor = txeo::Matrix<int>::to_tensor(matrix);
+
+  ASSERT_EQ(tensor.shape(), txeo::TensorShape({2, 3}));
+  EXPECT_EQ(tensor(0, 0), 1);
+  EXPECT_EQ(tensor(0, 1), 2);
+  EXPECT_EQ(tensor(0, 2), 3);
+  EXPECT_EQ(tensor(1, 0), 4);
+  EXPECT_EQ(tensor(1, 1), 5);
+  EXPECT_EQ(tensor(1, 2), 6);
+}
