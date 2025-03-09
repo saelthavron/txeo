@@ -1,4 +1,8 @@
-# Txeo: a Modern C++ Wrapper for TensorFlow
+# txeo: a Modern C++ Wrapper for TensorFlow
+
+<p align="center">
+  <img src="txeo.png" alt="txeo logo">
+</p>
 
 [![License: Apache 2.0](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 [![GitHub release](https://img.shields.io/github/v/release/rdabra/txeo)](https://github.com/rdabra/txeo/releases)
@@ -9,7 +13,7 @@
 
 ## 📝 Overview
 
-**Txeo** is a lightweight and intuitive **C++ wrapper for TensorFlow**, designed to **simplify TensorFlow C++ development** while preserving **high performance and flexibility**. Built entirely with **Modern C++**, **Txeo** allows developers to use TensorFlow with the ease of a high-level API, eliminating the complexity of its low-level C++ interface.
+**txeo** is a lightweight and intuitive **C++ wrapper for TensorFlow**, designed to **simplify TensorFlow C++ development** while preserving **high performance and flexibility**. Built entirely with **Modern C++**, **txeo** allows developers to use TensorFlow with the ease of a high-level API, eliminating the complexity of its low-level C++ interface.
 
 ## ✨ Features
 
@@ -23,7 +27,7 @@
 
 ## 🚀 Performance Comparison
 
-**Txeo** was benchmarked against the native **TensorFlow C++ API** using inference from a saved **multiclassification convolution model**.
+**txeo** was benchmarked against the native **TensorFlow C++ API** using inference from a saved **multiclassification convolution model**.
 
 - **Model and other info:**
   - **279,610 parameters**
@@ -35,14 +39,14 @@
 
 ### 🔎 **Results Overview**
 
-| Compiler | Txeo (μs) | TensorFlow (μs) | Difference (%) |
+| Compiler | txeo (μs) | TensorFlow (μs) | Difference (%) |
 |----------|-----------|-----------------|----------------|
 | GCC      | 233,994   | 232,494         | +0.65%         |
 | Intel    | 234,489   | 232,683         | +0.78%         |
 | Clang    | 236,858   | 234,016         | +1.21%         |
 
 - The performance overhead is **negligible**, ranging from **0.65% to 1.21%**.
-- **Txeo’s abstraction layer** provides **ease of use** with almost no cost to performance.
+- **txeo’s abstraction layer** provides **ease of use** with almost no cost to performance.
 
 ## ⚡ Installation Guide
 
@@ -84,7 +88,7 @@ Choose the correct version based on your system:
 | 🚀 With CPU optimizations: | [libtensorflow-2.18-linux-x64-cpu-opt.tar.gz](https://github.com/rdabra/txeo/releases/download/v1.0.0/libtensorflow-2.18-linux-x64-cpu-opt.tar.gz) |
 | 🎮 With GPU support: | [libtensorflow-2.18-linux-x64-gpu.tar.gz](https://github.com/rdabra/txeo/releases/download/v1.0.0/libtensorflow-2.18-linux-x64-gpu.tar.gz) |
 
-💡 **Important Note** : The Protobuf and TensorFlow source codes used for compiling the binaries above **were not modified** in any way. These assets are **only provided to simplify installation** for **Txeo** users.
+💡 **Important Note** : The Protobuf and TensorFlow source codes used for compiling the binaries above **were not modified** in any way. These assets are **only provided to simplify installation** for **txeo** users.
 
 Installing TensorFlow binaries:
 
@@ -95,9 +99,9 @@ echo "export TensorFlow_ROOT_DIR=/opt/tensorflow" >> ~/.bashrc
 source ~/.bashrc
 ```
 
-#### **3️⃣ Clone and install Txeo**
+#### **3️⃣ Clone and install txeo**
 
-Installing **Txeo** and making libraries visible via library path:
+Installing **txeo** and making libraries visible via library path:
 
 ```sh
 git clone https://github.com/rdabra/txeo.git
@@ -151,7 +155,7 @@ echo "export TensorFlow_ROOT_DIR=/opt/tensorflow" >> ~/.bashrc
 source ~/.bashrc 
 ```
 
-#### **3️⃣ Installing Txeo**
+#### **3️⃣ Installing txeo**
 
 ```sh
 git clone https://github.com/rdabra/txeo.git
@@ -165,9 +169,9 @@ echo "export LD_LIBRARY_PATH=/opt/tensorflow/lib:/opt/txeo/lib:$LD_LIBRARY_PATH"
 
 ## 🚗 Basic Usage
 
-This section provides **two simple C++ examples** to help you get started with **Txeo**.
+This section provides **two simple C++ examples** to help you get started with **txeo**.
 
-> **📌 Prerequisite:** Before compiling, ensure that TensorFlow and **Txeo** are properly installed in `/opt/`.  
+> **📌 Prerequisite:** Before compiling, ensure that TensorFlow and **txeo** are properly installed in `/opt/`.  
 > If necessary, add the library paths:  
 >
 > ```sh
@@ -176,7 +180,7 @@ This section provides **two simple C++ examples** to help you get started with *
 
 ### **🔹 A Simple CMakeLists.txt**
 
-To compile a project using **Txeo**, use the following **CMakeLists.txt** file.
+To compile a project using **txeo**, use the following **CMakeLists.txt** file.
 
 ```cmake
 # CMakeLists.txt
@@ -289,7 +293,7 @@ int main() {
 
 ## 📆 Roadmap
 
-**Txeo** is actively evolving! Here are some of the upcoming features:
+**txeo** is actively evolving! Here are some of the upcoming features:
 
 ### 🏋️ Training Capabilities
 
@@ -316,11 +320,11 @@ For any inquiries or contributions:
 
 ## 📜 License
 
-**Txeo** is licensed under the **Apache License 2.0**, meaning it is **open-source, free to use, modify, and distribute**, while requiring proper attribution.
+**txeo** is licensed under the **Apache License 2.0**, meaning it is **open-source, free to use, modify, and distribute**, while requiring proper attribution.
 
 ### 📄 Third-Party Licenses
 
-**Txeo** depends on third-party libraries that have their own licenses:
+**txeo** depends on third-party libraries that have their own licenses:
 
 - **TensorFlow C++** - Licensed under **Apache License 2.0**  
   - 📜 [TensorFlow License](third_party/tensorflow/LICENSE)
