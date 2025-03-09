@@ -233,11 +233,17 @@ int main() {
   // 3×3 matrix created from a list of double values in row-major order
   Matrix<double> matrix({3, 3}, {1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f});
 
-  // Save tensor to file
+  // Save matrix to file
   MatrixIO::write_textfile(matrix, "matrix.txt");
 
-  // Load tensor from file
-  auto loaded_tensor = TensorIO::read_textfile<double>("matrix.txt");
+  // Load matrix from file
+  auto loaded_matrix = TensorIO::read_textfile<double>("matrix.txt");
+
+  // Convert matrix to second-order tensor
+  auto loaded_tensor = Matrix::to_tensor(loaded_matrix);
+
+  // Reshape second-order tensor to first-order
+  loaded_tensor.reshape({9});
 
   // Display loaded tensor
   cout << loaded_tensor << endl;
