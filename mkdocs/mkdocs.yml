@@ -1,7 +1,11 @@
 site_name: txeo
+site_description: "A Modern C++ wrapper for TensorFlow"
 site_url: https://rdabra.github.io/txeo/
+repo_url: "https://github.com/rdabra/txeo"
+repo_name: "rdabra/txeo"
 theme:
   name: material
+  language: en
   logo: assets/logo.png
   palette:
     - media: "(prefers-color-scheme: dark)"
@@ -13,7 +17,48 @@ theme:
 
     - media: "(prefers-color-scheme: light)"
       scheme: default
-      primary: orange
+      primary: blue grey
       toggle:
         icon: material/weather-night
         name: Switch to dark mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - search.highlight
+    - search.share
+nav:
+  - Home: index.md
+  - Getting Started: getting-started.md
+  - Usage:
+      - Basic Usage: usage.md
+      - Advanced Topics:
+          - Tensors: advanced/tensor.md
+          - Matrix & Vector: advanced/matrix-vector.md
+          - Predictor: advanced/predictor.md
+  - API Reference:
+      - TensorShape: api-reference/tensor-shape.md
+      - Tensor: api-reference/tensor.md
+      - Matrix: api-reference/matrix.md
+      - Vector: api-reference/vector.md
+      - Predictor: api-reference/predictor.md
+  - Tutorials:
+      - Intro to Tensors: tutorials/intro-to-tensors.md
+      - Matrix Math: tutorials/matrix-math.md
+      - Model Inference Guide: tutorials/inference-guide.md
+  - Changelog: changelog.md
+  - FAQ: faq.md
+  - Contributing: contributing.md
+
+markdown_extensions:
+  - toc:
+      permalink: true
+  - admonition
+  - pymdownx.superfences
+  - pymdownx.inlinehilite
+  - pymdownx.highlight
+  - pymdownx.tasklist:
+      custom_checkbox: true
+
+extra_css:
+  - stylesheets/extra.css
