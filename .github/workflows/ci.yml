@@ -28,4 +28,4 @@ jobs:
 
       - name: Deploy to GitHub Pages
         working-directory: mkdocs
-        run: mkdocs gh-deploy --force --config-file
+        run: mkdocs gh-deploy --force
