@@ -40,7 +40,11 @@ nav:
       - TensorShape: api-reference/tensor-shape.md
       - Tensor: api-reference/tensor.md
       - Matrix: api-reference/matrix.md
+      - MatrixIO: api-reference/matrix-io.md
       - Vector: api-reference/vector.md
+      - TensorOp: api-reference/tensor-op.md
+      - TensorAgg: api-reference/tensor-agg.md
+      - TensorFunc: api-reference/tensor-func.md
       - Predictor: api-reference/predictor.md
   - Tutorials:
       - Intro to Tensors: tutorials/intro-to-tensors.md

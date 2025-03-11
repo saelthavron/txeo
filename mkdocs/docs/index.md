@@ -4,8 +4,9 @@
 
 # Welcome to txeo Library Documentation
 
-**txeo** is a lightweight and intuitive **C++ wrapper for TensorFlow**, designed to **simplify TensorFlow C++ development** while preserving **high performance and flexibility**. Built entirely with **Modern C++**, **txeo** allows developers to use TensorFlow with the ease of a high-level API, eliminating the complexity of its low-level C++ interface. **txeo** is an open-source library hosted  hosted at [**Github**](https://github.com/rdabra/txeo).
+**txeo** is a lightweight and intuitive **C++ wrapper for TensorFlow**, designed to **simplify TensorFlow C++ development** while preserving **high performance and flexibility**. Built entirely with **Modern C++**, **txeo** allows developers to use TensorFlow with the ease of a high-level API, eliminating the complexity of its low-level C++ interface. 
 
+**txeo** is an open-source library hosted at [**Github**](https://github.com/rdabra/txeo).
 
 ## Main Features
 

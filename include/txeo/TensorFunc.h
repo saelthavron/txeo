@@ -1,10 +1,11 @@
 #ifndef TENSORFUNC_H
 #define TENSORFUNC_H
-#include "txeo/Matrix.h"
-#include <cstddef>
 #pragma once
 
+#include "txeo/Matrix.h"
 #include "txeo/Tensor.h"
+
+#include <cstddef>
 
 namespace txeo {
 
