@@ -8,6 +8,8 @@
 
 **txeo** is an open-source library hosted at [**Github**](https://github.com/rdabra/txeo).
 
+---
+
 ## Main Features
 
 - 📦 **Intuitive API** – A clean and modern C++ interface, simplifying TensorFlow C++ usage.
@@ -17,6 +19,8 @@
 - ⚡ **XLA Acceleration** – Effortlessly enable or disable TensorFlow’s XLA optimizations.
 - 🚀 **Near-Native Performance** – Achieves **99.35% to 99.79% of native TensorFlow speed** with negligible overhead.
 - 🛡 **Encapsulated TensorFlow API** – Fully abstracts TensorFlow internals for a cleaner, more maintainable experience.
+
+---
 
 ## Performance Comparison
 
@@ -40,3 +44,50 @@
 
 - The performance overhead is **negligible**, ranging from **0.65% to 1.21%**.
 - **txeo’s abstraction layer** provides **ease of use** with almost no cost to performance.
+
+---
+
+## Roadmap
+
+**txeo** is actively evolving! Here are some of the upcoming features:
+
+### 🏋️ Training Capabilities
+
+- **Model Training** - Enable training models using TensorFlow C++.
+- **Backpropagation Support** - Implement automatic differentiation.
+- **Gradient Descent & Optimizers** - Integrate optimizers like SGD and Adam.
+
+### 🔢 Advanced Tensor Operations
+
+- **Linear Algebra Functions (SVD, QR decomposition)** - Matrix Computations on tensors.
+
+### 📊 Model Saving & Loading Enhancements
+
+- **Checkpointing** - Save model weights at different training stages.
+- **Frozen Graph Support** - Load & optimize frozen models for inference.
+
+## 📬 Contact
+
+For any inquiries or contributions:
+
+- **GitHub Discussions:** [Start a discussion](https://github.com/rdabra/txeo/discussions)
+- **Issue Reporting:** [Open an issue](https://github.com/rdabra/txeo/issues)
+- **Email:** [robertodias70@outlook.com](mailto:robertodias70@outlook.com) *(for serious inquiries only)*
+
+---
+
+## License
+
+**txeo** is licensed under the **Apache License 2.0**, meaning it is **open-source, free to use, modify, and distribute**, while requiring proper attribution.
+
+### 📄 Third-Party Licenses
+
+**txeo** depends on third-party libraries that have their own licenses:
+
+- **TensorFlow C++** - Licensed under **Apache License 2.0**  
+  - 📜 [TensorFlow License](third_party/tensorflow/LICENSE)
+  - 🔗 [TensorFlow GitHub](https://github.com/tensorflow/tensorflow)
+- **Protobuf** - Licensed under **BSD 3-Clause**  
+  - 📜 [Protobuf License](https://github.com/protocolbuffers/protobuf/blob/main/LICENSE)
+
+> **📌 Note:** The precompiled binaries of TensorFlow and Protobuf provided in the releases section **are unmodified versions** of the official source code.

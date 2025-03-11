@@ -45,14 +45,15 @@ nav:
       - TensorOp: api-reference/tensor-op.md
       - TensorAgg: api-reference/tensor-agg.md
       - TensorFunc: api-reference/tensor-func.md
+      - TensorPart: api-reference/tensor-part.md
       - Predictor: api-reference/predictor.md
-  - Tutorials:
-      - Intro to Tensors: tutorials/intro-to-tensors.md
-      - Matrix Math: tutorials/matrix-math.md
-      - Model Inference Guide: tutorials/inference-guide.md
+  # - Tutorials:
+  #     - Intro to Tensors: tutorials/intro-to-tensors.md
+  #     - Matrix Math: tutorials/matrix-math.md
+  #     - Model Inference Guide: tutorials/inference-guide.md
   - Changelog: changelog.md
-  - FAQ: faq.md
-  - Contributing: contributing.md
+  # - FAQ: faq.md
+  # - Contributing: contributing.md
 
 markdown_extensions:
   - toc:

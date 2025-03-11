@@ -15,6 +15,8 @@
   - 🔗 **TensorFlow 2.18.0** → [GitHub](https://github.com/tensorflow/tensorflow)
   - 📜 **Protobuf 3.21.9** → [GitHub](https://github.com/protocolbuffers/protobuf)
 
+---
+
 ## Option 1: Installation Steps with Precompiled Binaries (Fastest Way)
 
 This method **installs TensorFlow and Protobuf binaries** into `/opt/`.
@@ -62,6 +64,8 @@ make -j$(nproc)
 sudo make install
 echo "export LD_LIBRARY_PATH=/opt/tensorflow/lib:/opt/txeo/lib:$LD_LIBRARY_PATH" >> ~/.bashrc
 ```
+
+---
 
 ## Option 2: Installation Steps with Protobuf and TensorFlow built from source (may take a long time)
 

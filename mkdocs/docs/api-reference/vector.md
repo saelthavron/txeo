@@ -1,12 +1,12 @@
 # Vector
 
-The `Vector` class in **txeo** is a specialized subclass of `txeo::Tensor`, specifically designed for first-order (1-dimensional) tensors, providing a straightforward interface for vector operations.
+The `Vector` class in **txeo** is a specialized subclass of `txeo::Tensor`, specifically designed for first-order tensors, providing a straightforward interface for vector operations.
 
 ---
 
 ## Overview
 
-The `Vector` class simplifies handling 1-dimensional tensor operations, offering intuitive constructors, easy initialization methods, and seamless conversion between vectors and general tensors.
+The `Vector` class simplifies handling 1st-order tensor operations, offering intuitive constructors, easy initialization methods, and seamless conversion between vectors and general tensors.
 
 ---
 
@@ -69,12 +69,20 @@ auto vector = txeo::Vector<int>::to_vector(std::move(tensor));
 
 ```cpp
 txeo::Vector<int> vector({1, 2, 3, 4});
-txeo::Tensor<int> tensor = txeo::Vector<int>::to_tensor(vector); // Copy semantics
+// Copy semantics
+txeo::Tensor<int> tensor = txeo::Vector<int>::to_tensor(vector);
 ```
 
 ```cpp
 // Using move semantics
 txeo::Tensor<int> tensor = txeo::Vector<int>::to_tensor(std::move(vector));
+```
+
+### Vector to Tensor (Move Constructor)
+
+```cpp
+txeo::Tensor<int> tensor({1, 2, 3, 4});
+txeo::Vector<int> vector(std::move(tensor));
 ```
 
 ---
@@ -86,7 +94,8 @@ Invalid vector operations throw `VectorError` exceptions:
 ```cpp
 try {
     txeo::Tensor<int> tensor({2, 2}, {1, 2, 3, 4});
-    auto vector = txeo::Vector<int>::to_vector(std::move(tensor)); // Throws VectorError
+    // Throws VectorError
+    auto vector = txeo::Vector<int>::to_vector(std::move(tensor));
 } catch (const txeo::VectorError &e) {
     std::cerr << e.what() << std::endl;
 }

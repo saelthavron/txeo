@@ -6,7 +6,7 @@ The `TensorOp` class provides utility methods for performing common mathematical
 
 ## Overview
 
-`TensorOp` offers a suite of static functions, including arithmetic operations, scalar operations, and higher-level linear algebra functions, specifically tailored to simplify tensor computations.
+`TensorOp` offers a collection of static functions, including arithmetic operations, scalar operations, and higher-level linear algebra functions, specifically tailored to simplify tensor computations.
 
 ---
 

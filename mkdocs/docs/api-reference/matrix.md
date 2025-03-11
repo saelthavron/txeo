@@ -44,6 +44,13 @@ txeo::Matrix<int> matrix{{1, 2, 3}, {4, 5, 6}};  // 2x3 matrix
 
 ## Conversion between Matrix and Tensor
 
+### Matrix to Tensor (Move Constructor)
+
+```cpp
+txeo::Tensor<int> tensor({2, 3}, {1, 2, 3, 4, 5, 6});
+txeo::Matrix<int> matrix(std::move(tensor));
+```
+
 ### Tensor to Matrix (Move Semantics)
 
 ```cpp

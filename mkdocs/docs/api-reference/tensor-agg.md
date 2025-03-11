@@ -1,6 +1,6 @@
 # TensorAgg
 
-The `TensorAgg` class provides aggregation functions to simplify statistical and reduction operations on tensors in the **txeo** library.
+The `TensorAgg` class of **txeo** library provides aggregation functions to simplify statistical and reduction operations on tensors in the **txeo** library.
 
 ---
 

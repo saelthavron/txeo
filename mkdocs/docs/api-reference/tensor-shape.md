@@ -151,7 +151,7 @@ int main() {
 
 ## Exception Handling
 
-All invalid operations throw a clear `TensorShapeError`:
+All invalid operations throw a `TensorShapeError`:
 
 ```cpp
 try {

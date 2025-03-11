@@ -1,6 +1,6 @@
 # Tensor Functions
 
-`txeo::TensorFunc` provides common mathematical operations that can be applied element-wise to tensors. This document outlines available functions and examples of how to use them.
+The class `TensorFunc` of **txeo** provides common mathematical functions that can be applied element-wise to tensors.
 
 ## Overview
 

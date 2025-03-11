@@ -1,19 +1,19 @@
 # Tensor
 
-**txeo**'s `Tensor` class implements a powerful and intuitive representation of mathematical tensors, supporting operations from basic scalar handling to advanced multidimensional tensor manipulations. This page details the API, usage examples, and fundamental concepts.
+**txeo**'s `Tensor` class implements a powerful and intuitive representation of mathematical tensors, supporting operations from basic scalar handling to advanced multidimensional tensor manipulations.
 
 ---
 
 ## Overview
 
-A **tensor** in Txeo generalizes scalars, vectors, and matrices to higher dimensions:
+A tensor in **txeo** generalizes scalars, vectors, and matrices to higher dimensions:
 
 - **0th order:** Scalar (single numeric value)
 - **1st order:** Vector
 - **2nd order:** Matrix
 - **N-th order:** General tensor with N dimensions
 
-Txeo tensors support advanced functionality such as reshaping, slicing, arithmetic operations, and more.
+**txeo** tensors support advanced functionality such as reshaping, slicing, arithmetic operations, and more.
 
 ---
 
@@ -166,7 +166,7 @@ catch (const txeo::TensorError& e) {
 
 ## Performance Notes
 
-- **Memory Efficiency:** Txeo avoids unnecessary data copies (e.g., `slice`, `reshape`).
+- **Memory Efficiency:** **txeo** avoids unnecessary data copies (e.g., `slice`, `reshape`).
 - **Deep Copy Behavior:** Assignment and copy constructors perform deep copies, ensuring independent data between tensors.
 
 ---

@@ -1,6 +1,6 @@
 # MatrixIO
 
-`txeo::MatrixIO` is a class designed for convenient reading and writing of matrix data from and to text files. It supports flexible formatting options including custom separators and floating-point precision control.
+`txeo::MatrixIO` is a **txeo** class designed for convenient reading and writing of matrix data from and to text files. It supports flexible formatting options including custom separators and floating-point precision control.
 
 ## Constructors
 
