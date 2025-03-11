@@ -40,13 +40,13 @@ Examples:
 ### Constructing from dimensions
 
 ```cpp
-**txeo**::TensorShape shape({2, 3, 4}); // Creates a shape with dimensions 2x3x4
+txeo::TensorShape shape({2, 3, 4}); // Creates a shape with dimensions 2x3x4
 ```
 
 ### Creating uniform dimensions
 
 ```cpp
-**txeo**::TensorShape shape(3, 5); // Shape with three axes, each of dimension 5
+txeo::TensorShape shape(3, 5); // Shape with three axes, each of dimension 5
 ```
 
 ## Common Operations
@@ -119,11 +119,11 @@ for (size_t s : strides)
 
 ```cpp
 #include <iostream>
-#include "**txeo**/TensorShape.h"
+#include "txeo/TensorShape.h"
 
 int main() {
-    **txeo**::TensorShape shape1({3, 4});
-    **txeo**::TensorShape shape2({3, 4});
+    txeo::TensorShape shape1({3, 4});
+    txeo::TensorShape shape2({3, 4});
 
     if (shape == shape2) {
         std::cout << "Shapes match!" << std::endl;
@@ -135,10 +135,10 @@ int main() {
 
 ```cpp
 #include <iostream>
-#include "**txeo**/TensorShape.h"
+#include "txeo/TensorShape.h"
 
 int main() {
-    **txeo**::TensorShape shape({2, 3});
+    txeo::TensorShape shape({2, 3});
 
     shape.push_axis_back(4);       // shape now (2,3,4)
     shape.set_dim(1, 5);            // Update dimension of axis 1 from 3 to 5
@@ -156,11 +156,11 @@ All invalid operations throw a clear `TensorShapeError`:
 ```cpp
 try {
     shape.insert_axis(10, 2); // invalid operation
-} catch (const **txeo**::TensorShapeError &e) {
+} catch (const txeo::TensorShapeError &e) {
     std::cerr << "Error: " << e.what();
 }
 ```
 
 ---
 
-For detailed API references, see individual method documentation at [**txeo**::TensorShape](https://**txeo**-doc.netlify.app/class**txeo**_1_1_tensor_shape.html).
+For detailed API references, see individual method documentation at [txeo::TensorShape](https://txeo-doc.netlify.app/classtxeo_1_1_tensor_shape.html).

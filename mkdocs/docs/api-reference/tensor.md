@@ -47,10 +47,10 @@ Create a tensor by specifying its shape:
 
 ```cpp
 #include <iostream>
-#include "**txeo**/Tensor.h"
+#include "txeo/Tensor.h"
 
 int main() {
-    **txeo**::Tensor<int> tensor({3, 4}); // Create a 3x4 tensor
+    txeo::Tensor<int> tensor({3, 4}); // Create a 3x4 tensor
     std::cout << "Shape: " << tensor.shape() << std::endl;
 }
 ```
@@ -58,19 +58,19 @@ int main() {
 ### Initializing with Values
 
 ```cpp
-**txeo**::Tensor<int> tensor({2, 3}, {1, 2, 3, 4, 5, 6}); // 2x3 Tensor with predefined values
+txeo::Tensor<int> tensor({2, 3}, {1, 2, 3, 4, 5, 6}); // 2x3 Tensor with predefined values
 ```
 
 ### Filling with a Specific Value
 
 ```cpp
-**txeo**::Tensor<float> tensor({2, 2}, 5.0f); // Tensor initialized with 5.0
+txeo::Tensor<float> tensor({2, 2}, 5.0f); // Tensor initialized with 5.0
 ```
 
 ### Nested Initialization
 
 ```cpp
-**txeo**::Tensor<int> tensor{{1, 2, 3}, {4, 5, 6}}; // 2x3 Tensor
+txeo::Tensor<int> tensor{{1, 2, 3}, {4, 5, 6}}; // 2x3 Tensor
 ```
 
 ---
@@ -80,8 +80,8 @@ int main() {
 ### Element-wise Arithmetic
 
 ```cpp
-**txeo**::Tensor<int> a({2,2}, {1,2,3,4});
-**txeo**::Tensor<int> b({2,2}, {5,6,7,8});
+txeo::Tensor<int> a({2,2}, {1,2,3,4});
+txeo::Tensor<int> b({2,2}, {5,6,7,8});
 
 // Addition
 a + b; // [[6, 8], [10, 12]]
@@ -93,21 +93,21 @@ a * 2; // [[2, 4], [6, 8]]
 ### Reshaping
 
 ```cpp
-**txeo**::Tensor<int> tensor{{1, 2, 3, 4}}; // Shape (1, 4)
+txeo::Tensor<int> tensor{{1, 2, 3, 4}}; // Shape (1, 4)
 tensor.reshape({2, 2}); // Reshape to (2, 2)
 ```
 
 ### Slicing
 
 ```cpp
-**txeo**::Tensor<int> tensor{{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
+txeo::Tensor<int> tensor{{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
 auto sliced = tensor.slice(0, 2); // First two rows
 ```
 
 ### Random Initialization
 
 ```cpp
-**txeo**::Tensor<float> tensor({3,3});
+txeo::Tensor<float> tensor({3,3});
 tensor.fill_with_uniform_random(0.0f, 1.0f);
 ```
 
@@ -126,7 +126,7 @@ tensor(1, 2) = 42; // Set value at position (1,2)
 ```cpp
 try {
     tensor.at(10, 5) = 42; // Throws exception if out of bounds
-} catch (const **txeo**::TensorError& e) {
+} catch (const txeo::TensorError& e) {
     std::cerr << e.what() << std::endl;
 }
 ```
@@ -157,7 +157,7 @@ for (auto &value : tensor) {
 `TensorError` is thrown if operations fail due to inconsistent initialization, index out-of-bounds access, or invalid reshaping.
 
 ```cpp
-catch (const **txeo**::TensorError& e) {
+catch (const txeo::TensorError& e) {
     std::cerr << "Tensor Error: " << e.what() << std::endl;
 }
 ```
@@ -171,4 +171,4 @@ catch (const **txeo**::TensorError& e) {
 
 ---
 
-For detailed API references, see individual method documentation at [**txeo**::Tensor](https://**txeo**-doc.netlify.app/class**txeo**_1_1_tensor.html).
+For detailed API references, see individual method documentation at [txeo::Tensor](https://txeo-doc.netlify.app/classtxeo_1_1_tensor.html).

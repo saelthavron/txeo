@@ -14,10 +14,10 @@ The `Matrix` class in **txeo** is a specialized tensor explicitly tailored for s
 
 ```cpp
 #include <iostream>
-#include "**txeo**/Matrix.h"
+#include "txeo/Matrix.h"
 
 int main() {
-    **txeo**::Matrix<int> matrix(3, 3); // Creates a 3x3 matrix
+    txeo::Matrix<int> matrix(3, 3); // Creates a 3x3 matrix
     std::cout << matrix << std::endl;
 }
 ```
@@ -25,19 +25,19 @@ int main() {
 ### Initialization with Specific Values
 
 ```cpp
-**txeo**::Matrix<int> matrix(2, 3, 5);  // 2x3 matrix filled with value 5
+txeo::Matrix<int> matrix(2, 3, 5);  // 2x3 matrix filled with value 5
 ```
 
 ### Initialization from Vector
 
 ```cpp
-**txeo**::Matrix<int> matrix(2, 3, {1, 2, 3, 4, 5, 6});
+txeo::Matrix<int> matrix(2, 3, {1, 2, 3, 4, 5, 6});
 ```
 
 ### Nested Initializer Lists
 
 ```cpp
-**txeo**::Matrix<int> matrix{{1, 2, 3}, {4, 5, 6}};  // 2x3 matrix
+txeo::Matrix<int> matrix{{1, 2, 3}, {4, 5, 6}};  // 2x3 matrix
 ```
 
 ---
@@ -47,21 +47,21 @@ int main() {
 ### Tensor to Matrix (Move Semantics)
 
 ```cpp
-**txeo**::Tensor<int> tensor({2, 3}, {1, 2, 3, 4, 5, 6});
-auto matrix = **txeo**::Matrix<int>::to_matrix(std::move(tensor));
+txeo::Tensor<int> tensor({2, 3}, {1, 2, 3, 4, 5, 6});
+auto matrix = txeo::Matrix<int>::to_matrix(std::move(tensor));
 ```
 
 ### Matrix to Tensor (Copy)
 
 ```cpp
-**txeo**::Matrix<int> matrix(2, 3, {1, 2, 3, 4, 5, 6});
-**txeo**::Tensor<int> tensor = **txeo**::Matrix<int>::to_tensor(matrix);
+txeo::Matrix<int> matrix(2, 3, {1, 2, 3, 4, 5, 6});
+txeo::Tensor<int> tensor = txeo::Matrix<int>::to_tensor(matrix);
 ```
 
 ### Matrix to Tensor (Move Semantics)
 
 ```cpp
-**txeo**::Tensor<int> tensor = **txeo**::Matrix<int>::to_tensor(std::move(matrix));
+txeo::Tensor<int> tensor = txeo::Matrix<int>::to_tensor(std::move(matrix));
 ```
 
 ---
@@ -82,8 +82,8 @@ Matrix-related errors throw `MatrixError` exceptions:
 
 ```cpp
 try {
-    **txeo**::Matrix<int> matrix(2, 3, {1,2,3});  // Invalid initialization
-} catch (const **txeo**::MatrixError &e) {
+    txeo::Matrix<int> matrix(2, 3, {1,2,3});  // Invalid initialization
+} catch (const txeo::MatrixError &e) {
     std::cerr << e.what() << std::endl;
 }
 ```
@@ -96,11 +96,11 @@ try {
 
 ```cpp
 #include <iostream>
-#include "**txeo**/Tensor.h"
-#include "**txeo**/Matrix.h"
+#include "txeo/Tensor.h"
+#include "txeo/Matrix.h"
 
 int main() {
-    **txeo**::Matrix<int> mat{{1, 2}, {3, 4}};
+    txeo::Matrix<int> mat{{1, 2}, {3, 4}};
     mat(0, 1) = 10;
     std::cout << "Matrix:\n" << mat << std::endl;
 }
@@ -110,10 +110,10 @@ int main() {
 
 ```cpp
 #include <iostream>
-#include "**txeo**/Matrix.h"
+#include "txeo/Matrix.h"
 
 int main() {
-    **txeo**::Matrix<int> mat(2, 2, {1, 2, 3, 4});
+    txeo::Matrix<int> mat(2, 2, {1, 2, 3, 4});
     auto mat2 = mat * 3;  // Scalar multiplication
 
     std::cout << "Resulting matrix: " << mat2 << std::endl;
@@ -123,4 +123,4 @@ int main() {
 
 ---
 
-For detailed API references, see individual method documentation at [**txeo**::Matrix](https://**txeo**-doc.netlify.app/class**txeo**_1_1_matrix.html).
+For detailed API references, see individual method documentation at [txeo::Matrix](https://txeo-doc.netlify.app/classtxeo_1_1_matrix.html).
