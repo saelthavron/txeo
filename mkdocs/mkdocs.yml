@@ -32,10 +32,10 @@ nav:
   - Getting Started: getting-started.md
   - Usage:
       - Basic Usage: usage.md
-      - Advanced Topics:
-          - Tensors: advanced/tensor.md
-          - Matrix & Vector: advanced/matrix-vector.md
-          - Predictor: advanced/predictor.md
+      # - Advanced Topics:
+      #     - Tensors: advanced/tensor.md
+      #     - Matrix & Vector: advanced/matrix-vector.md
+      #     - Predictor: advanced/predictor.md
   - API Reference:
       - TensorShape: api-reference/tensor-shape.md
       - Tensor: api-reference/tensor.md
