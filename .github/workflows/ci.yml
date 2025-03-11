@@ -27,4 +27,5 @@ jobs:
           pip install mkdocs mkdocs-material
 
       - name: Deploy to GitHub Pages
-        run: mkdocs gh-deploy --force --config-file mkdocs/mkdocs.yml
+        working-directory: mkdocs
+        run: mkdocs gh-deploy --force --config-file
