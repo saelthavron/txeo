@@ -1,14 +1,14 @@
 #ifndef MATRIXIO_H
 #define MATRIXIO_H
-#include <map>
-#include <unordered_set>
 #pragma once
 
 #include "txeo/Matrix.h"
 
 #include <cstddef>
 #include <filesystem>
+#include <map>
 #include <type_traits>
+#include <unordered_set>
 
 namespace txeo {
 
@@ -158,6 +158,44 @@ class MatrixIO {
       io.write_text_file(matrix, precision);
     };
 
+    /**
+     * @brief Performs one-hot encoding in all non-numeric columns in a text file and writes the
+     * result to a target file.
+     *
+     * @param source_path The path to the source text file containing the input data.
+     * @param separator The delimiter used in the input file (e.g., ',' for CSV).
+     * @param has_header A flag indicating whether the input file has a header row.
+     * @param target_path The path to the target text file where the encoded data will be written.
+     * @return A `MatrixIO` object representing the encoded data file.
+     *
+     * @throws txeo::MatrixIOError If the source and target paths are the same, if the file cannot
+     * be opened, or if the input data is inconsistent (e.g., different types in the same column).
+     *
+     * **Example Usage:**
+     * @code
+     * #include "MatrixIO.h"
+     * #include <filesystem>
+     *
+     * int main() {
+     *     std::filesystem::path source_path = "input.csv";
+     *     std::filesystem::path target_path = "output.csv";
+     *     char separator = ',';
+     *     bool has_header = true;
+     *
+     *     try
+     *     {
+     *          auto matrix_io = MatrixIO::one_hot_encode_text_file(source_path, separator,
+     * has_header, target_path);
+     *          std::cout << "One-hot encoding completed successfully. Output
+     * written to: " << target_path << std::endl;
+     *      } catch (const txeo::MatrixIOError &e) { std::cerr
+     * << "Error: " << e.what() << std::endl;
+     *     }
+     *
+     *     return 0;
+     * }
+     * @endcode
+     */
     static txeo::MatrixIO one_hot_encode_text_file(const std::filesystem::path &source_path,
                                                    char separator, bool has_header,
                                                    const std::filesystem::path &target_path);

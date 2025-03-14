@@ -102,5 +102,23 @@ TEST_F(MatrixIOTest, FloatingPointRequires) {
   EXPECT_TRUE((requires { MatrixIO::write_textfile(float_tensor, 2, "test.csv"); }));
 }
 
+TEST_F(MatrixIOTest, OneHotEncode) {
+  std::filesystem::path input_path{"../../../../tests/test_data/files/insurance.csv"};
+  std::filesystem::path output_path{test_dir + "/test_insurance_one_hot.csv"};
+  auto io = MatrixIO::one_hot_encode_text_file(input_path, ',', true, output_path);
+  auto matrix = io.read_text_file<float>(true);
+
+  EXPECT_EQ(matrix.dim(), 55);
+  EXPECT_EQ(matrix(3, 1), 1.0f);
+  EXPECT_EQ(matrix(4, 9), 0.0f);
+  EXPECT_THROW(MatrixIO::one_hot_encode_text_file("nofile.txt", ',', true, output_path),
+               MatrixIOError);
+
+  const std::string path = test_dir + "/inconsistent.csv";
+  create_test_file(path, "1,2,3\n4,5");
+
+  EXPECT_THROW(MatrixIO::one_hot_encode_text_file(path, ',', false, output_path), MatrixIOError);
+}
+
 } // namespace
 } // namespace txeo
