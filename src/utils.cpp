@@ -96,4 +96,12 @@ std::vector<size_t> calc_stride(const tf::TensorShape &shape) {
   return resp;
 }
 
+bool is_numeric(const std::string &word) {
+  std::istringstream word_stream{word};
+  double val{};
+  char c{};
+
+  return (word_stream >> val) && !(word_stream >> c);
+}
+
 } // namespace txeo::detail

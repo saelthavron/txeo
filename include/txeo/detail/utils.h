@@ -63,6 +63,8 @@ bool is_zero(T value) {
   return value == 0;
 }
 
+bool is_numeric(const std::string &word);
+
 } // namespace txeo::detail
 
 #endif
