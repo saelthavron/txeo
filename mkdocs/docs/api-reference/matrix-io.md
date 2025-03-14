@@ -122,6 +122,31 @@ txeo::MatrixIO::write_textfile(results, 3, "science.csv");
 // Output: 0.000,4567.800,9.100,234.567
 ```
 
+### one_hot_encode_text_file
+
+```cpp
+    static txeo::MatrixIO one_hot_encode_text_file(const std::filesystem::path &source_path,
+                                                   char separator, bool has_header,
+                                                   const std::filesystem::path &target_path);
+```
+
+Loads a source file, one-hot-encode its non-numeric columns, outputs the result  to a target file and returns 
+its associated `MatrixIO`.
+
+**Example:**
+
+```cpp
+std::filesystem::path source_path = "input.csv";
+std::filesystem::path target_path = "output.csv";
+char separator = ',';
+bool has_header = true;
+
+auto io = MatrixIO::one_hot_encode_text_file(source_path, separator, has_header, target_path);
+auto matrix = io.read_text_file<float>(true);
+
+std::cout << matrix << std::endl;
+```
+
 ## Exceptions
 
 All methods may throw:
