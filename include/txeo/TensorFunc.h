@@ -1,5 +1,6 @@
 #ifndef TENSORFUNC_H
 #define TENSORFUNC_H
+#include <functional>
 #pragma once
 
 #include "txeo/Matrix.h"
@@ -189,6 +190,9 @@ class TensorFunc {
      */
     static txeo::Tensor<T> &permute_by(txeo::Tensor<T> &tensor, const std::vector<size_t> &axes);
 
+    static txeo::Tensor<T> &min_max_normalize_by(txeo::Tensor<T> &tensor, size_t axis);
+    static txeo::Tensor<T> min_max_normalize(const txeo::Tensor<T> &tensor, size_t axis);
+
     /**
      * @brief Transposes a matrix.
      *
@@ -221,6 +225,12 @@ class TensorFunc {
 
   private:
     TensorFunc() = default;
+
+    static void
+    axis_func(txeo::Tensor<T> &tensor, size_t axis,
+              std::function<void(const std::vector<T> &, const std::vector<T *> &)> func);
+    static void min_max_normalize(const std::vector<T> &values, const std::vector<T *> &adresses);
+    static void z_score_normalize(const std::vector<T> &values, const std::vector<T *> &adresses);
 };
 
 /**

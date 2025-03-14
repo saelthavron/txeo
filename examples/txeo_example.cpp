@@ -1,6 +1,7 @@
 #include "txeo/MatrixIO.h"
 #include "txeo/TensorIO.h"
 #include <algorithm>
+#include <cmath>
 #include <cstddef>
 #include <filesystem>
 #include <fstream>
@@ -12,21 +13,49 @@
 #include <string>
 #include <unordered_set>
 
-// bool is_numeric(std::string word) {
-//   std::istringstream word_stream{word};
-//   double val{};
-//   char c{};
+template <typename T>
+void min_max_normalize(std::vector<T> &values) {
+  auto [min, max] = std::ranges::minmax_element(values);
+  auto dif = *max - *min;
+  for (size_t i{0}; i < values.size(); ++i)
+    values[i] = (values[i] - *min) / dif;
+}
 
-//   return (word_stream >> val) && !(word_stream >> c);
-// }
+template <typename T>
+void z_score_normalize(std::vector<T> &values) {
+  T mean = 0.0;
+  for (const auto &item : values)
+    mean += item;
+  mean /= values.size();
+
+  T variance_num = 0.0;
+  for (const auto &item : values) {
+    auto dif = (item - mean);
+    variance_num += dif * dif;
+  }
+  auto std_dev = std::sqrt(variance_num / (values.size() - 1.));
+
+  for (size_t i{0}; i < values.size(); ++i)
+    values[i] = (values[i] - mean) / std_dev;
+}
 
 int main() {
-  std::filesystem::path input_path{"/home/roberto/my_works/personal/txeo/examples/input.txt"};
-  std::filesystem::path output_path{"/home/roberto/my_works/personal/txeo/examples/output.txt"};
 
-  auto io = txeo::MatrixIO::one_hot_encode_text_file(input_path, ',', true, output_path);
+  std::vector<double> vec1{2., 3., 4., 5., 6.};
+  std::vector<double> vec2{2., 3., 4., 5., 6.};
 
-  std::cout << io.path() << std::endl;
+  min_max_normalize(vec1);
+  z_score_normalize(vec2);
+
+  for (auto &item : vec1) {
+    std::cout << item << " ";
+  }
+  std::cout << std::endl;
+
+  for (auto &item : vec2) {
+    std::cout << item << " ";
+  }
+  std::cout << std::endl;
 
   // bool has_header = true;
 

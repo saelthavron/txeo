@@ -872,7 +872,7 @@ class Tensor {
     /**
      * @brief Acesses the raw data of this tensor
      *
-     * @return const T*
+     * @return T*
      */
     T *data();
 
