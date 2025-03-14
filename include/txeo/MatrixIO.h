@@ -1,5 +1,7 @@
 #ifndef MATRIXIO_H
 #define MATRIXIO_H
+#include <map>
+#include <unordered_set>
 #pragma once
 
 #include "txeo/Matrix.h"
@@ -24,6 +26,10 @@ class MatrixIO {
      */
     explicit MatrixIO(const std::filesystem::path &path, char separator = ',')
         : _path(std::move(path)), _separator(separator) {};
+
+    [[nodiscard]] std::filesystem::path path() const { return _path; }
+
+    [[nodiscard]] char separator() const { return _separator; }
 
     /**
      * @brief Returns a matrix with elements read from a text file
@@ -152,9 +158,20 @@ class MatrixIO {
       io.write_text_file(matrix, precision);
     };
 
+    static txeo::MatrixIO one_hot_encode_text_file(const std::filesystem::path &source_path,
+                                                   char separator, bool has_header,
+                                                   const std::filesystem::path &target_path);
+
   private:
     std::filesystem::path _path;
     char _separator;
+
+    static std::map<size_t, std::unordered_set<std::string>>
+    build_lookups_map(const std::filesystem::path &source_path, char separator, bool has_header);
+
+    static std::string
+    build_target_header(const std::filesystem::path &source_path, char separator, bool has_header,
+                        const std::map<size_t, std::unordered_set<std::string>> &lookups_map);
 };
 
 /**
