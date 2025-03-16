@@ -222,4 +222,43 @@ TEST(TensorFuncTest, TransposeBy) {
   EXPECT_EQ(matrix(1, 0), 2);
 }
 
+TEST(TensorFuncTest, NormalizationAll) {
+
+  txeo::Tensor<double> tens1({3, 3}, {1., 2., 3., 4., 5., 6., 7., 8., 9.});
+  txeo::TensorFunc<double>::normalize_by(tens1, txeo::NormalizationType::MIN_MAX);
+  txeo::Tensor<double> resp1({3, 3}, {0, 0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875, 1});
+  EXPECT_TRUE(tens1 == resp1);
+
+  txeo::Tensor<double> tens2({3, 3}, {1., 2., 3., 4., 5., 6., 7., 8., 9.});
+  txeo::TensorFunc<double>::normalize_by(tens2, txeo::NormalizationType::Z_SCORE);
+  EXPECT_NEAR(tens2(0, 0), -1.46059, 1e-5);
+  EXPECT_NEAR(tens2(1, 1), 0.00000, 1e-5);
+  EXPECT_NEAR(tens2(2, 1), 1.09544, 1e-5);
+
+  txeo::Tensor<double> tens3(txeo::TensorShape({0}));
+  EXPECT_THROW(txeo::TensorFunc<double>::normalize_by(tens3, txeo::NormalizationType::Z_SCORE),
+               txeo::TensorFuncError);
+
+  txeo::Tensor<double> tens4({3, 3}, {1., 2., 3., 4., 5., 6., 7., 8., 9.});
+  auto resp4 = txeo::TensorFunc<double>::normalize(tens4, txeo::NormalizationType::Z_SCORE);
+  EXPECT_TRUE(resp4 == tens2);
+
+  txeo::Tensor<double> tens5({1}, {3});
+  txeo::TensorFunc<double>::normalize_by(tens5, txeo::NormalizationType::Z_SCORE);
+  txeo::Tensor<double> resp5({1}, {3});
+  EXPECT_TRUE(resp5 == tens5);
+}
+
+TEST(TensorFuncTest, NormalizationAxis) {
+
+  txeo::Tensor<double> tens6({3, 3}, {1., 2., 3., 4., 5., 6., 7., 8., 9.});
+  txeo::TensorFunc<double>::normalize_by(tens6, 0, txeo::NormalizationType::MIN_MAX);
+  txeo::Tensor<double> resp6({3, 3}, {0, 0, 0, 0.5, 0.5, 0.5, 1, 1, 1});
+  EXPECT_TRUE(tens6 == resp6);
+
+  txeo::Tensor<double> tens7({3, 3}, {1., 2., 3., 4., 5., 6., 7., 8., 9.});
+  auto tens7_norm = txeo::TensorFunc<double>::normalize(tens7, 0, txeo::NormalizationType::Z_SCORE);
+  txeo::Tensor<double> resp7({3, 3}, {-1, -1, -1, 0, 0, 0, 1, 1, 1});
+  EXPECT_TRUE(tens7_norm == resp7);
+}
 } // namespace txeo

@@ -1,12 +1,13 @@
 #ifndef TENSORFUNC_H
 #define TENSORFUNC_H
-#include <functional>
 #pragma once
 
 #include "txeo/Matrix.h"
 #include "txeo/Tensor.h"
+#include "txeo/types.h"
 
 #include <cstddef>
+#include <functional>
 
 namespace txeo {
 
@@ -19,7 +20,6 @@ namespace txeo {
  *
  * @tparam T The data type of the tensor elements (e.g., int, double).
  */
-
 template <typename T>
 class TensorFunc {
   public:
@@ -175,7 +175,7 @@ class TensorFunc {
      * @param axes The new order of axes. Must be a valid permutation of the tensor's dimensions.
      * @return A reference to the modified tensor.
      *
-     * @throws std::invalid_argument If the axes are invalid (e.g., size mismatch or out of range).
+     * @throws std::TensorFuncError
      *
      * **Example Usage:**
      * @code
@@ -190,8 +190,87 @@ class TensorFunc {
      */
     static txeo::Tensor<T> &permute_by(txeo::Tensor<T> &tensor, const std::vector<size_t> &axes);
 
-    static txeo::Tensor<T> &min_max_normalize_by(txeo::Tensor<T> &tensor, size_t axis);
-    static txeo::Tensor<T> min_max_normalize(const txeo::Tensor<T> &tensor, size_t axis);
+    /**
+     * @brief Normalizes the input tensor along a specified axis in-place
+     *
+     * @param[in,out] tensor The tensor to be normalized (modified in-place)
+     * @param axis The dimension along which to apply normalization
+     * @param type The normalization method from NormalizationType enum:
+     *             - MIN_MAX: Scales values to [0, 1] range
+     *             - Z_SCORE: Standardizes to mean=0, std=1
+     * @return Reference to the modified input tensor
+     *
+     * @throws std::TensorFuncError
+     *
+     * **Example Usage:**
+     * @code
+     * // Example: Z-score normalization along columns (axis=1)
+     * txeo::Tensor<double> matrix({{1.0, 2.0}, {3.0, 4.0}}); // 2x2 matrix
+     * TensorFunc<double>::normalize_by(matrix, 1, txeo::NormalizationType::Z_SCORE);
+     * // Column 0 becomes [-1.0, 1.0], Column 1 becomes [-1.0, 1.0]
+     * @endcode
+     */
+    static txeo::Tensor<T> &normalize_by(txeo::Tensor<T> &tensor, size_t axis,
+                                         txeo::NormalizationType type);
+
+    /**
+     * @brief Creates a normalized copy of the input tensor along a specified axis
+     *
+     * @param tensor The input tensor to normalize
+     * @param axis The dimension along which to apply normalization
+     * @param type The normalization method (MIN_MAX or Z_SCORE)
+     * @return New tensor containing normalized values
+     *
+     * @throws std::TensorFuncError
+     *
+     * **Example Usage:**
+     * @code
+     * // Example: Min-max normalization of a vector
+     * txeo::Tensor<float> vec({2.0f, 4.0f, 6.0f}); // min=2, max=6
+     * auto normalized = TensorFunc<float>::normalize(vec, 0, txeo::NormalizationType::MIN_MAX);
+     * // normalized contains [0.0, 0.5, 1.0]
+     * @endcode
+     */
+    static txeo::Tensor<T> normalize(const txeo::Tensor<T> &tensor, size_t axis,
+                                     txeo::NormalizationType type);
+
+    /**
+     * @brief Normalizes the entire tensor in-place (global normalization)
+     *
+     * @param[in,out] tensor The tensor to be normalized (modified in-place)
+     * @param type The normalization method (MIN_MAX or Z_SCORE)
+     * @return Reference to the modified input tensor
+     *
+     * @throws std::TensorFuncError
+     *
+     * **Example Usage:**
+     * @code
+     * // Example: Global min-max normalization
+     * txeo::Tensor<double> data({{10.0, 20.0}, {30.0, 40.0}}); // min=10, max=40
+     * TensorFunc<double>::normalize_by(data, txeo::NormalizationType::MIN_MAX);
+     * // data now contains [[0.0, 0.333], [0.666, 1.0]]
+     * @endcode
+     */
+    static txeo::Tensor<T> &normalize_by(txeo::Tensor<T> &tensor, txeo::NormalizationType type);
+
+    /**
+     * @brief Creates a normalized copy of the entire tensor (global normalization)
+     *
+     * @param tensor The input tensor to normalize
+     * @param type The normalization method (MIN_MAX or Z_SCORE)
+     * @return New tensor containing normalized values
+     *
+     * @throws std::TensorFuncError
+     *
+     * **Example Usage:**
+     * @code
+     * // Example: Global Z-score normalization
+     * txeo::Tensor<float> cube({{{1.0f, 2.0f}, {3.0f, 4.0f}}, {{5.0f, 6.0f}, {7.0f, 8.0f}}});
+     * auto result = TensorFunc<float>::normalize(cube, txeo::NormalizationType::Z_SCORE);
+     * // result contains values with μ=4.5 and σ=2.449
+     * @endcode
+     */
+    static txeo::Tensor<T> normalize(const txeo::Tensor<T> &tensor, txeo::NormalizationType type);
 
     /**
      * @brief Transposes a matrix.
@@ -231,6 +310,9 @@ class TensorFunc {
               std::function<void(const std::vector<T> &, const std::vector<T *> &)> func);
     static void min_max_normalize(const std::vector<T> &values, const std::vector<T *> &adresses);
     static void z_score_normalize(const std::vector<T> &values, const std::vector<T *> &adresses);
+
+    static void min_max_normalize(txeo::Tensor<T> &tensor);
+    static void z_score_normalize(txeo::Tensor<T> &tensor);
 };
 
 /**

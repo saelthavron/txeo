@@ -173,7 +173,7 @@ bool Tensor<T>::operator==(const Tensor &tensor) {
   if (_impl->tf_tensor->shape() != tensor._impl->tf_tensor->shape())
     return false;
   for (size_t i{0}; i < this->dim(); ++i) {
-    if (this->data()[i] != tensor.data()[i])
+    if (!txeo::detail::is_zero(this->data()[i] - tensor.data()[i]))
       return false;
   }
 

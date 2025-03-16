@@ -1,6 +1,8 @@
 #include "txeo/Matrix.h"
 #include "txeo/Tensor.h"
+#include "txeo/TensorFunc.h"
 #include "txeo/detail/utils.h"
+
 #include <cstddef>
 
 namespace txeo {
@@ -10,6 +12,16 @@ Matrix<T>::Matrix(txeo::Tensor<T> &&tensor) : txeo::Tensor<T>(std::move(tensor))
   if (tensor.order() != 2)
     throw txeo::MatrixError("Tensor does not have order two.");
 }
+
+template <typename T>
+void Matrix<T>::normalize_columns(txeo::NormalizationType type) {
+  txeo::TensorFunc<T>::normalize_by(*this, 0, type);
+};
+
+template <typename T>
+void Matrix<T>::normalize_rows(txeo::NormalizationType type) {
+  txeo::TensorFunc<T>::normalize_by(*this, 1, type);
+};
 
 template <typename T>
 void Matrix<T>::reshape(const txeo::TensorShape &shape) {

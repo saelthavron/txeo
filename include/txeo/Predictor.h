@@ -5,36 +5,13 @@
 
 #include "txeo/Tensor.h"
 #include "txeo/TensorShape.h"
+#include "types.h"
 
 #include <filesystem>
 #include <optional>
 #include <string>
 
 namespace txeo {
-
-/**
- * @brief Bundle of device information
- *
- */
-struct DeviceInfo {
-    /**
-     * @brief Device name
-     *
-     */
-    std::string name{};
-
-    /**
-     * @brief Device type (CPU or GPU)
-     *
-     */
-    std::string device_type{};
-
-    /**
-     * @brief Memory limit in bytes
-     *
-     */
-    size_t memory_limit{};
-};
 
 /**
  * @brief Class that deals with the main tasks of prediction (inference)

@@ -1,5 +1,6 @@
 #include "txeo/Vector.h"
 #include "txeo/Tensor.h"
+#include "txeo/TensorFunc.h"
 #include "txeo/detail/utils.h"
 
 namespace txeo {
@@ -18,7 +19,7 @@ void Vector<T>::reshape(const txeo::TensorShape &shape) {
 }
 
 template <typename T>
-inline Vector<T> Vector<T>::to_vector(txeo::Tensor<T> &&tensor) {
+Vector<T> Vector<T>::to_vector(txeo::Tensor<T> &&tensor) {
   if (tensor.order() != 1)
     throw txeo::VectorError("Tensor does not have order one.");
 
@@ -53,6 +54,11 @@ txeo::Tensor<T> Vector<T>::to_tensor(const Vector<T> &vector) {
   txeo::Tensor<T> resp{vector};
 
   return resp;
+}
+
+template <typename T>
+void Vector<T>::normalize(txeo::NormalizationType type) {
+  txeo::TensorFunc<T>::normalize_by(*this, type);
 }
 
 template class Vector<short>;

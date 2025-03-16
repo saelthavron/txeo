@@ -175,3 +175,11 @@ TEST(VectorTest, ToTensorConstRef) {
   EXPECT_EQ(tensor(2), 15);
   EXPECT_EQ(tensor(3), 16);
 }
+
+TEST(VectorTest, Normalization) {
+  txeo::Vector<double> vec({1., 2., 3., 4., 5., 6., 7., 8., 9.});
+  txeo::Vector<double> resp({0, 0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875, 1});
+
+  vec.normalize(txeo::NormalizationType::MIN_MAX);
+  EXPECT_TRUE(vec == resp);
+}

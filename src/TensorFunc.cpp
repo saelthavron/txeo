@@ -161,15 +161,22 @@ txeo::Tensor<size_t> &TensorFunc<size_t>::abs_by(txeo::Tensor<size_t> &tensor) {
 template <typename T>
 void TensorFunc<T>::min_max_normalize(const std::vector<T> &values,
                                       const std::vector<T *> &adresses) {
-  auto [min, max] = std::ranges::minmax_element(values);
-  auto dif = *max - *min;
+  auto [min_it, max_it] = std::ranges::minmax_element(values);
+  auto dif = *max_it - *min_it;
+  if (txeo::detail::is_zero(dif))
+    return;
+
+  auto min = *min_it;
   for (size_t i{0}; i < adresses.size(); ++i)
-    *(adresses[i]) = (*(adresses[i]) - *min) / dif;
+    *(adresses[i]) = (*(adresses[i]) - min) / dif;
 }
 
 template <typename T>
 void TensorFunc<T>::z_score_normalize(const std::vector<T> &values,
                                       const std::vector<T *> &adresses) {
+  if (values.size() == 1)
+    return;
+
   T mean = 0.0;
   for (const auto &item : values)
     mean += item;
@@ -181,6 +188,9 @@ void TensorFunc<T>::z_score_normalize(const std::vector<T> &values,
     variance_num += dif * dif;
   }
   auto std_dev = std::sqrt(variance_num / (values.size() - 1.));
+
+  if (txeo::detail::is_zero(std_dev))
+    return;
 
   for (size_t i{0}; i < adresses.size(); ++i)
     *(adresses[i]) = (*(adresses[i]) - mean) / std_dev;
@@ -230,19 +240,87 @@ void TensorFunc<T>::axis_func(
 }
 
 template <typename T>
-txeo::Tensor<T> &TensorFunc<T>::min_max_normalize_by(txeo::Tensor<T> &tensor, size_t axis) {
-  axis_func(tensor, axis,
-            [](const std::vector<T> &values, const std::vector<T *> &addresses) -> void {
-              min_max_normalize(values, addresses);
-            });
+txeo::Tensor<T> &TensorFunc<T>::normalize_by(txeo::Tensor<T> &tensor, size_t axis,
+                                             txeo::NormalizationType type) {
+  if (type == txeo::NormalizationType::MIN_MAX)
+    axis_func(tensor, axis,
+              [](const std::vector<T> &values, const std::vector<T *> &addresses) -> void {
+                min_max_normalize(values, addresses);
+              });
+  else
+    axis_func(tensor, axis,
+              [](const std::vector<T> &values, const std::vector<T *> &addresses) -> void {
+                z_score_normalize(values, addresses);
+              });
 
   return tensor;
 }
 
 template <typename T>
-txeo::Tensor<T> TensorFunc<T>::min_max_normalize(const txeo::Tensor<T> &tensor, size_t axis) {
+txeo::Tensor<T> TensorFunc<T>::normalize(const txeo::Tensor<T> &tensor, size_t axis,
+                                         txeo::NormalizationType type) {
   txeo::Tensor<T> resp{tensor};
-  TensorFunc<T>::min_max_normalize_by(resp, axis);
+  TensorFunc<T>::normalize_by(resp, axis, type);
+
+  return resp;
+}
+
+template <typename T>
+void TensorFunc<T>::min_max_normalize(txeo::Tensor<T> &tensor) {
+  auto [min_it, max_it] = std::ranges::minmax_element(tensor);
+  auto dif = *max_it - *min_it;
+
+  if (txeo::detail::is_zero(dif))
+    return;
+
+  auto min = *min_it;
+  for (auto &element : tensor)
+    element = (element - min) / dif;
+}
+
+template <typename T>
+void TensorFunc<T>::z_score_normalize(txeo::Tensor<T> &tensor) {
+  if (tensor.dim() == 1)
+    return;
+
+  T mean = 0.0;
+  for (auto &element : tensor)
+    mean += element;
+  mean /= tensor.dim();
+
+  T variance_num = 0.0;
+  for (const auto &element : tensor) {
+    auto dif = (element - mean);
+    variance_num += dif * dif;
+  }
+  auto std_dev = std::sqrt(variance_num / (tensor.dim() - 1.));
+  if (txeo::detail::is_zero(std_dev))
+    return;
+
+  for (auto &element : tensor)
+    element = (element - mean) / std_dev;
+}
+
+template <typename T>
+inline txeo::Tensor<T> &TensorFunc<T>::normalize_by(txeo::Tensor<T> &tensor,
+                                                    txeo::NormalizationType type) {
+
+  if (tensor.dim() == 0)
+    throw txeo::TensorFuncError("Tensor has dimension zero.");
+
+  if (type == txeo::NormalizationType::MIN_MAX)
+    min_max_normalize(tensor);
+  else
+    z_score_normalize(tensor);
+
+  return tensor;
+}
+
+template <typename T>
+txeo::Tensor<T> TensorFunc<T>::normalize(const txeo::Tensor<T> &tensor,
+                                         txeo::NormalizationType type) {
+  txeo::Tensor<T> resp{tensor};
+  TensorFunc<T>::normalize_by(resp, type);
 
   return resp;
 }
