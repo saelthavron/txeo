@@ -39,7 +39,7 @@
 
 ### 🔎 **Results Overview**
 
-| Compiler | txeo (μs) | TensorFlow (μs) | Difference (%) |
+| Compiler | txeo (μs) | TensorFlow C++ (μs) | Difference (%) |
 |----------|-----------|-----------------|----------------|
 | GCC      | 233,994   | 232,494         | +0.65%         |
 | Intel    | 234,489   | 232,683         | +0.78%         |
