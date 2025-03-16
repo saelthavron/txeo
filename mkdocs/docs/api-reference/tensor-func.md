@@ -62,6 +62,18 @@ txeo::Tensor<int> tensor({2, 3, 4}, {1, 2, ..., 24});
 auto result = TensorFunc<int>::permute(tensor, {1, 2, 0});  // shape: (3, 4, 2)
 ```
 
+### Normalization
+
+```cpp
+enum class NormalizationType { MIN_MAX, Z_SCORE };
+```
+
+```cpp
+  txeo::Tensor<double> tensor({3, 3}, {1., 2., 3., 4., 5., 6., 7., 8., 9.});
+  txeo::TensorFunc<double>::normalize_by(tensor, txeo::NormalizationType::MIN_MAX);
+  std::cout << tens << std::endl; //  [0 0.125 0.25][0.375 0.5 0.625][0.75 0.875 1]
+```
+
 ### Matrix Transpose
 
 ```cpp

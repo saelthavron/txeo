@@ -16,6 +16,7 @@ class TensorIterator {
     using difference_type = std::ptrdiff_t;
     using iterator_category = std::random_access_iterator_tag;
 
+    TensorIterator() : _elements(nullptr), _step(1) {} // required by some std functions
     TensorIterator(T *elements, std::ptrdiff_t step = 1) : _elements(elements), _step(step) {}
 
     inline reference operator*() const { return *_elements; }

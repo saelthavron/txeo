@@ -4,6 +4,7 @@
 
 #include "txeo/Tensor.h"
 #include "txeo/TensorShape.h"
+#include "txeo/types.h"
 
 #include <cstddef>
 #include <initializer_list>
@@ -158,6 +159,52 @@ class Matrix : public txeo::Tensor<T> {
      * @endcode
      */
     [[nodiscard]] size_t size() const { return txeo::Tensor<T>::dim(); };
+
+    /**
+     * @brief Normalizes matrix columns in-place using specified normalization method
+     * @param type Normalization type to apply (MIN_MAX or Z_SCORE)
+     *
+     * **Example Usage:**
+     * @code
+     * // Example: Min-max normalize columns
+     * Matrix<double> mat({{10.0, 20.0},  // Column 1: [10, 30]
+     *                    {30.0, 40.0}}); // Column 2: [20, 40]
+     * mat.normalize_columns(txeo::NormalizationType::MIN_MAX);
+     * // Column 1 becomes [0.0, 1.0]
+     * // Column 2 becomes [0.0, 1.0]
+     *
+     * // Example: Z-score normalize columns
+     * Matrix<float> m({{1.0f, 4.0f},   // Column 1: μ=2.0, σ=1.414
+     *                 {3.0f, 6.0f}});  // Column 2: μ=5.0, σ=1.414
+     * m.normalize_columns(txeo::NormalizationType::Z_SCORE);
+     * // Column 1 becomes [-0.707, 0.707]
+     * // Column 2 becomes [-0.707, 0.707]
+     * @endcode
+     */
+    void normalize_columns(txeo::NormalizationType type);
+
+    /**
+     * @brief Normalizes matrix rows in-place using specified normalization method
+     * @param type Normalization type to apply (MIN_MAX or Z_SCORE)
+     *
+     * **Example Usage:**
+     * @code
+     * // Example: Min-max normalize rows
+     * Matrix<double> mat({{10.0, 20.0, 30.0},  // Row 1: [10, 20, 30]
+     *                    {5.0, 10.0, 15.0}});  // Row 2: [5, 10, 15]
+     * mat.normalize_rows(txeo::NormalizationType::MIN_MAX);
+     * // Row 1 becomes [0.0, 0.5, 1.0]
+     * // Row 2 becomes [0.0, 0.5, 1.0]
+     *
+     * // Example: Z-score normalize rows
+     * Matrix<float> m({{2.0f, 4.0f},   // Row 1: μ=3.0, σ=1.414
+     *                {6.0f, 8.0f}});  // Row 2: μ=7.0, σ=1.414
+     * m.normalize_rows(txeo::NormalizationType::Z_SCORE);
+     * // Row 1 becomes [-0.707, 0.707]
+     * // Row 2 becomes [-0.707, 0.707]
+     * @endcode
+     */
+    void normalize_rows(txeo::NormalizationType type);
 
     void reshape(const txeo::TensorShape &shape);
 

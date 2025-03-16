@@ -8,6 +8,18 @@ The `Matrix` class in **txeo** is a specialized tensor explicitly tailored for s
 
 ---
 
+## API Reference
+
+| Method                   | Description                                                |
+|---------------------------|-------------------------------------------------------------|
+| `size()`                  | Returns total number of matrix elements                      |
+| `to_matrix(tensor)`   | Converts a second-order tensor to matrix (move semantics)  |
+| `to_tensor(matrix)`  | Converts a matrix to tensor, supports copy and move semantics |
+| `normalize_columns(type)` | Normalize all the columns of this matrix according to a normalization type |
+| `normalize_rows(type)` | Normalize all the rows of this matrix according to a normalization type |
+
+---
+
 ## Creating Matrices
 
 ### Basic Matrix Creation
@@ -42,6 +54,26 @@ txeo::Matrix<int> matrix{{1, 2, 3}, {4, 5, 6}};  // 2x3 matrix
 
 ---
 
+## Normalization
+
+```cpp
+// Example: Min-max normalize columns
+txeo::Matrix<double> mat({{10.0, 20.0},  // Column 1: [10, 30]
+                         {30.0, 40.0}}); // Column 2: [20, 40]
+mat.normalize_columns(txeo::NormalizationType::MIN_MAX);
+// Column 1 becomes [0.0, 1.0]
+// Column 2 becomes [0.0, 1.0]
+
+// Example: Z-score normalize columns
+txeo::Matrix<float> m({{1.0f, 4.0f},   // Column 1: μ=2.0, σ=1.414
+                      {3.0f, 6.0f}});  // Column 2: μ=5.0, σ=1.414
+m.normalize_columns(txeo::NormalizationType::Z_SCORE);
+// Column 1 becomes [-0.707, 0.707]
+// Column 2 becomes [-0.707, 0.707]
+````
+
+---
+
 ## Conversion between Matrix and Tensor
 
 ### Matrix to Tensor (Move Constructor)
@@ -70,16 +102,6 @@ txeo::Tensor<int> tensor = txeo::Matrix<int>::to_tensor(matrix);
 ```cpp
 txeo::Tensor<int> tensor = txeo::Matrix<int>::to_tensor(std::move(matrix));
 ```
-
----
-
-## Matrix Methods
-
-| Method                   | Description                                                |
-|---------------------------|-------------------------------------------------------------|
-| `size()`                  | Returns total number of matrix elements                      |
-| `to_matrix(tensor)`   | Converts a second-order tensor to matrix (move semantics)  |
-| `to_tensor(matrix)`  | Converts a matrix to tensor, supports copy and move semantics |
 
 ---
 

@@ -17,6 +17,7 @@ The `Vector` class simplifies handling 1st-order tensor operations, offering int
 | `reshape(shape)`                | Changes the shape of the vector                        |
 | `to_vector(tensor)`             | Converts a first-order tensor to vector (copy/move)    |
 | `to_tensor(vector)`             | Converts a vector to tensor (copy/move)                |
+| `normalize(type)` | Normalize this vector according to a normalization type |
 
 ---
 
@@ -86,6 +87,25 @@ txeo::Vector<int> vector(std::move(tensor));
 ```
 
 ---
+
+## Normalization
+
+### Min-Max
+
+```cpp
+Vector<double> vec({2.0, 4.0, 6.0});
+vec.normalize(txeo::NormalizationType::MIN_MAX);
+// vec becomes [0.0, 0.5, 1.0] (original min=2, max=6)
+```
+
+### Z-Score
+
+```cpp
+Vector<float> v({2.0f, 4.0f, 6.0f});
+v.normalize(txeo::NormalizationType::Z_SCORE);
+// v becomes approximately [-1.2247, 0.0, 1.2247]
+// (μ=4.0, σ≈1.63299)
+```
 
 ## Exception Handling
 

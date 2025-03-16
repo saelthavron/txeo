@@ -5,9 +5,11 @@
 #include "txeo/detail/TensorPrivate.h"
 #include "txeo/detail/utils.h"
 
+#include <algorithm>
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
+#include <queue>
 #include <tensorflow/cc/ops/array_ops.h>
 #include <utility>
 
@@ -61,7 +63,7 @@ txeo::Tensor<T> TensorFunc<T>::sqrt(const txeo::Tensor<T> &tensor) {
 }
 
 template <typename T>
-inline txeo::Tensor<T> &TensorFunc<T>::sqrt_by(txeo::Tensor<T> &tensor) {
+txeo::Tensor<T> &TensorFunc<T>::sqrt_by(txeo::Tensor<T> &tensor) {
   if (tensor.dim() == 0)
     throw txeo::TensorFuncError("Tensor has dimension zero.");
 
@@ -72,7 +74,7 @@ inline txeo::Tensor<T> &TensorFunc<T>::sqrt_by(txeo::Tensor<T> &tensor) {
 }
 
 template <typename T>
-inline txeo::Tensor<T> TensorFunc<T>::abs(const txeo::Tensor<T> &tensor) {
+txeo::Tensor<T> TensorFunc<T>::abs(const txeo::Tensor<T> &tensor) {
   if (tensor.dim() == 0)
     throw txeo::TensorFuncError("Tensor has dimension zero.");
 
@@ -88,7 +90,7 @@ inline txeo::Tensor<T> TensorFunc<T>::abs(const txeo::Tensor<T> &tensor) {
 }
 
 template <typename T>
-inline txeo::Tensor<T> &TensorFunc<T>::abs_by(txeo::Tensor<T> &tensor) {
+txeo::Tensor<T> &TensorFunc<T>::abs_by(txeo::Tensor<T> &tensor) {
   if (tensor.dim() == 0)
     throw txeo::TensorFuncError("Tensor has dimension zero.");
 
@@ -135,14 +137,14 @@ txeo::Matrix<T> TensorFunc<T>::transpose(const txeo::Matrix<T> &matrix) {
 }
 
 template <typename T>
-inline txeo::Matrix<T> &TensorFunc<T>::transpose_by(txeo::Matrix<T> &matrix) {
+txeo::Matrix<T> &TensorFunc<T>::transpose_by(txeo::Matrix<T> &matrix) {
   matrix = std::move(TensorFunc<T>::transpose(matrix));
   return matrix;
 }
 
 // Type specialization to avoid calling abs for unsigned types
 template <>
-inline txeo::Tensor<bool> &TensorFunc<bool>::abs_by(txeo::Tensor<bool> &tensor) {
+txeo::Tensor<bool> &TensorFunc<bool>::abs_by(txeo::Tensor<bool> &tensor) {
   if (tensor.dim() == 0)
     throw txeo::TensorFuncError("Tensor has dimension zero.");
   return tensor;
@@ -150,10 +152,177 @@ inline txeo::Tensor<bool> &TensorFunc<bool>::abs_by(txeo::Tensor<bool> &tensor) 
 
 // Type specialization to avoid calling abs for unsigned types
 template <>
-inline txeo::Tensor<size_t> &TensorFunc<size_t>::abs_by(txeo::Tensor<size_t> &tensor) {
+txeo::Tensor<size_t> &TensorFunc<size_t>::abs_by(txeo::Tensor<size_t> &tensor) {
   if (tensor.dim() == 0)
     throw txeo::TensorFuncError("Tensor has dimension zero.");
   return tensor;
+}
+
+template <typename T>
+void TensorFunc<T>::min_max_normalize(const std::vector<T> &values,
+                                      const std::vector<T *> &adresses) {
+  auto [min_it, max_it] = std::ranges::minmax_element(values);
+  auto dif = *max_it - *min_it;
+  if (txeo::detail::is_zero(dif))
+    return;
+
+  auto min = *min_it;
+  for (size_t i{0}; i < adresses.size(); ++i)
+    *(adresses[i]) = (*(adresses[i]) - min) / dif;
+}
+
+template <typename T>
+void TensorFunc<T>::z_score_normalize(const std::vector<T> &values,
+                                      const std::vector<T *> &adresses) {
+  if (values.size() == 1)
+    return;
+
+  T mean = 0.0;
+  for (const auto &item : values)
+    mean += item;
+  mean /= values.size();
+
+  T variance_num = 0.0;
+  for (const auto &item : values) {
+    auto dif = (item - mean);
+    variance_num += dif * dif;
+  }
+  auto std_dev = std::sqrt(variance_num / (values.size() - 1.));
+
+  if (txeo::detail::is_zero(std_dev))
+    return;
+
+  for (size_t i{0}; i < adresses.size(); ++i)
+    *(adresses[i]) = (*(adresses[i]) - mean) / std_dev;
+}
+
+template <typename T>
+void TensorFunc<T>::axis_func(
+    txeo::Tensor<T> &tensor, size_t axis,
+    std::function<void(const std::vector<T> &, const std::vector<T *> &)> func) {
+
+  if (tensor.dim() == 0)
+    throw txeo::TensorFuncError("Tensor has dimension zero.");
+
+  if (axis >= txeo::detail::to_size_t(tensor.order()))
+    throw txeo::TensorFuncError("Inconsistent axis.");
+
+  int64_t accum_step = 1;
+  for (size_t i{axis + 1}; i < txeo::detail::to_size_t(tensor.order()); ++i)
+    accum_step *= tensor.shape().axis_dim(i);
+  auto axis_dim = txeo::detail::to_size_t(tensor.shape().axis_dim(axis));
+
+  size_t p{0}, s{0};
+  auto data = tensor.data();
+  std::priority_queue<size_t, std::vector<size_t>, std::greater<>> accum_indexes;
+  std::vector<T> values;
+  std::vector<T *> addresses;
+
+  while (p < tensor.dim()) {
+    s = p;
+    values.emplace_back(data[p]);
+    addresses.push_back(data + p);
+    for (size_t i{0}; i < axis_dim - 1; ++i) {
+      s += accum_step;
+      accum_indexes.emplace(s);
+      values.emplace_back(data[s]);
+      addresses.push_back(data + s);
+    }
+    func(values, addresses);
+    values.clear();
+    addresses.clear();
+    ++p;
+    while (!accum_indexes.empty() && p == accum_indexes.top()) {
+      accum_indexes.pop();
+      ++p;
+    }
+  }
+}
+
+template <typename T>
+txeo::Tensor<T> &TensorFunc<T>::normalize_by(txeo::Tensor<T> &tensor, size_t axis,
+                                             txeo::NormalizationType type) {
+  if (type == txeo::NormalizationType::MIN_MAX)
+    axis_func(tensor, axis,
+              [](const std::vector<T> &values, const std::vector<T *> &addresses) -> void {
+                min_max_normalize(values, addresses);
+              });
+  else
+    axis_func(tensor, axis,
+              [](const std::vector<T> &values, const std::vector<T *> &addresses) -> void {
+                z_score_normalize(values, addresses);
+              });
+
+  return tensor;
+}
+
+template <typename T>
+txeo::Tensor<T> TensorFunc<T>::normalize(const txeo::Tensor<T> &tensor, size_t axis,
+                                         txeo::NormalizationType type) {
+  txeo::Tensor<T> resp{tensor};
+  TensorFunc<T>::normalize_by(resp, axis, type);
+
+  return resp;
+}
+
+template <typename T>
+void TensorFunc<T>::min_max_normalize(txeo::Tensor<T> &tensor) {
+  auto [min_it, max_it] = std::ranges::minmax_element(tensor);
+  auto dif = *max_it - *min_it;
+
+  if (txeo::detail::is_zero(dif))
+    return;
+
+  auto min = *min_it;
+  for (auto &element : tensor)
+    element = (element - min) / dif;
+}
+
+template <typename T>
+void TensorFunc<T>::z_score_normalize(txeo::Tensor<T> &tensor) {
+  if (tensor.dim() == 1)
+    return;
+
+  T mean = 0.0;
+  for (auto &element : tensor)
+    mean += element;
+  mean /= tensor.dim();
+
+  T variance_num = 0.0;
+  for (const auto &element : tensor) {
+    auto dif = (element - mean);
+    variance_num += dif * dif;
+  }
+  auto std_dev = std::sqrt(variance_num / (tensor.dim() - 1.));
+  if (txeo::detail::is_zero(std_dev))
+    return;
+
+  for (auto &element : tensor)
+    element = (element - mean) / std_dev;
+}
+
+template <typename T>
+inline txeo::Tensor<T> &TensorFunc<T>::normalize_by(txeo::Tensor<T> &tensor,
+                                                    txeo::NormalizationType type) {
+
+  if (tensor.dim() == 0)
+    throw txeo::TensorFuncError("Tensor has dimension zero.");
+
+  if (type == txeo::NormalizationType::MIN_MAX)
+    min_max_normalize(tensor);
+  else
+    z_score_normalize(tensor);
+
+  return tensor;
+}
+
+template <typename T>
+txeo::Tensor<T> TensorFunc<T>::normalize(const txeo::Tensor<T> &tensor,
+                                         txeo::NormalizationType type) {
+  txeo::Tensor<T> resp{tensor};
+  TensorFunc<T>::normalize_by(resp, type);
+
+  return resp;
 }
 
 template class TensorFunc<size_t>;

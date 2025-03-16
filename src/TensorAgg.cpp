@@ -1,7 +1,6 @@
 #include "txeo/TensorAgg.h"
 #include "txeo/Tensor.h"
 #include "txeo/TensorFunc.h"
-#include "txeo/TensorOp.h"
 #include "txeo/detail/TensorHelper.h"
 #include "txeo/detail/TensorPrivate.h"
 #include "txeo/detail/utils.h"
@@ -41,8 +40,8 @@ void TensorAgg<T>::verify_parameters(const txeo::Tensor<T> &tensor,
 }
 
 template <typename T>
-inline txeo::Tensor<T> TensorAgg<T>::accumulate(const txeo::Tensor<T> &tensor, size_t axis,
-                                                std::function<T(std::vector<T> &)> acc_fun) {
+txeo::Tensor<T> TensorAgg<T>::accumulate(const txeo::Tensor<T> &tensor, size_t axis,
+                                         std::function<T(std::vector<T> &)> acc_fun) {
 
   if (tensor.dim() == 0)
     throw txeo::TensorAggError("Tensor has dimension zero.");
@@ -91,8 +90,8 @@ inline txeo::Tensor<T> TensorAgg<T>::accumulate(const txeo::Tensor<T> &tensor, s
 }
 
 template <typename T>
-inline txeo::Tensor<size_t> TensorAgg<T>::count(const txeo::Tensor<T> &tensor, size_t axis,
-                                                std::function<size_t(std::vector<T> &)> count_fun) {
+txeo::Tensor<size_t> TensorAgg<T>::count(const txeo::Tensor<T> &tensor, size_t axis,
+                                         std::function<size_t(std::vector<T> &)> count_fun) {
 
   if (tensor.dim() == 0)
     throw txeo::TensorAggError("Tensor has dimension zero.");
@@ -221,8 +220,8 @@ txeo::Tensor<T> TensorAgg<T>::reduce_min(const txeo::Tensor<T> &tensor,
 }
 
 template <typename T>
-inline txeo::Tensor<T> TensorAgg<T>::reduce_euclidean_norm(const txeo::Tensor<T> &tensor,
-                                                           const std::vector<size_t> &axes) {
+txeo::Tensor<T> TensorAgg<T>::reduce_euclidean_norm(const txeo::Tensor<T> &tensor,
+                                                    const std::vector<size_t> &axes) {
   TensorAgg<T>::verify_parameters(tensor, axes);
   try {
     auto resp = txeo::detail::TensorHelper::reduce_tensor<T>(
@@ -237,8 +236,7 @@ inline txeo::Tensor<T> TensorAgg<T>::reduce_euclidean_norm(const txeo::Tensor<T>
 }
 
 template <typename T>
-inline txeo::Tensor<T> TensorAgg<T>::reduce_maximum_norm(const txeo::Tensor<T> &tensor,
-                                                         size_t axis) {
+txeo::Tensor<T> TensorAgg<T>::reduce_maximum_norm(const txeo::Tensor<T> &tensor, size_t axis) {
   return TensorAgg<T>::accumulate(
       tensor, axis, [](std::vector<T> &values) { return TensorAgg<T>::maximum_norm(values); });
 }
@@ -264,7 +262,7 @@ txeo::Tensor<T> TensorAgg<T>::cumulative_prod(const txeo::Tensor<T> &tensor, siz
 }
 
 template <typename T>
-inline txeo::Tensor<T> TensorAgg<T>::cumulative_sum(const txeo::Tensor<T> &tensor, size_t axis) {
+txeo::Tensor<T> TensorAgg<T>::cumulative_sum(const txeo::Tensor<T> &tensor, size_t axis) {
   try {
     auto resp = txeo::detail::TensorHelper::reduce_tensor<T>(
         *tensor._impl->tf_tensor, axis,
@@ -318,8 +316,7 @@ Tensor<size_t> TensorAgg<T>::arg_min(const txeo::Tensor<T> &tensor, size_t axis)
 }
 
 template <typename T>
-inline txeo::Tensor<size_t> TensorAgg<T>::count_non_zero(const txeo::Tensor<T> &tensor,
-                                                         size_t axis) {
+txeo::Tensor<size_t> TensorAgg<T>::count_non_zero(const txeo::Tensor<T> &tensor, size_t axis) {
 
   return TensorAgg<T>::count(tensor, axis, [](std::vector<T> &values) -> size_t {
     return TensorAgg<T>::count_non_zero(values);
@@ -382,15 +379,14 @@ txeo::Tensor<T> TensorAgg<T>::reduce_median(const txeo::Tensor<T> &tensor, size_
 }
 
 template <typename T>
-inline txeo::Tensor<T> TensorAgg<T>::reduce_geometric_mean(const txeo::Tensor<T> &tensor,
-                                                           size_t axis) {
+txeo::Tensor<T> TensorAgg<T>::reduce_geometric_mean(const txeo::Tensor<T> &tensor, size_t axis) {
   return TensorAgg<T>::accumulate(tensor, axis, [](std::vector<T> &values) -> T {
     return TensorAgg<T>::geometric_mean(values);
   });
 }
 
 template <typename T>
-inline T TensorAgg<T>::sum_all(const txeo::Tensor<T> &tensor) {
+T TensorAgg<T>::sum_all(const txeo::Tensor<T> &tensor) {
   if (tensor.dim() == 0)
     throw txeo::TensorAggError("Tensor has dimension zero.");
 
@@ -416,7 +412,7 @@ T TensorAgg<T>::median(std::vector<T> &values) {
 }
 
 template <typename T>
-inline T TensorAgg<T>::geometric_mean(std::vector<T> &values) {
+T TensorAgg<T>::geometric_mean(std::vector<T> &values) {
   if (values.size() == 1)
     return values[0];
 
@@ -447,7 +443,7 @@ T TensorAgg<T>::variance(std::vector<T> &values) {
 }
 
 template <typename T>
-inline T TensorAgg<T>::maximum_norm(std::vector<T> &values) {
+T TensorAgg<T>::maximum_norm(std::vector<T> &values) {
   auto resp = std::ranges::max_element(
       values, [](const T &left, const T &right) { return std::abs(left) < std::abs(right); });
 
@@ -456,7 +452,7 @@ inline T TensorAgg<T>::maximum_norm(std::vector<T> &values) {
 
 // Type specialization to avoid calling abs for unsigned types
 template <>
-inline bool TensorAgg<bool>::maximum_norm(std::vector<bool> &values) {
+bool TensorAgg<bool>::maximum_norm(std::vector<bool> &values) {
   auto resp = std::ranges::max_element(values);
 
   return *resp;
@@ -464,7 +460,7 @@ inline bool TensorAgg<bool>::maximum_norm(std::vector<bool> &values) {
 
 // Type specialization to avoid calling abs for unsigned types
 template <>
-inline size_t TensorAgg<size_t>::maximum_norm(std::vector<size_t> &values) {
+size_t TensorAgg<size_t>::maximum_norm(std::vector<size_t> &values) {
   auto resp = std::ranges::max_element(values);
   return *resp;
 }

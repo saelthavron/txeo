@@ -165,3 +165,16 @@ TEST(MatrixTest, ToTensorConstRef) {
   EXPECT_EQ(tensor(1, 1), 5);
   EXPECT_EQ(tensor(1, 2), 6);
 }
+
+TEST(MatrixTest, Normalization) {
+
+  txeo::Matrix<double> mat(3, 3, {1., 2., 3., 4., 5., 6., 7., 8., 9.});
+  mat.normalize_columns(txeo::NormalizationType::MIN_MAX);
+  txeo::Matrix<double> resp(3, 3, {0, 0, 0, 0.5, 0.5, 0.5, 1, 1, 1});
+  EXPECT_TRUE(mat == resp);
+
+  txeo::Matrix<double> mat1(3, 3, {1., 2., 3., 4., 5., 6., 7., 8., 9.});
+  mat1.normalize_rows(txeo::NormalizationType::Z_SCORE);
+  txeo::Matrix<double> resp1(3, 3, {-1, 0, 1, -1, 0, 1, -1, 0, 1});
+  EXPECT_TRUE(mat1 == resp1);
+}

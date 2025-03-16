@@ -1,5 +1,6 @@
 #ifndef VECTOR_H
 #define VECTOR_H
+#include "txeo/types.h"
 #pragma once
 
 #include "txeo/Tensor.h"
@@ -134,6 +135,27 @@ class Vector : public txeo::Tensor<T> {
      * @endcode
      */
     explicit Vector(txeo::Tensor<T> &&tensor);
+
+    /**
+     * @brief Normalizes the vector in-place using specified normalization method
+     * @param type Normalization type to apply:
+     *             - MIN_MAX: Scales values to [0, 1] range
+     *             - Z_SCORE: Standardizes to mean=0, std=1
+     *
+     * @code
+     * // Example 1: Min-max normalization
+     * Vector<double> vec({2.0, 4.0, 6.0});
+     * vec.normalize(txeo::NormalizationType::MIN_MAX);
+     * // vec becomes [0.0, 0.5, 1.0] (original min=2, max=6)
+     *
+     * // Example 2: Z-score normalization
+     * Vector<float> v({2.0f, 4.0f, 6.0f});
+     * v.normalize(txeo::NormalizationType::Z_SCORE);
+     * // v becomes approximately [-1.2247, 0.0, 1.2247]
+     * // (μ=4.0, σ≈1.63299)
+     * @endcode
+     */
+    void normalize(txeo::NormalizationType type);
 
     void reshape(const txeo::TensorShape &shape);
 
