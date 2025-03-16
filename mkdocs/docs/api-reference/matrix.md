@@ -70,7 +70,7 @@ txeo::Matrix<float> m({{1.0f, 4.0f},   // Column 1: μ=2.0, σ=1.414
 m.normalize_columns(txeo::NormalizationType::Z_SCORE);
 // Column 1 becomes [-0.707, 0.707]
 // Column 2 becomes [-0.707, 0.707]
-````
+```
 
 ---
 
