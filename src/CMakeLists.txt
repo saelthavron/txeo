@@ -11,7 +11,8 @@ set(TXEO_SOURCES
     MatrixIO.cpp
     TensorPart.cpp 
     TensorFunc.cpp
-    Predictor.cpp)
+    Predictor.cpp
+    Trainer.cpp)
 
 
 #################################################### Finding Tensorflow ####################################################
