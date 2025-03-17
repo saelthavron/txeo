@@ -15,6 +15,8 @@
 
 **txeo** is a lightweight and intuitive **C++ wrapper for TensorFlow**, designed to **simplify TensorFlow C++ development** while preserving **high performance and flexibility**. Built entirely with **Modern C++**, **txeo** allows developers to use TensorFlow with the ease of a high-level API, eliminating the complexity of its low-level C++ interface.
 
+**Library site:** https://rdabra.github.io/txeo/
+
 ## ✨ Features
 
 - 📦 **Intuitive API** – A clean and modern C++ interface, simplifying TensorFlow C++ usage.
