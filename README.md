@@ -9,7 +9,7 @@
 [![Last Commit](https://img.shields.io/github/last-commit/rdabra/txeo)](https://github.com/rdabra/txeo/commits/main)
 [![Star Badge](https://img.shields.io/github/stars/rdabra/txeo-tf?style=social)]
 
-# txeo: a Modern C++ Wrapper for TensorFlow
+# [txeo: a Modern C++ Wrapper for TensorFlow](https://rdabra.github.io/txeo/)
 
 ## 📝 Overview
 
