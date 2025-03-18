@@ -29,6 +29,7 @@ class TensorHelper;
  */
 class TensorShape {
   public:
+    explicit TensorShape();
     TensorShape(const TensorShape &shape);
     TensorShape(TensorShape &&shape) noexcept;
     ~TensorShape();
@@ -320,8 +321,6 @@ class TensorShape {
 
     template <typename P>
     void create_from_vector(P &&shape);
-
-    explicit TensorShape();
 };
 
 /**

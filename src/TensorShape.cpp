@@ -27,6 +27,7 @@ void TensorShape::create_from_vector(P &&shape) {
 }
 
 TensorShape::TensorShape() : _impl{std::make_unique<Impl>()} {
+  this->create_from_vector(std::vector<int64_t>{});
 }
 
 TensorShape::TensorShape(const std::vector<size_t> &shape) : _impl{std::make_unique<Impl>()} {
@@ -47,8 +48,9 @@ TensorShape::TensorShape(int number_of_axes, size_t dim) : _impl{std::make_uniqu
 }
 
 TensorShape::TensorShape(const TensorShape &shape) : _impl{std::make_unique<Impl>()} {
-  auto aux = shape._impl->tf_shape != nullptr ? *shape._impl->tf_shape : *shape._impl->ext_tf_shape;
-  _impl->tf_shape = std::make_unique<tf::TensorShape>(aux);
+  _impl->tf_shape = shape._impl->tf_shape != nullptr
+                        ? std::make_unique<tf::TensorShape>(*shape._impl->tf_shape)
+                        : nullptr;
   _impl->stride = shape._impl->stride;
   _impl->ext_tf_shape = shape._impl->ext_tf_shape;
 }
@@ -62,8 +64,9 @@ TensorShape::TensorShape(TensorShape &&shape) noexcept : _impl{std::make_unique<
 }
 
 TensorShape &TensorShape::operator=(const TensorShape &shape) {
-  auto aux = shape._impl->tf_shape != nullptr ? *shape._impl->tf_shape : *shape._impl->ext_tf_shape;
-  _impl->tf_shape = std::make_unique<tf::TensorShape>(aux);
+  _impl->tf_shape = shape._impl->tf_shape != nullptr
+                        ? std::make_unique<tf::TensorShape>(*shape._impl->tf_shape)
+                        : nullptr;
   _impl->stride = shape._impl->stride;
   _impl->ext_tf_shape = shape._impl->ext_tf_shape;
 

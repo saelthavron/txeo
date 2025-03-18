@@ -42,6 +42,7 @@ class TensorFunc;
 template <typename T>
 class Matrix : public txeo::Tensor<T> {
   public:
+    Matrix() = default;
     ~Matrix() = default;
 
     Matrix(const Matrix &matrix) : txeo::Tensor<T>{matrix} {};
@@ -283,8 +284,6 @@ class Matrix : public txeo::Tensor<T> {
     static txeo::Tensor<T> to_tensor(const Matrix<T> &matrix);
 
   private:
-    Matrix() = default;
-
     friend class txeo::Predictor<T>;
     friend class txeo::TensorAgg<T>;
     friend class txeo::TensorPart<T>;

@@ -47,6 +47,7 @@ class TensorFunc;
 template <typename T>
 class Tensor {
   public:
+    explicit Tensor();
     /**
      * @note This copy constructor performs a deep copy, behaving differently from TensorFlow C++.
      */
@@ -1058,8 +1059,6 @@ class Tensor {
         std::vector<T> &flat_data, std::vector<size_t> &shape);
 
     void check_indexes(const std::vector<size_t> &indexes);
-
-    explicit Tensor();
 };
 
 /**

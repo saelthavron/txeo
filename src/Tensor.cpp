@@ -34,6 +34,7 @@ void Tensor<T>::create_from_shape(P &&shape) {
   auto aux = std::forward<P>(shape);
   auto shp = aux._impl->tf_shape != nullptr ? *aux._impl->tf_shape : *aux._impl->ext_tf_shape;
   _impl->tf_tensor = std::make_unique<tf::Tensor>(txeo::detail::get_tf_dtype<T>(), shp);
+  _impl->txeo_shape._impl->tf_shape = nullptr;
   _impl->txeo_shape._impl->ext_tf_shape = &_impl->tf_tensor->shape();
   _impl->txeo_shape._impl->stride =
       txeo::detail::calc_stride(*_impl->txeo_shape._impl->ext_tf_shape);
@@ -41,6 +42,8 @@ void Tensor<T>::create_from_shape(P &&shape) {
 
 template <typename T>
 Tensor<T>::Tensor() : _impl{std::make_unique<Impl>()} {
+  this->create_from_shape(txeo::TensorShape({}));
+  this->data()[0] = 0;
 }
 
 template <typename T>

@@ -12,7 +12,8 @@ set(TXEO_SOURCES
     TensorPart.cpp 
     TensorFunc.cpp
     Predictor.cpp
-    Trainer.cpp)
+    Trainer.cpp
+    OrdLeastSquaresTrainer.cpp)
 
 
 #################################################### Finding Tensorflow ####################################################

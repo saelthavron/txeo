@@ -1,4 +1,5 @@
 #include "txeo/MatrixIO.h"
+#include "txeo/Tensor.h"
 #include "txeo/TensorFunc.h"
 #include "txeo/TensorIO.h"
 #include "txeo/Vector.h"
@@ -43,10 +44,13 @@ void z_score_normalize(std::vector<T> &values) {
 
 int main() {
 
-  txeo::Vector<double> vec({1., 2., 3., 4., 5., 6., 7., 8., 9.});
-  vec.normalize(txeo::NormalizationType::MIN_MAX);
+  // txeo::Vector<double> vec({1., 2., 3., 4., 5., 6., 7., 8., 9.});
+  // vec.normalize(txeo::NormalizationType::MIN_MAX);
 
-  std::cout << vec << std::endl;
+  txeo::TensorShape shape({2, 3, 4});
+  txeo::Tensor<int> t(shape);
+
+  std::cout << t.dim() << std::endl;
 
   //  txeo::TensorFunc<double>::normalize_by(tens, txeo::NormalizationType::MIN_MAX);
 
