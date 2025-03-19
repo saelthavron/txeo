@@ -233,7 +233,7 @@ using namespace std;
 int main() {
 
   // 3×3 matrix created from a list of double values in row-major order
-  Matrix<double> matrix({3, 3}, {1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f});
+  Matrix<double> matrix(3, 3, {1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f});
 
   // Save matrix to file
   MatrixIO::write_textfile(matrix, "matrix.txt");
