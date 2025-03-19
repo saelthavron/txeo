@@ -108,6 +108,7 @@ class TensorShape {
      * @brief Constructs a tensor shape from an initializer list
      *
      * @param shape vector of dimensions
+     *
      * * **Example Usage:**
      * @code
      * #include <iostream>
