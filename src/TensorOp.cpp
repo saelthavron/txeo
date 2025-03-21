@@ -1,10 +1,12 @@
 #include "txeo/TensorOp.h"
 #include "txeo/Matrix.h"
 #include "txeo/Tensor.h"
+#include "txeo/Vector.h"
 #include "txeo/detail/TensorHelper.h"
 #include "txeo/detail/utils.h"
 
 #include <cmath>
+#include <cstddef>
 #include <tensorflow/cc/ops/math_ops.h>
 
 namespace txeo {
@@ -276,6 +278,24 @@ inline txeo::Tensor<T> &TensorOp<T>::hadamard_div_by(txeo::Tensor<T> &left,
 }
 
 template <typename T>
+inline T TensorOp<T>::dot(const txeo::Tensor<T> &left, const txeo::Tensor<T> &right) {
+  if (left.dim() == 0 || right.dim() == 0)
+    throw txeo::TensorOpError("One of the operands has dimension zero.");
+
+  if (left.dim() != right.dim())
+    throw txeo::TensorOpError("Operands are incompatible.");
+
+  auto l_data = left.data();
+  auto r_data = right.data();
+
+  T resp = 0.0;
+  for (size_t i{0}; i < left.dim(); ++i)
+    resp += l_data[i] * r_data[i];
+
+  return resp;
+}
+
+template <typename T>
 inline txeo::Matrix<T> TensorOp<T>::product(const txeo::Matrix<T> &left,
                                             const txeo::Matrix<T> &right) {
 
@@ -295,19 +315,28 @@ inline txeo::Matrix<T> TensorOp<T>::product(const txeo::Matrix<T> &left,
 }
 
 template <typename T>
-T TensorOp<T>::dot(const txeo::Vector<T> &left, const txeo::Vector<T> &right) {
+txeo::Tensor<T> TensorOp<T>::product(const txeo::Matrix<T> &left, const txeo::Vector<T> &right) {
+
   if (left.dim() == 0 || right.dim() == 0)
     throw txeo::TensorOpError("One of the operands has dimension zero.");
 
-  if (left.dim() != right.dim())
+  if (left.col_size() != right.size())
     throw txeo::TensorOpError("Operands are incompatible.");
 
-  auto l_data = left.data();
-  auto r_data = right.data();
+  auto left_flat = left.data();
+  auto right_flat = right.data();
 
-  T resp = 0.0;
-  for (size_t i{0}; i < left.dim(); ++i)
-    resp += l_data[i] * r_data[i];
+  T aux{0};
+  size_t step{0};
+  Tensor<T> resp({left.row_size(), 1});
+  auto resp_flat = resp.data();
+  for (size_t i{0}; i < left.row_size(); ++i) {
+    aux = 0;
+    for (size_t j{0}; j < left.col_size(); ++j)
+      aux += left_flat[step + j] * right_flat[j];
+    resp_flat[i] = aux;
+    step += left.col_size();
+  }
 
   return resp;
 }

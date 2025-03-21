@@ -42,7 +42,7 @@ class TensorFunc;
 template <typename T>
 class Matrix : public txeo::Tensor<T> {
   public:
-    Matrix() = default;
+    explicit Matrix();
     ~Matrix() = default;
 
     Matrix(const Matrix &matrix) : txeo::Tensor<T>{matrix} {};
@@ -160,6 +160,10 @@ class Matrix : public txeo::Tensor<T> {
      * @endcode
      */
     [[nodiscard]] size_t size() const { return txeo::Tensor<T>::dim(); };
+
+    [[nodiscard]] size_t row_size() const { return this->shape().axis_dim(0); };
+
+    [[nodiscard]] size_t col_size() const { return this->shape().axis_dim(1); };
 
     /**
      * @brief Normalizes matrix columns in-place using specified normalization method
@@ -282,6 +286,30 @@ class Matrix : public txeo::Tensor<T> {
      * @endcode
      */
     static txeo::Tensor<T> to_tensor(const Matrix<T> &matrix);
+
+    template <typename U>
+    friend Matrix<U> operator+(const Matrix<U> &left, const Matrix<U> &right);
+
+    template <typename U>
+    friend Matrix<U> operator+(const Matrix<U> &left, const U &right);
+
+    template <typename U>
+    friend Matrix<U> operator-(const Matrix<U> &left, const Matrix<U> &right);
+
+    template <typename U>
+    friend Matrix<U> operator-(const Matrix<U> &left, const U &right);
+
+    template <typename U>
+    friend Matrix<U> operator-(const U &left, const Matrix<U> &right);
+
+    template <typename U>
+    friend Matrix<U> operator*(const Matrix<U> &tensor, const U &scalar);
+
+    template <typename U>
+    friend Matrix<U> operator/(const Matrix<U> &left, const U &right);
+
+    template <typename U>
+    friend Matrix<U> operator/(const U &left, const Matrix<U> &right);
 
   private:
     friend class txeo::Predictor<T>;

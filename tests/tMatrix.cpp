@@ -178,3 +178,122 @@ TEST(MatrixTest, Normalization) {
   txeo::Matrix<double> resp1(3, 3, {-1, 0, 1, -1, 0, 1, -1, 0, 1});
   EXPECT_TRUE(mat1 == resp1);
 }
+
+TEST(MatrixTest, AdditionMatrixMatrix) {
+  txeo::Matrix<int> m1(2, 2, {1, 2, 3, 4});
+  txeo::Matrix<int> m2(2, 2, {5, 6, 7, 8});
+  auto result = m1 + m2;
+
+  EXPECT_EQ(result.shape(), txeo::TensorShape({2, 2}));
+  EXPECT_EQ(result.data()[0], 6);
+  EXPECT_EQ(result.data()[1], 8);
+  EXPECT_EQ(result.data()[2], 10);
+  EXPECT_EQ(result.data()[3], 12);
+}
+
+TEST(MatrixTest, AdditionMatrixScalar) {
+  txeo::Matrix<double> m(2, 2, {1.5, 2.5, 3.5, 4.5});
+  auto result = m + 2.5;
+
+  EXPECT_EQ(result.shape(), txeo::TensorShape({2, 2}));
+  EXPECT_DOUBLE_EQ(result.data()[0], 4.0);
+  EXPECT_DOUBLE_EQ(result.data()[3], 7.0);
+}
+
+TEST(MatrixTest, SubtractionMatrixMatrix) {
+  txeo::Matrix<float> m1(1, 3, {10.0f, 20.0f, 30.0f});
+  txeo::Matrix<float> m2(1, 3, {1.0f, 2.0f, 3.0f});
+  auto result = m1 - m2;
+
+  EXPECT_EQ(result.shape(), txeo::TensorShape({1, 3}));
+  EXPECT_FLOAT_EQ(result.data()[1], 18.0f);
+}
+
+TEST(MatrixTest, SubtractionMatrixScalar) {
+  txeo::Matrix<int> m(2, 2, {5, 10, 15, 20});
+  auto result = m - 3;
+
+  EXPECT_EQ(result.data()[0], 2);
+  EXPECT_EQ(result.data()[1], 7);
+  EXPECT_EQ(result.data()[2], 12);
+  EXPECT_EQ(result.data()[3], 17);
+}
+
+TEST(MatrixTest, SubtractionScalarMatrix) {
+  txeo::Matrix<int> m(2, 2, {1, 2, 3, 4});
+  auto result = 10 - m;
+
+  EXPECT_EQ(result.data()[0], 9);
+  EXPECT_EQ(result.data()[1], 8);
+  EXPECT_EQ(result.data()[2], 7);
+  EXPECT_EQ(result.data()[3], 6);
+}
+
+TEST(MatrixTest, MultiplicationMatrixScalar) {
+  txeo::Matrix<int> m(2, 3, {2, 3, 4, 5, 6, 7});
+  auto result = m * 3;
+
+  EXPECT_EQ(result.data()[0], 6);
+  EXPECT_EQ(result.data()[1], 9);
+  EXPECT_EQ(result.data()[2], 12);
+  EXPECT_EQ(result.data()[3], 15);
+  EXPECT_EQ(result.data()[4], 18);
+  EXPECT_EQ(result.data()[5], 21);
+}
+
+TEST(MatrixTest, DivisionMatrixScalar) {
+  txeo::Matrix<double> m(1, 4, {10.0, 20.0, 30.0, 40.0});
+  auto result = m / 2.0;
+
+  EXPECT_DOUBLE_EQ(result.data()[2], 15.0);
+}
+
+TEST(MatrixTest, DivisionScalarMatrix) {
+  txeo::Matrix<int> m(2, 2, {2, 4, 5, 10});
+  auto result = 100 / m;
+
+  EXPECT_EQ(result.data()[0], 50);
+  EXPECT_EQ(result.data()[1], 25);
+  EXPECT_EQ(result.data()[2], 20);
+  EXPECT_EQ(result.data()[3], 10);
+}
+
+TEST(MatrixTest, DefaultMatrixOperations) {
+  txeo::Matrix<float> defa;
+  auto result_add = defa + 5.0f;
+  auto result_mul = defa * 2.0f;
+
+  EXPECT_EQ(result_add(0, 0), 5.0f);
+  EXPECT_EQ(result_mul(0, 0), 0.0f);
+}
+
+TEST(MatrixTest, MixedOperations) {
+  txeo::Matrix<int> m1(2, 2, {5, 10, 15, 20});
+  txeo::Matrix<int> m2(2, 2, {1, 2, 3, 4});
+
+  auto result = (m1 - m2) * 2 + 10;
+
+  EXPECT_EQ(result.data()[0], 18);
+  EXPECT_EQ(result.data()[1], 26);
+  EXPECT_EQ(result.data()[2], 34);
+  EXPECT_EQ(result.data()[3], 42);
+}
+
+TEST(MatrixTest, FloatingPointPrecision) {
+  txeo::Matrix<double> m(1, 2, {1.0, 2.0});
+  auto result = m / 3.0;
+
+  EXPECT_DOUBLE_EQ(result.data()[0], 1.0 / 3.0);
+  EXPECT_DOUBLE_EQ(result.data()[1], 2.0 / 3.0);
+}
+
+TEST(MatrixTest, BooleanMatrixOperations) {
+  txeo::Matrix<bool> m1(2, 2, {true, false, true, false});
+  txeo::Matrix<bool> m2(2, 2, {true, true, false, false});
+  auto result = m1 - m2;
+
+  EXPECT_EQ(result.data()[0], false);
+  EXPECT_EQ(result.data()[1], true);
+  EXPECT_EQ(result.data()[2], true);
+  EXPECT_EQ(result.data()[3], false);
+}

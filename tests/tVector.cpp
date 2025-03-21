@@ -183,3 +183,117 @@ TEST(VectorTest, Normalization) {
   vec.normalize(txeo::NormalizationType::MIN_MAX);
   EXPECT_TRUE(vec == resp);
 }
+
+TEST(VectorTest, VectorAddition) {
+  txeo::Vector<int> v1({1, 2, 3});
+  txeo::Vector<int> v2({4, 5, 6});
+  auto result = v1 + v2;
+
+  EXPECT_EQ(result.shape(), txeo::TensorShape({3}));
+  EXPECT_EQ(result.data()[0], 5);
+  EXPECT_EQ(result.data()[1], 7);
+  EXPECT_EQ(result.data()[2], 9);
+}
+
+TEST(VectorTest, ScalarAddition) {
+  txeo::Vector<double> v({1.5, 2.5, 3.5});
+  auto result = v + 2.5;
+
+  EXPECT_EQ(result.shape(), txeo::TensorShape({3}));
+  EXPECT_DOUBLE_EQ(result.data()[0], 4.0);
+  EXPECT_DOUBLE_EQ(result.data()[1], 5.0);
+  EXPECT_DOUBLE_EQ(result.data()[2], 6.0);
+}
+
+TEST(VectorTest, VectorSubtraction) {
+  txeo::Vector<float> v1({5.0f, 3.0f, 8.0f});
+  txeo::Vector<float> v2({1.0f, 2.0f, 3.0f});
+  auto result = v1 - v2;
+
+  EXPECT_EQ(result.shape(), txeo::TensorShape({3}));
+  EXPECT_FLOAT_EQ(result.data()[0], 4.0f);
+  EXPECT_FLOAT_EQ(result.data()[1], 1.0f);
+  EXPECT_FLOAT_EQ(result.data()[2], 5.0f);
+}
+
+TEST(VectorTest, ScalarSubtractionRight) {
+  txeo::Vector<int> v({5, 3, 8});
+  auto result = v - 2;
+
+  EXPECT_EQ(result.data()[0], 3);
+  EXPECT_EQ(result.data()[1], 1);
+  EXPECT_EQ(result.data()[2], 6);
+}
+
+TEST(VectorTest, ScalarSubtractionLeft) {
+  txeo::Vector<int> v({1, 2, 3});
+  auto result = 10 - v;
+
+  EXPECT_EQ(result.data()[0], 9);
+  EXPECT_EQ(result.data()[1], 8);
+  EXPECT_EQ(result.data()[2], 7);
+}
+
+TEST(VectorTest, ScalarMultiplication) {
+  txeo::Vector<int> v({2, 3, 4});
+  auto result = v * 3;
+
+  EXPECT_EQ(result.data()[0], 6);
+  EXPECT_EQ(result.data()[1], 9);
+  EXPECT_EQ(result.data()[2], 12);
+}
+
+TEST(VectorTest, ScalarDivisionRight) {
+  txeo::Vector<double> v({10.0, 20.0, 30.0});
+  auto result = v / 2.0;
+
+  EXPECT_DOUBLE_EQ(result.data()[0], 5.0);
+  EXPECT_DOUBLE_EQ(result.data()[1], 10.0);
+  EXPECT_DOUBLE_EQ(result.data()[2], 15.0);
+}
+
+TEST(VectorTest, ScalarDivisionLeft) {
+  txeo::Vector<int> v({2, 4, 5});
+  auto result = 100 / v;
+
+  EXPECT_EQ(result.data()[0], 50);
+  EXPECT_EQ(result.data()[1], 25);
+  EXPECT_EQ(result.data()[2], 20);
+}
+
+TEST(VectorTest, EmptyVectorOperations) {
+  txeo::Vector<float> empty_vec;
+  auto result_add = empty_vec + 5.0f;
+  auto result_mul = empty_vec * 2.0f;
+
+  EXPECT_EQ(result_add(0), 5.0f);
+  EXPECT_EQ(result_mul(0), 0.0f);
+}
+
+TEST(VectorTest, MixedPrecisionOperations) {
+  txeo::Vector<double> v({1.0, 2.0, 3.0});
+  auto result = (v * 2.) - 1.5;
+
+  EXPECT_DOUBLE_EQ(result.data()[0], 0.5);
+  EXPECT_DOUBLE_EQ(result.data()[1], 2.5);
+  EXPECT_DOUBLE_EQ(result.data()[2], 4.5);
+}
+
+TEST(VectorTest, FloatingPointPrecision) {
+  txeo::Vector<double> v({1.0, 2.0, 3.0});
+  auto result = v / 3.0;
+
+  EXPECT_DOUBLE_EQ(result.data()[0], 1.0 / 3.0);
+  EXPECT_DOUBLE_EQ(result.data()[1], 2.0 / 3.0);
+  EXPECT_DOUBLE_EQ(result.data()[2], 1.0);
+}
+
+TEST(VectorTest, BooleanOperations) {
+  txeo::Vector<bool> v1({true, false, true});
+  txeo::Vector<bool> v2({true, true, false});
+  auto result = v1 - v2;
+
+  EXPECT_EQ(result.data()[0], false);
+  EXPECT_EQ(result.data()[1], true);
+  EXPECT_EQ(result.data()[2], true);
+}

@@ -1028,9 +1028,9 @@ class Tensor {
     Tensor<T> &operator+=(const Tensor<T> &tensor);
     Tensor<T> &operator+=(const T &tensor);
     Tensor<T> &operator-=(const Tensor<T> &tensor);
-    Tensor<T> &operator-=(const T &tensor);
-    Tensor<T> &operator*=(const T &scalar);
-    Tensor<T> &operator/=(const T &scalar);
+    virtual Tensor<T> &operator-=(const T &tensor);
+    virtual Tensor<T> &operator*=(const T &scalar);
+    virtual Tensor<T> &operator/=(const T &scalar);
 
     txeo::TensorIterator<T> begin();
     txeo::TensorIterator<T> end();

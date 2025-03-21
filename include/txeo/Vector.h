@@ -1,5 +1,6 @@
 #ifndef VECTOR_H
 #define VECTOR_H
+#include "txeo/Matrix.h"
 #include "txeo/types.h"
 #pragma once
 
@@ -42,7 +43,7 @@ class TensorFunc;
 template <typename T>
 class Vector : public txeo::Tensor<T> {
   public:
-    Vector() = default;
+    explicit Vector();
     ~Vector() = default;
 
     Vector(const Vector &Vector) : txeo::Tensor<T>{Vector} {};
@@ -166,6 +167,8 @@ class Vector : public txeo::Tensor<T> {
       this->reshape(std::vector<size_t>(shape));
     };
 
+    [[nodiscard]] size_t size() const { return this->dim(); }
+
     /**
      * @brief Converts a tensor to a vector by moving data.
      *
@@ -231,6 +234,30 @@ class Vector : public txeo::Tensor<T> {
      * @endcode
      */
     static txeo::Tensor<T> to_tensor(const Vector<T> &vector);
+
+    template <typename U>
+    friend txeo::Vector<U> operator+(const txeo::Vector<U> &left, const txeo::Vector<U> &right);
+
+    template <typename U>
+    friend txeo::Vector<U> operator+(const txeo::Vector<U> &left, const U &right);
+
+    template <typename U>
+    friend txeo::Vector<U> operator-(const txeo::Vector<U> &left, const txeo::Vector<U> &right);
+
+    template <typename U>
+    friend txeo::Vector<U> operator-(const txeo::Vector<U> &left, const U &right);
+
+    template <typename U>
+    friend txeo::Vector<U> operator-(const U &left, const txeo::Vector<U> &right);
+
+    template <typename U>
+    friend txeo::Vector<U> operator*(const txeo::Vector<U> &tensor, const U &scalar);
+
+    template <typename U>
+    friend txeo::Vector<U> operator/(const txeo::Vector<U> &left, const U &right);
+
+    template <typename U>
+    friend txeo::Vector<U> operator/(const U &left, const txeo::Vector<U> &right);
 
   private:
     friend class txeo::Predictor<T>;

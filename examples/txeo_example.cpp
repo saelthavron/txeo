@@ -1,37 +1,88 @@
-#include "txeo/MatrixIO.h"
-#include "txeo/Tensor.h"
-#include "txeo/TensorFunc.h"
-#include "txeo/TensorIO.h"
-#include "txeo/Vector.h"
 
-#include <algorithm>
+#include "txeo/Matrix.h"
+#include "txeo/Tensor.h"
+#include "txeo/TensorAgg.h"
+#include "txeo/TensorFunc.h"
+#include "txeo/TensorOp.h"
 #include <cmath>
 #include <cstddef>
-#include <filesystem>
-#include <fstream>
 #include <iostream>
-#include <iterator>
-#include <map>
 #include <ostream>
-#include <sstream>
-#include <string>
 #include <tensorflow/cc/client/client_session.h>
+#include <tensorflow/cc/ops/math_ops.h>
 #include <tensorflow/cc/ops/standard_ops.h>
 #include <tensorflow/core/framework/tensor.h>
 
 namespace tf = tensorflow;
 using namespace tensorflow::ops;
 
-void LinearRegressionExample() {
-  // 1. Create a TF scope
-  tf::Scope root = tf::Scope::NewRootScope();
+void MyLinearRegression() {
 
-  // 2. Training data (replace with actual data loading)
   std::vector<float> X_data = {1, 2, 3, 4};
   std::vector<float> Y_data = {2, 4, 6, 8};
 
-  tf::Tensor X_tensor(tf::DT_FLOAT, {4, 1});
-  tf::Tensor Y_tensor(tf::DT_FLOAT, {4, 1});
+  size_t p = 4;
+  size_t n = 1;
+  size_t m = 1;
+  size_t epochs = 50;
+  float learning_rate = 0.01;
+  bool enable_barzelay_borwein = true;
+  float epsilon = 0.0001;
+
+  txeo::Matrix<float> X(p, n + 1);
+
+  for (size_t i{0}; i < p; ++i) {
+    for (size_t j{0}; j < n; ++j)
+      X(i, j) = X_data[i];
+    X(i, n) = 1.;
+  }
+
+  txeo::Matrix<float> Y(m, p, Y_data);
+
+  auto X_t = txeo::TensorFunc<float>::transpose(X);
+  auto Z = txeo::TensorOp<float>::product(X_t, X);
+  auto K = txeo::TensorOp<float>::product(Y, X);
+
+  auto norm_X = txeo::TensorAgg<float>::reduce_euclidean_norm(X, {0, 1})();
+  auto norm_Y = txeo::TensorAgg<float>::reduce_euclidean_norm(Y, {0, 1})();
+
+  txeo::Matrix<float> B_prev{m, n + 1, norm_Y / norm_X};
+  if (enable_barzelay_borwein)
+    learning_rate = 1.0f / (norm_X * norm_X);
+
+  txeo::Matrix<float> B{B_prev - (txeo::TensorOp<float>::product(B_prev, Z) - K) * learning_rate};
+  txeo::Matrix<float> L{B - B_prev};
+
+  for (size_t e{0}; e < epochs; ++e) {
+    auto B_t = txeo::TensorFunc<float>::transpose(B);
+    auto Y_t = txeo::TensorFunc<float>::transpose(Y);
+    auto loss = txeo::TensorFunc<float>::square(txeo::TensorOp<float>::product(X, B_t) - Y_t);
+    loss = txeo::TensorAgg<float>::reduce_mean(loss, {0, 1});
+    std::cout << "Epoch " << e << ", Loss: " << loss() << std::endl;
+    if (loss() < epsilon)
+      break;
+
+    B_prev = B;
+    if (enable_barzelay_borwein) {
+      txeo::Matrix<float> LZ{txeo::TensorOp<float>::product(L, Z)};
+      auto numerator = std::abs(txeo::TensorOp<float>::dot(L, LZ));
+      auto denominator = txeo::TensorOp<float>::dot(LZ, LZ);
+      learning_rate = numerator / denominator;
+    };
+    B -= (txeo::TensorOp<float>::product(B, Z) - K) * learning_rate;
+    L = txeo::Matrix<float>::to_matrix(B - B_prev);
+  }
+  std::cout << "Weight: " << B << std::endl;
+}
+
+void LinearRegressionExample() {
+  tf::Scope root = tf::Scope::NewRootScope();
+
+  std::vector<float> X_data = {1, 2, 3, 4};
+  std::vector<float> Y_data = {2, 4, 6, 8};
+
+  tf::Tensor X_tensor(tf::DT_FLOAT, {4, 2});
+  tf::Tensor Y_tensor(tf::DT_FLOAT, {1, 4});
 
   auto X_tensor_mapped = X_tensor.matrix<float>();
   auto Y_tensor_mapped = Y_tensor.matrix<float>();
@@ -39,41 +90,49 @@ void LinearRegressionExample() {
   for (int i = 0; i < 4; ++i) {
     for (int j = 0; j < 1; ++j)
       X_tensor_mapped(i, j) = X_data[i];
-    Y_tensor_mapped(i, 0) = Y_data[i];
+    Y_tensor_mapped(0, i) = Y_data[i];
+    X_tensor_mapped(i, 1) = 1.0;
   }
 
-  // Initialize weights W and bias b
-  tf::Tensor W(tf::DT_FLOAT, {1, 1});
-  tf::Tensor b(tf::DT_FLOAT, {4, 1});
-  auto W_flat = W.flat<float>();
-  auto b_flat = b.flat<float>();
-  for (int i = 0; i < 4; ++i) {
-    W_flat(i) = 0.0f;
-    b_flat(i) = 0.0f;
-  }
-
-  auto XW = tf::ops::MatMul(root, X_tensor, W); // 4,1 . 1,1
-  auto Y_pred = tf::ops::Add(root, XW, b);      // 4,1 + 4,1
-
-  auto error = tf::ops::Sub(root, Y_pred, Y_tensor);                  // 4,1 - 4,1
-  auto loss = tf::ops::Mean(root, tf::ops::Square(root, error), {0}); // 1,1
-
-  auto dW = tf::ops::MatMul(root, tf::ops::Transpose(root, X_tensor, {1, 0}), error); // 1,4 . 4,1
-  auto db = tf::ops::Mean(root, error, {0});                                          // 4, 1
-
-  auto W_update =
-      tf::ops::Sub(root, W, tf::ops::Mul(root, tf::ops::Const(root, 0.001), dW)); // 1,1 - 1,1
-  auto b_update =
-      tf::ops::Sub(root, b, tf::ops::Mul(root, tf::ops::Const(root, 0.001), db)); // 4,1 - 4,1
+  auto denominator = tf::ops::Mul(root, X_tensor, X_tensor);
+  auto denominator_reduced = tf::ops::Sum(root, denominator, {0, 1});
+  auto numerator = tf::ops::Mul(root, Y_tensor, Y_tensor);
+  auto numerator_reduced = tf::ops::Sum(root, numerator, {0, 1});
 
   tf::ClientSession session(root);
+  std::vector<tensorflow::Tensor> outputs;
+  auto status = session.Run({denominator_reduced, numerator_reduced}, &outputs);
+  if (!status.ok())
+    std::cout << "Error calculating weight and bias: " << status.ToString();
+
+  auto guess = outputs[1].scalar<float>()(0) / outputs[0].scalar<float>()(0);
+  // Initialize weight W
+  tf::Tensor W(tf::DT_FLOAT, {1, 2});
+  auto W_flat = W.flat<float>();
+  for (int i = 0; i < 2; ++i)
+    W_flat(i) = std::sqrt(guess);
+
+  auto Z = tf::ops::MatMul(root, tf::ops::Transpose(root, X_tensor, {1, 0}), X_tensor);
+
+  auto WZ = tf::ops::MatMul(root, W, Z);
+  auto YX = tf::ops::MatMul(root, Y_tensor, X_tensor);
+  auto WZ_YX = tf::ops::Sub(root, WZ, YX);
+  auto lr_Z_YX = tf::ops::Mul(root, tf::ops::Const(root, 0.001), WZ_YX);
+
+  auto XW = tf::ops::MatMul(root, X_tensor, W);
+  auto Y_pred = tf::ops::MatMul(root, W, X_tensor);
+
+  auto error = tf::ops::Sub(root, Y_pred, Y_tensor);
+  auto loss = tf::ops::Mean(root, tf::ops::Square(root, error), {0});
+
+  auto W_update = tf::ops::Sub(root, W, lr_Z_YX);
+
   for (int epoch = 0; epoch < 50; ++epoch) {
     std::vector<tf::Tensor> outputs;
-    auto status = session.Run({W_update, b_update}, &outputs);
+    auto status = session.Run({W_update}, &outputs);
     if (!status.ok())
       std::cout << "Error calculating weight and bias: " << status.ToString();
     W = outputs[0];
-    b = outputs[1];
 
     if (epoch % 100 == 0) {
       std::vector<tf::Tensor> loss_output;
@@ -84,12 +143,11 @@ void LinearRegressionExample() {
     }
   }
   std::cout << "W: " << W << std::endl;
-  std::cout << "b: " << b << std::endl;
 }
 
 int main() {
 
-  LinearRegressionExample();
+  // MyLinearRegression();
 
   // txeo::Vector<double> vec({1., 2., 3., 4., 5., 6., 7., 8., 9.});
   // vec.normalize(txeo::NormalizationType::MIN_MAX);
