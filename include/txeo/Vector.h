@@ -167,6 +167,17 @@ class Vector : public txeo::Tensor<T> {
       this->reshape(std::vector<size_t>(shape));
     };
 
+    /**
+     * @brief Returns the size of the vector.
+     *
+     * @return The total number of elements in the vector.
+     *
+     * **Example Usage:**
+     * @code
+     * txeo::Vector<int> vec(3);
+     * size_t size = vec.size();  // size = 3
+     * @endcode
+     */
     [[nodiscard]] size_t size() const { return this->dim(); }
 
     /**

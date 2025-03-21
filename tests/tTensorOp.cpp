@@ -354,4 +354,71 @@ TEST(TensorOpTest, DotProductEmptyVectors) {
   EXPECT_THROW(TensorOp<int>::dot(left, right), txeo::TensorOpError);
 }
 
+TEST(TensorOpTest, ValidMatrixVectorMultiplication) {
+  txeo::Matrix<int> mat(2, 3, {1, 2, 3, 4, 5, 6});
+  txeo::Vector<int> vec({7, 8, 9});
+
+  auto result = txeo::TensorOp<int>::product(mat, vec);
+
+  EXPECT_EQ(result.shape(), txeo::TensorShape({2, 1}));
+  EXPECT_EQ(result.data()[0], 50);
+  EXPECT_EQ(result.data()[1], 122);
+}
+
+TEST(TensorOpTest, FloatingPointPrecision) {
+  txeo::Matrix<double> mat(2, 2, {0.1, 0.2, 0.3, 0.4});
+  txeo::Vector<double> vec({1.5, 2.5});
+
+  auto result = txeo::TensorOp<double>::product(mat, vec);
+
+  EXPECT_EQ(result.shape(), txeo::TensorShape({2, 1}));
+  EXPECT_DOUBLE_EQ(result.data()[0], 0.1 * 1.5 + 0.2 * 2.5);
+  EXPECT_DOUBLE_EQ(result.data()[1], 0.3 * 1.5 + 0.4 * 2.5);
+}
+
+TEST(TensorOpTest, InvalidDimensions) {
+  txeo::Matrix<float> mat(3, 2, {1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f});
+  txeo::Vector<float> vec({1.0f, 2.0f, 3.0f});
+
+  EXPECT_THROW({ txeo::TensorOp<float>::product(mat, vec); }, txeo::TensorOpError);
+}
+
+TEST(TensorOpTest, EmptyInputs) {
+  txeo::Matrix<int> empty_mat(0, 3);
+  txeo::Vector<int> empty_vec(0);
+  txeo::Vector<int> valid_vec({1, 2, 3});
+
+  EXPECT_THROW(txeo::TensorOp<int>::product(empty_mat, valid_vec), txeo::TensorOpError);
+
+  EXPECT_THROW(txeo::TensorOp<int>::product(txeo::Matrix<int>(2, 2), empty_vec),
+               txeo::TensorOpError);
+}
+
+TEST(TensorOpTest, SingleElementOperations) {
+  txeo::Matrix<int> mat(1, 1, {5});
+  txeo::Vector<int> vec({7});
+
+  auto result = txeo::TensorOp<int>::product(mat, vec);
+
+  EXPECT_EQ(result.shape(), txeo::TensorShape({1, 1}));
+  EXPECT_EQ(result.data()[0], 35);
+}
+
+TEST(TensorOpTest, LargeDimensions) {
+  const size_t ROWS = 100;
+  const size_t COLS = 200;
+  std::vector<int> mat_data(ROWS * COLS, 1);
+  std::vector<int> vec_data(COLS, 2);
+
+  txeo::Matrix<int> mat(ROWS, COLS, mat_data);
+  txeo::Vector<int> vec(COLS, vec_data);
+
+  auto result = txeo::TensorOp<int>::product(mat, vec);
+
+  EXPECT_EQ(result.shape(), txeo::TensorShape({ROWS, 1}));
+  for (auto val : result) {
+    EXPECT_EQ(val, COLS * 2);
+  }
+}
+
 } // namespace txeo

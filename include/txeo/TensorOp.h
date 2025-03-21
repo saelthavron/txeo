@@ -384,6 +384,22 @@ class TensorOp {
      */
     static txeo::Matrix<T> product(const txeo::Matrix<T> &left, const txeo::Matrix<T> &right);
 
+    /**
+     * @brief Computes the matrix product of a matrix and a vector.
+     *
+     * @param left The left matrix (m x n).
+     * @param right The right vector (n).
+     * @return A new tensor (m x 1) containing the result of the matrix product.
+     *
+     * @throws txeo::TensorOpError
+     *
+     * **Example Usage:**
+     * @code
+     * txeo::Matrix<int> left(2, 3, {1, 2, 3, 4, 5, 6});  // 2x3 matrix
+     * txeo::Vector<int> right(3, {7, 8, 9});  // vector of size 3
+     * auto result = TensorOp<int>::product(left, right);
+     * @endcode
+     */
     static txeo::Tensor<T> product(const txeo::Matrix<T> &left, const txeo::Vector<T> &right);
 
   private:

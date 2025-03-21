@@ -161,8 +161,30 @@ class Matrix : public txeo::Tensor<T> {
      */
     [[nodiscard]] size_t size() const { return txeo::Tensor<T>::dim(); };
 
+    /**
+     * @brief Returns the row size of the matrix.
+     *
+     * @return The number of rows in the matrix.
+     *
+     * **Example Usage:**
+     * @code
+     * txeo::Matrix<int> matrix(2, 3);
+     * size_t size = matrix.row_size();  // size = 2
+     * @endcode
+     */
     [[nodiscard]] size_t row_size() const { return this->shape().axis_dim(0); };
 
+    /**
+     * @brief Returns the column size of the matrix.
+     *
+     * @return The number of columns in the matrix.
+     *
+     * **Example Usage:**
+     * @code
+     * txeo::Matrix<int> matrix(2, 3);
+     * size_t size = matrix.col_size();  // size = 3
+     * @endcode
+     */
     [[nodiscard]] size_t col_size() const { return this->shape().axis_dim(1); };
 
     /**
