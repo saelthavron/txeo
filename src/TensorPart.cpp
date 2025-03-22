@@ -1,8 +1,10 @@
 #include "txeo/TensorPart.h"
+#include "txeo/TensorShape.h"
 #include "txeo/detail/TensorHelper.h"
 #include "txeo/detail/utils.h"
 
 #include <cstddef>
+#include <cstdint>
 #include <tensorflow/cc/client/client_session.h>
 #include <tensorflow/cc/framework/ops.h>
 #include <tensorflow/cc/framework/scope.h>
@@ -57,6 +59,55 @@ inline txeo::Tensor<T> TensorPart<T>::slice(const txeo::Tensor<T> &tensor, size_
     throw txeo::TensorPartError("This tensor could not be sliced!");
 
   return resp;
+}
+
+template <typename T>
+txeo::Tensor<T> TensorPart<T>::increment_dimension(const txeo::Tensor<T> &tensor, size_t axis,
+                                                   T value) {
+  if (axis >= txeo::detail::to_size_t(tensor.order()))
+    throw txeo::TensorError("Axis inconsistent with the order of this tensor!");
+
+  txeo::TensorShape shp{tensor.shape()};
+  auto axis_int = txeo::detail::to_int(axis);
+  auto old_dim = shp.axis_dim(axis_int);
+  shp.set_dim(axis_int, old_dim + 1);
+
+  auto vec_shape = shp.axes_dims();
+  int64_t step = 1;
+  for (size_t i{axis + 1}; i < vec_shape.size(); ++i)
+    step *= vec_shape[i];
+
+  txeo::Tensor<T> resp(shp);
+
+  auto tensor_flat = tensor.data();
+  auto resp_flat = resp.data();
+
+  auto insert_pos = step * txeo::detail::to_size_t(old_dim);
+  size_t i{0}, j{0};
+  resp_flat[i] = tensor_flat[j];
+  auto resp_dim = resp.dim();
+  while (++i < resp.dim()) {
+    if (++j % insert_pos == 0) {
+      if ((i + step) <= resp_dim)
+        for (int64_t k{0}; k < step; ++k) {
+          resp_flat[i] = value;
+          i++;
+        }
+      if (i >= resp_dim)
+        break;
+    }
+    resp_flat[i] = tensor_flat[j];
+  }
+
+  return resp;
+}
+
+template <typename T>
+txeo::Tensor<T> &TensorPart<T>::increment_dimension_by(txeo::Tensor<T> &tensor, size_t axis,
+                                                       T value) {
+  tensor = std::move(TensorPart<T>::increment_dimension(tensor, axis, value));
+
+  return tensor;
 }
 
 template class TensorPart<short>;

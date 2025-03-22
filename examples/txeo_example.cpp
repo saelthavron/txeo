@@ -5,6 +5,7 @@
 #include "txeo/TensorAgg.h"
 #include "txeo/TensorFunc.h"
 #include "txeo/TensorOp.h"
+#include "txeo/TensorPart.h"
 #include <cmath>
 #include <cstddef>
 #include <iostream>
@@ -80,7 +81,14 @@ void MyLinearRegression() {
 
 int main() {
 
-  MyLinearRegression();
+  //  MyLinearRegression();
+
+  txeo::Tensor<int> t({{{1, 2, 3}, {4, 5, 6}}, {{7, 8, 9}, {10, 11, 12}}});
+  std::cout << t << std::endl;
+
+  txeo::TensorPart<int>::increment_dimension_by(t, 0, -1);
+
+  std::cout << t << std::endl;
 
   // txeo::Vector<double> vec({1., 2., 3., 4., 5., 6., 7., 8., 9.});
   // vec.normalize(txeo::NormalizationType::MIN_MAX);

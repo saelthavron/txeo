@@ -1,4 +1,5 @@
 #include "txeo/TensorFunc.h"
+#include "txeo/Matrix.h"
 #include "txeo/Tensor.h"
 #include "txeo/TensorOp.h"
 #include "txeo/detail/TensorHelper.h"
@@ -323,6 +324,13 @@ txeo::Tensor<T> TensorFunc<T>::normalize(const txeo::Tensor<T> &tensor,
   TensorFunc<T>::normalize_by(resp, type);
 
   return resp;
+}
+
+template <typename T>
+txeo::Matrix<T> TensorFunc<T>::get_gram_matrix(const txeo::Matrix<T> &matrix) {
+  auto resp = TensorFunc<T>::transpose(matrix);
+
+  return txeo::TensorOp<T>::product(resp, matrix);
 }
 
 template class TensorFunc<size_t>;

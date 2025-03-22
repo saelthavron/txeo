@@ -302,6 +302,8 @@ class TensorFunc {
      */
     static txeo::Matrix<T> &transpose_by(txeo::Matrix<T> &matrix);
 
+    static txeo::Matrix<T> get_gram_matrix(const txeo::Matrix<T> &matrix);
+
   private:
     TensorFunc() = default;
 

@@ -1,5 +1,6 @@
 #ifndef TRAINER_H
 #define TRAINER_H
+#include "txeo/Loss.h"
 #pragma once
 
 #include "txeo/Tensor.h"
@@ -17,7 +18,7 @@ class Trainer {
     Trainer &operator=(Trainer &&) = default;
     virtual ~Trainer() = default;
 
-    Trainer(size_t epochs) : _epochs{epochs} {}
+    Trainer(const txeo::Loss<T> &loss, size_t epochs) : _loss{&loss}, _epochs{epochs} {}
 
     virtual void fit(const txeo::Tensor<T> &X, const txeo::Tensor<T> &y);
 
@@ -38,6 +39,7 @@ class Trainer {
   protected:
     Trainer() = default;
 
+    const txeo::Loss<T> *_loss;
     size_t _epochs{};
     double _epsilon{0.01};
     bool _is_trained{false};

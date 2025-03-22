@@ -99,6 +99,10 @@ class TensorPart {
     static txeo::Tensor<T> slice(const txeo::Tensor<T> &tensor, size_t first_axis_begin,
                                  size_t first_axis_end);
 
+    static txeo::Tensor<T> increment_dimension(const txeo::Tensor<T> &tensor, size_t axis, T value);
+
+    static txeo::Tensor<T> &increment_dimension_by(txeo::Tensor<T> &tensor, size_t axis, T value);
+
   private:
     TensorPart() = default;
 };
