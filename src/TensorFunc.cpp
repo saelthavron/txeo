@@ -303,8 +303,8 @@ void TensorFunc<T>::z_score_normalize(txeo::Tensor<T> &tensor) {
 }
 
 template <typename T>
-inline txeo::Tensor<T> &TensorFunc<T>::normalize_by(txeo::Tensor<T> &tensor,
-                                                    txeo::NormalizationType type) {
+txeo::Tensor<T> &TensorFunc<T>::normalize_by(txeo::Tensor<T> &tensor,
+                                             txeo::NormalizationType type) {
 
   if (tensor.dim() == 0)
     throw txeo::TensorFuncError("Tensor has dimension zero.");

@@ -45,8 +45,8 @@ std::vector<txeo::Tensor<T>> TensorPart<T>::unstack(const txeo::Tensor<T> &tenso
 }
 
 template <typename T>
-inline txeo::Tensor<T> TensorPart<T>::slice(const txeo::Tensor<T> &tensor, size_t first_axis_begin,
-                                            size_t first_axis_end) {
+txeo::Tensor<T> TensorPart<T>::slice(const txeo::Tensor<T> &tensor, size_t first_axis_begin,
+                                     size_t first_axis_end) {
   if (first_axis_end < first_axis_begin)
     throw txeo::TensorError("The end index can not be less than the initial index!");
   if (txeo::detail::to_int64(first_axis_end) > tensor._impl->txeo_shape.axis_dim(0))

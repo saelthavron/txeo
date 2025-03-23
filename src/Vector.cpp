@@ -7,7 +7,7 @@
 namespace txeo {
 
 template <typename T>
-inline Vector<T>::Vector() {
+Vector<T>::Vector() {
   this->create_from_shape(txeo::TensorShape({1}));
   this->data()[0] = 0;
 }

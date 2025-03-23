@@ -185,7 +185,7 @@ txeo::Tensor<T> &TensorOp<T>::divide_by(txeo::Tensor<T> &tensor, const T &scalar
 }
 
 template <typename T>
-inline txeo::Tensor<T> TensorOp<T>::divide(const T &scalar, const txeo::Tensor<T> &tensor) {
+txeo::Tensor<T> TensorOp<T>::divide(const T &scalar, const txeo::Tensor<T> &tensor) {
   if (tensor.dim() == 0)
     throw txeo::TensorOpError("Right operand has dimension zero.");
 
@@ -200,7 +200,7 @@ inline txeo::Tensor<T> TensorOp<T>::divide(const T &scalar, const txeo::Tensor<T
 }
 
 template <typename T>
-inline txeo::Tensor<T> &TensorOp<T>::divide_by(const T &scalar, txeo::Tensor<T> &tensor) {
+txeo::Tensor<T> &TensorOp<T>::divide_by(const T &scalar, txeo::Tensor<T> &tensor) {
   if (tensor.dim() == 0)
     throw txeo::TensorOpError("Tensor has dimension zero.");
 
@@ -243,8 +243,8 @@ txeo::Tensor<T> &TensorOp<T>::hadamard_prod_by(txeo::Tensor<T> &left,
 }
 
 template <typename T>
-inline txeo::Tensor<T> TensorOp<T>::hadamard_div(const txeo::Tensor<T> &left,
-                                                 const txeo::Tensor<T> &right) {
+txeo::Tensor<T> TensorOp<T>::hadamard_div(const txeo::Tensor<T> &left,
+                                          const txeo::Tensor<T> &right) {
   if (left.dim() == 0 || right.dim() == 0)
     throw txeo::TensorOpError("One of the operands has dimension zero.");
   if (left.shape() != right.shape())
@@ -261,8 +261,7 @@ inline txeo::Tensor<T> TensorOp<T>::hadamard_div(const txeo::Tensor<T> &left,
 }
 
 template <typename T>
-inline txeo::Tensor<T> &TensorOp<T>::hadamard_div_by(txeo::Tensor<T> &left,
-                                                     const txeo::Tensor<T> &right) {
+txeo::Tensor<T> &TensorOp<T>::hadamard_div_by(txeo::Tensor<T> &left, const txeo::Tensor<T> &right) {
   if (left.dim() == 0 || right.dim() == 0)
     throw txeo::TensorOpError("One of the operands has dimension zero.");
   if (left.shape() != right.shape())
@@ -278,7 +277,7 @@ inline txeo::Tensor<T> &TensorOp<T>::hadamard_div_by(txeo::Tensor<T> &left,
 }
 
 template <typename T>
-inline T TensorOp<T>::dot(const txeo::Tensor<T> &left, const txeo::Tensor<T> &right) {
+T TensorOp<T>::dot(const txeo::Tensor<T> &left, const txeo::Tensor<T> &right) {
   if (left.dim() == 0 || right.dim() == 0)
     throw txeo::TensorOpError("One of the operands has dimension zero.");
 
@@ -296,11 +295,14 @@ inline T TensorOp<T>::dot(const txeo::Tensor<T> &left, const txeo::Tensor<T> &ri
 }
 
 template <typename T>
-inline txeo::Matrix<T> TensorOp<T>::product(const txeo::Matrix<T> &left,
-                                            const txeo::Matrix<T> &right) {
+txeo::Tensor<T> TensorOp<T>::product_tensors(const txeo::Tensor<T> &left,
+                                             const txeo::Tensor<T> &right) {
 
   if (left.dim() == 0 || right.dim() == 0)
     throw txeo::TensorOpError("One of the operands has dimension zero.");
+
+  if (left.order() != 2 || right.order() != 2)
+    throw txeo::TensorOpError("One of the operands is not a matrix.");
 
   if (left.shape().axis_dim(1) != right.shape().axis_dim(0))
     throw txeo::TensorOpError("Operands are incompatible.");
@@ -311,7 +313,13 @@ inline txeo::Matrix<T> TensorOp<T>::product(const txeo::Matrix<T> &left,
         return tf::ops::MatMul(scope, left, right);
       });
 
-  return txeo::Matrix<T>(std::move(aux));
+  return aux;
+}
+
+template <typename T>
+txeo::Matrix<T> TensorOp<T>::product(const txeo::Matrix<T> &left, const txeo::Matrix<T> &right) {
+  auto resp = txeo::Matrix<T>::to_matrix(TensorOp<T>::product_tensors(left, right));
+  return resp;
 }
 
 template <typename T>

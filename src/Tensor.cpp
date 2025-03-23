@@ -434,19 +434,19 @@ Tensor<T> &Tensor<T>::operator*=(const T &scalar) {
 }
 
 template <typename T>
-inline Tensor<T> &Tensor<T>::operator/=(const T &scalar) {
+Tensor<T> &Tensor<T>::operator/=(const T &scalar) {
   txeo::TensorOp<T>::divide_by(*this, scalar);
   return *this;
 }
 
 template <typename T>
-inline Tensor<T> &Tensor<T>::operator+=(const T &scalar) {
+Tensor<T> &Tensor<T>::operator+=(const T &scalar) {
   txeo::TensorOp<T>::sum_by(*this, scalar);
   return *this;
 }
 
 template <typename T>
-inline Tensor<T> &Tensor<T>::operator-=(const T &scalar) {
+Tensor<T> &Tensor<T>::operator-=(const T &scalar) {
   txeo::TensorOp<T>::subtract_by(*this, scalar);
   return *this;
 }

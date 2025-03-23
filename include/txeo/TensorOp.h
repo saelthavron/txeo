@@ -365,6 +365,9 @@ class TensorOp {
      */
     static T dot(const txeo::Tensor<T> &left, const txeo::Tensor<T> &right);
 
+    static txeo::Tensor<T> product_tensors(const txeo::Tensor<T> &left,
+                                           const txeo::Tensor<T> &right);
+
     /**
      * @brief Computes the matrix product of two matrices.
      *

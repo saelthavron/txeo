@@ -7,7 +7,7 @@
 namespace txeo {
 
 template <typename T>
-inline void Loss<T>::set_loss(txeo::LossFunc func) {
+void Loss<T>::set_loss(txeo::LossFunc func) {
   switch (func) {
   case LossFunc::MSE:
     _loss_func = [this](const txeo::Tensor<T> &pred) -> T { return this->mse(pred); };

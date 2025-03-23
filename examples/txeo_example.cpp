@@ -1,6 +1,7 @@
 
 #include "txeo/Loss.h"
 #include "txeo/Matrix.h"
+#include "txeo/OlsGDTrainer.h"
 #include "txeo/Tensor.h"
 #include "txeo/TensorAgg.h"
 #include "txeo/TensorFunc.h"
@@ -83,12 +84,18 @@ int main() {
 
   //  MyLinearRegression();
 
-  txeo::Tensor<int> t({{{1, 2, 3}, {4, 5, 6}}, {{7, 8, 9}, {10, 11, 12}}});
-  std::cout << t << std::endl;
+  txeo::Matrix<double> x_train(4, 1, {1, 2, 3, 4});
+  txeo::Matrix<double> y_train(4, 1, {5, 8, 11, 14});
 
-  txeo::TensorPart<int>::increment_dimension_by(t, 0, -1);
+  txeo::Matrix<double> x_valid(4, 1, {10, 11, 12, 13});
+  txeo::Matrix<double> y_valid(4, 1, {32, 35, 38, 41});
 
-  std::cout << t << std::endl;
+  txeo::OlsGDTrainer<double> ols{x_train, y_train, x_valid, y_valid};
+
+  ols.enable_variable_lr();
+  ols.fit(50, txeo::LossFunc::MAE, 0.001, 5);
+
+  std::cout << ols.weight_bias() << std::endl;
 
   // txeo::Vector<double> vec({1., 2., 3., 4., 5., 6., 7., 8., 9.});
   // vec.normalize(txeo::NormalizationType::MIN_MAX);

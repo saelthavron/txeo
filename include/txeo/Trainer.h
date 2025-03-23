@@ -18,38 +18,48 @@ class Trainer {
     Trainer &operator=(Trainer &&) = default;
     virtual ~Trainer() = default;
 
-    Trainer(const txeo::Loss<T> &loss, size_t epochs) : _loss{&loss}, _epochs{epochs} {}
+    Trainer(const txeo::Tensor<T> &x_train, const txeo::Tensor<T> &y_train,
+            const txeo::Tensor<T> &x_valid, const txeo::Tensor<T> &y_valid);
 
-    virtual void fit(const txeo::Tensor<T> &X, const txeo::Tensor<T> &y);
+    Trainer(const txeo::Tensor<T> &x_train, const txeo::Tensor<T> &y_train)
+        : Trainer{x_train, y_train, x_train, y_train} {}
 
-    virtual txeo::Tensor<T> predict(const txeo::Tensor<T> input) = 0;
+    virtual void fit(size_t epochs, txeo::LossFunc metric);
 
-    [[nodiscard]] size_t epochs() const { return _epochs; }
+    virtual void fit(size_t epochs, txeo::LossFunc metric, T epsilon, size_t patience);
+
+    virtual txeo::Tensor<T> predict(const txeo::Tensor<T> &input) = 0;
+
     [[nodiscard]] double epsilon() const { return _epsilon; }
 
-    void set_epochs(const size_t &epochs);
-    void set_epsilon(double epsilon);
-
     [[nodiscard]] bool is_trained() const { return _is_trained; }
-
-    void enable_early_stopping(double epsilon, size_t patience = 5);
-
-    void disable_early_stopping();
 
   protected:
     Trainer() = default;
 
-    const txeo::Loss<T> *_loss;
-    size_t _epochs{};
     double _epsilon{0.01};
     bool _is_trained{false};
     bool _is_converged{false};
     bool _is_early_stop{false};
-    size_t _patience{5};
+    size_t _patience{0};
 
-    virtual void train(const txeo::Tensor<T> &X, const txeo::Tensor<T> &y) = 0;
+    const txeo::Tensor<T> *_x_train;
+    const txeo::Tensor<T> *_y_train;
+    const txeo::Tensor<T> *_x_valid;
+    const txeo::Tensor<T> *_y_valid;
+
+    virtual void train(size_t epochs, txeo::LossFunc loss_func) = 0;
 
     void reset();
+};
+
+/**
+ * @brief Exceptions concerning @ref txeo::OlsGDTrainer
+ *
+ */
+class TrainerError : public std::runtime_error {
+  public:
+    using std::runtime_error::runtime_error;
 };
 
 } // namespace txeo

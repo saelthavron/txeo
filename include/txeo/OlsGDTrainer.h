@@ -1,5 +1,6 @@
 #ifndef OLSGDTRAINER_H
 #define OLSGDTRAINER_H
+#include "txeo/Matrix.h"
 #pragma once
 
 #include "txeo/Loss.h"
@@ -20,9 +21,14 @@ class OlsGDTrainer : public txeo::Trainer<T> {
     OlsGDTrainer &operator=(OlsGDTrainer &&) = delete;
     ~OlsGDTrainer() = default;
 
-    OlsGDTrainer(const txeo::Loss<T> &loss, size_t epochs) : txeo::Trainer<T>{loss, epochs} {};
+    OlsGDTrainer(const txeo::Matrix<T> &x_train, const txeo::Matrix<T> &y_train,
+                 const txeo::Matrix<T> &x_valid, const txeo::Matrix<T> &y_valid)
+        : txeo::Trainer<T>{x_train, y_train, x_valid, y_valid} {};
 
-    txeo::Tensor<T> predict(const txeo::Tensor<T> input) override;
+    OlsGDTrainer(const txeo::Matrix<T> &x_train, const txeo::Matrix<T> &y_train)
+        : OlsGDTrainer{x_train, y_train, x_train, y_train} {}
+
+    txeo::Tensor<T> predict(const txeo::Tensor<T> &input) override;
 
     [[nodiscard]] T learning_rate() const;
     void set_learning_rate(T learning_rate);
@@ -30,14 +36,15 @@ class OlsGDTrainer : public txeo::Trainer<T> {
     void enable_variable_lr() { _variable_lr = true; }
     void disable_variable_lr() { _variable_lr = false; }
 
+    const txeo::Matrix<T> &weight_bias() const;
+
   private:
     T _learning_rate{0.01};
-    txeo::Tensor<T> _bias{};
-    txeo::Tensor<T> _weight{};
+    txeo::Matrix<T> _weight_bias{};
     bool _variable_lr{false};
 
     OlsGDTrainer() = default;
-    void train(const txeo::Tensor<T> &X, const txeo::Tensor<T> &y) override;
+    void train(size_t epochs, txeo::LossFunc metric) override;
 };
 
 /**

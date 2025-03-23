@@ -3,40 +3,37 @@
 namespace txeo {
 
 template <typename T>
-inline void Trainer<T>::reset() {
+inline Trainer<T>::Trainer(const txeo::Tensor<T> &x_train, const txeo::Tensor<T> &y_train,
+                           const txeo::Tensor<T> &x_valid, const txeo::Tensor<T> &y_valid)
+    : _x_train{&x_train}, _y_train{&y_train}, _x_valid{&x_valid}, _y_valid{&y_valid} {
+  if (x_train.dim() == 0 || y_train.dim() == 0 || x_valid.dim() == 0 || y_valid.dim() == 0)
+    throw TrainerError("One of the tensors has zero dimension.");
+
+  if (x_train.shape().axis_dim(0) != y_train.shape().axis_dim(0) ||
+      x_valid.shape().axis_dim(0) != y_valid.shape().axis_dim(0))
+    throw TrainerError("Training or Validation tensor are incompatible.");
+};
+
+template <typename T>
+void Trainer<T>::reset() {
   _is_trained = false;
   _is_converged = false;
 }
 
 template <typename T>
-void Trainer<T>::fit(const txeo::Tensor<T> &X, const txeo::Tensor<T> &y) {
-  this->train(X, y);
+void Trainer<T>::fit(size_t epochs, txeo::LossFunc metric) {
+  this->train(epochs, metric);
   _is_trained = true;
 };
 
 template <typename T>
-void Trainer<T>::set_epochs(const size_t &epochs) {
-  this->reset();
-  _epochs = epochs;
-}
-
-template <typename T>
-void Trainer<T>::set_epsilon(double epsilon) {
-  this->reset();
-  _epsilon = epsilon;
-}
-
-template <typename T>
-void Trainer<T>::enable_early_stopping(double epsilon, size_t patience) {
-  this->reset();
+inline void Trainer<T>::fit(size_t epochs, txeo::LossFunc metric, T epsilon, size_t patience) {
+  if (epsilon < 0)
+    throw TrainerError("Tolerance cannot be negative.");
   _is_early_stop = true;
   _epsilon = epsilon;
   _patience = patience;
-}
-
-template <typename T>
-inline void Trainer<T>::disable_early_stopping() {
-  _is_early_stop = false;
+  this->fit(epochs, metric);
 }
 
 template class Trainer<size_t>;
