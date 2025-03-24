@@ -241,6 +241,7 @@ TEST(VectorTest, ScalarMultiplication) {
   EXPECT_EQ(result.data()[0], 6);
   EXPECT_EQ(result.data()[1], 9);
   EXPECT_EQ(result.data()[2], 12);
+  EXPECT_TRUE((4 * v) == txeo::Vector<int>({8, 12, 16}));
 }
 
 TEST(VectorTest, ScalarDivisionRight) {

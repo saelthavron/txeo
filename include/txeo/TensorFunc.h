@@ -56,7 +56,7 @@ class TensorFunc {
      * TensorOp<double>::power_elem_by(a, 3.0);  // a becomes [27.0, 64.0]
      * @endcode
      */
-    static txeo::Tensor<T> power_elem_by(txeo::Tensor<T> &tensor, const T &exponent);
+    static txeo::Tensor<T> &power_elem_by(txeo::Tensor<T> &tensor, const T &exponent);
 
     /**
      * @brief Computes the element-wise square of a tensor.
@@ -302,7 +302,7 @@ class TensorFunc {
      */
     static txeo::Matrix<T> &transpose_by(txeo::Matrix<T> &matrix);
 
-    static txeo::Matrix<T> get_gram_matrix(const txeo::Matrix<T> &matrix);
+    static txeo::Matrix<T> compute_gram_matrix(const txeo::Matrix<T> &matrix);
 
   private:
     TensorFunc() = default;

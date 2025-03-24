@@ -37,6 +37,12 @@ struct DeviceInfo {
  */
 enum class NormalizationType { MIN_MAX, Z_SCORE };
 
+/**
+ * @brief Types of loss functions
+ *
+ */
+enum class LossFunc { MSE, MAE, MSLE, LCHE };
+
 } // namespace txeo
 
 #endif

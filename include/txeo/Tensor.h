@@ -1,6 +1,7 @@
 #ifndef TENSOR_H
 #define TENSOR_H
 
+#include "txeo/types.h"
 #pragma once
 
 #include "TensorShape.h"
@@ -862,6 +863,24 @@ class Tensor {
      */
     void squeeze();
 
+    Tensor<T> &increase_dimension(size_t axis, T value);
+
+    Tensor<T> &power(const T &exponent);
+
+    Tensor<T> &square();
+
+    Tensor<T> &sqrt();
+
+    Tensor<T> &abs();
+
+    Tensor<T> &permute(const std::vector<size_t> &axes);
+
+    Tensor<T> &normalize(size_t axis, txeo::NormalizationType type);
+
+    Tensor<T> &normalize(txeo::NormalizationType type);
+
+    T dot(const Tensor<T> &tensor) const;
+
     /**
      * @brief Assigns a specified value to this tensor elements
      *
@@ -989,6 +1008,9 @@ class Tensor {
      */
     template <typename U>
     friend txeo::Tensor<U> operator*(const txeo::Tensor<U> &tensor, const U &scalar);
+
+    template <typename U>
+    friend txeo::Tensor<U> operator*(const U &scalar, const txeo::Tensor<U> &tensor);
 
     /**
      * @brief Element-wise division operator (tensor / scalar)

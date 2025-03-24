@@ -3,12 +3,11 @@
 #pragma once
 
 #include "txeo/Tensor.h"
+#include "txeo/types.h"
 
 #include <functional>
 
 namespace txeo {
-
-enum class LossFunc { MSE, MAE, MSLE, LCHE };
 
 /**
  * @class Loss

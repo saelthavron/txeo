@@ -1,5 +1,6 @@
 #include "txeo/Matrix.h"
 #include "txeo/Tensor.h"
+#include "txeo/TensorOp.h"
 #include "txeo/TensorShape.h"
 #include <gtest/gtest.h>
 
@@ -233,12 +234,15 @@ TEST(MatrixTest, MultiplicationMatrixScalar) {
   txeo::Matrix<int> m(2, 3, {2, 3, 4, 5, 6, 7});
   auto result = m * 3;
 
+  txeo::Matrix<int> t1(2, 3, {1, 2, 3, 4, 5, 6});
+
   EXPECT_EQ(result.data()[0], 6);
   EXPECT_EQ(result.data()[1], 9);
   EXPECT_EQ(result.data()[2], 12);
   EXPECT_EQ(result.data()[3], 15);
   EXPECT_EQ(result.data()[4], 18);
   EXPECT_EQ(result.data()[5], 21);
+  EXPECT_TRUE((3 * t1) == txeo::Matrix<int>(2, 3, {3, 6, 9, 12, 15, 18}));
 }
 
 TEST(MatrixTest, DivisionMatrixScalar) {
@@ -296,4 +300,95 @@ TEST(MatrixTest, BooleanMatrixOperations) {
   EXPECT_EQ(result.data()[1], true);
   EXPECT_EQ(result.data()[2], true);
   EXPECT_EQ(result.data()[3], false);
+}
+
+TEST(MatrixTest, Transpose2x3Matrix) {
+  txeo::Matrix<int> mat(2, 3, {1, 2, 3, 4, 5, 6});
+  mat.transpose();
+
+  ASSERT_EQ(mat.row_size(), 3);
+  ASSERT_EQ(mat.col_size(), 2);
+  EXPECT_EQ(mat(0, 0), 1);
+  EXPECT_EQ(mat(0, 1), 4);
+  EXPECT_EQ(mat(1, 0), 2);
+  EXPECT_EQ(mat(2, 1), 6);
+}
+
+TEST(MatrixTest, Transpose1x1Matrix) {
+  txeo::Matrix<float> mat(1, 1, {3.14f});
+  mat.transpose();
+
+  ASSERT_EQ(mat.row_size(), 1);
+  ASSERT_EQ(mat.col_size(), 1);
+  EXPECT_FLOAT_EQ(mat(0, 0), 3.14f);
+}
+
+TEST(MatrixTest, TransposeRowVectorToColumn) {
+  txeo::Matrix<double> mat(1, 3, {1.1, 2.2, 3.3});
+  mat.transpose();
+
+  ASSERT_EQ(mat.row_size(), 3);
+  ASSERT_EQ(mat.col_size(), 1);
+  EXPECT_DOUBLE_EQ(mat(0, 0), 1.1);
+  EXPECT_DOUBLE_EQ(mat(1, 0), 2.2);
+  EXPECT_DOUBLE_EQ(mat(2, 0), 3.3);
+}
+
+TEST(MatrixTest, MatrixMatrixMultiplication) {
+  txeo::Matrix<int> a(2, 3, {1, 2, 3, 4, 5, 6});
+  txeo::Matrix<int> b(3, 2, {7, 8, 9, 10, 11, 12});
+  txeo::Matrix<int> result = a.prod(b);
+
+  ASSERT_EQ(result.row_size(), 2);
+  ASSERT_EQ(result.col_size(), 2);
+  EXPECT_EQ(result(0, 0), 1 * 7 + 2 * 9 + 3 * 11);
+  EXPECT_EQ(result(0, 1), 1 * 8 + 2 * 10 + 3 * 12);
+  EXPECT_EQ(result(1, 0), 4 * 7 + 5 * 9 + 6 * 11);
+  EXPECT_EQ(result(1, 1), 4 * 8 + 5 * 10 + 6 * 12);
+}
+
+TEST(MatrixTest, MatrixVectorMultiplication) {
+  txeo::Matrix<int> mat(2, 3, {1, 2, 3, 4, 5, 6});
+  txeo::Vector<int> vec({7, 8, 9});
+  txeo::Tensor<int> result = mat.prod(vec);
+
+  ASSERT_EQ(result.shape().axis_dim(0), 2);
+  EXPECT_EQ(result(0, 0), 1 * 7 + 2 * 8 + 3 * 9);
+  EXPECT_EQ(result(1, 0), 4 * 7 + 5 * 8 + 6 * 9);
+}
+
+TEST(MatrixTest, InvalidDimensionsThrow) {
+  txeo::Matrix<int> a(2, 3);
+  txeo::Matrix<int> b(2, 3);
+  txeo::Vector<int> vec(2);
+
+  // Matrix-Matrix multiplication mismatch
+  EXPECT_THROW(a.prod(b), txeo::TensorOpError);
+
+  // Matrix-Vector multiplication mismatch
+  EXPECT_THROW(a.prod(vec), txeo::TensorOpError);
+}
+
+TEST(MatrixTest, SquareMatrixMultiplication) {
+  txeo::Matrix<int> a(2, 2, {1, 2, 3, 4});
+  txeo::Matrix<int> b(2, 2, {5, 6, 7, 8});
+  txeo::Matrix<int> result = a.prod(b);
+
+  ASSERT_EQ(result.row_size(), 2);
+  ASSERT_EQ(result.col_size(), 2);
+  EXPECT_EQ(result(0, 0), 1 * 5 + 2 * 7);
+  EXPECT_EQ(result(0, 1), 1 * 6 + 2 * 8);
+  EXPECT_EQ(result(1, 0), 3 * 5 + 4 * 7);
+  EXPECT_EQ(result(1, 1), 3 * 6 + 4 * 8);
+}
+
+TEST(MatrixTest, IdentityMatrixMultiplication) {
+  txeo::Matrix<int> identity(2, 2, {1, 0, 0, 1});
+  txeo::Matrix<int> mat(2, 3, {5, 6, 7, 8, 9, 10});
+  txeo::Matrix<int> result = identity.prod(mat);
+
+  ASSERT_EQ(result.row_size(), 2);
+  ASSERT_EQ(result.col_size(), 3);
+  EXPECT_EQ(result(0, 0), 5);
+  EXPECT_EQ(result(1, 2), 10);
 }

@@ -1,6 +1,5 @@
 #ifndef VECTOR_H
 #define VECTOR_H
-#include "txeo/Matrix.h"
 #include "txeo/types.h"
 #pragma once
 
@@ -262,7 +261,10 @@ class Vector : public txeo::Tensor<T> {
     friend txeo::Vector<U> operator-(const U &left, const txeo::Vector<U> &right);
 
     template <typename U>
-    friend txeo::Vector<U> operator*(const txeo::Vector<U> &tensor, const U &scalar);
+    friend txeo::Vector<U> operator*(const txeo::Vector<U> &vector, const U &scalar);
+
+    template <typename U>
+    friend txeo::Vector<U> operator*(const U &scalar, const txeo::Vector<U> &vector);
 
     template <typename U>
     friend txeo::Vector<U> operator/(const txeo::Vector<U> &left, const U &right);

@@ -38,10 +38,17 @@ class OlsGDTrainer : public txeo::Trainer<T> {
 
     const txeo::Matrix<T> &weight_bias() const;
 
+    T tolerance() const { return _tolerance; }
+    void set_tolerance(const T &tolerance);
+
+    [[nodiscard]] bool is_converged() const { return _is_converged; }
+
   private:
     T _learning_rate{0.01};
+    T _tolerance{0.0001};
     txeo::Matrix<T> _weight_bias{};
     bool _variable_lr{false};
+    bool _is_converged{false};
 
     OlsGDTrainer() = default;
     void train(size_t epochs, txeo::LossFunc metric) override;

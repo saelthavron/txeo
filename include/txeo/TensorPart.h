@@ -1,5 +1,6 @@
 #ifndef TENSORPART_H
 #define TENSORPART_H
+#include "txeo/Matrix.h"
 #pragma once
 
 #include "txeo/Tensor.h"
@@ -99,9 +100,15 @@ class TensorPart {
     static txeo::Tensor<T> slice(const txeo::Tensor<T> &tensor, size_t first_axis_begin,
                                  size_t first_axis_end);
 
-    static txeo::Tensor<T> increment_dimension(const txeo::Tensor<T> &tensor, size_t axis, T value);
+    static txeo::Tensor<T> increase_dimension(const txeo::Tensor<T> &tensor, size_t axis, T value);
 
-    static txeo::Tensor<T> &increment_dimension_by(txeo::Tensor<T> &tensor, size_t axis, T value);
+    static txeo::Tensor<T> &increase_dimension_by(txeo::Tensor<T> &tensor, size_t axis, T value);
+
+    static txeo::Matrix<T> sub_matrix_cols(const txeo::Matrix<T> &matrix,
+                                           const std::vector<size_t> &cols);
+
+    static txeo::Matrix<T> sub_matrix_rows(const txeo::Matrix<T> &matrix,
+                                           const std::vector<size_t> &rows);
 
   private:
     TensorPart() = default;

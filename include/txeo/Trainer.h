@@ -26,20 +26,16 @@ class Trainer {
 
     virtual void fit(size_t epochs, txeo::LossFunc metric);
 
-    virtual void fit(size_t epochs, txeo::LossFunc metric, T epsilon, size_t patience);
+    virtual void fit(size_t epochs, txeo::LossFunc metric, size_t patience);
 
     virtual txeo::Tensor<T> predict(const txeo::Tensor<T> &input) = 0;
-
-    [[nodiscard]] double epsilon() const { return _epsilon; }
 
     [[nodiscard]] bool is_trained() const { return _is_trained; }
 
   protected:
     Trainer() = default;
 
-    double _epsilon{0.01};
     bool _is_trained{false};
-    bool _is_converged{false};
     bool _is_early_stop{false};
     size_t _patience{0};
 
@@ -49,8 +45,6 @@ class Trainer {
     const txeo::Tensor<T> *_y_valid;
 
     virtual void train(size_t epochs, txeo::LossFunc loss_func) = 0;
-
-    void reset();
 };
 
 /**

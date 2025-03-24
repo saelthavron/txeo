@@ -166,7 +166,7 @@ class MatrixIO {
      * @param separator The delimiter used in the input file (e.g., ',' for CSV).
      * @param has_header A flag indicating whether the input file has a header row.
      * @param target_path The path to the target text file where the encoded data will be written.
-     * @return A `MatrixIO` object representing the encoded data file.
+     * @return A `MatrixIO` object representing the encoded data file pointing to target_path.
      *
      * @throws txeo::MatrixIOError If the source and target paths are the same, if the file cannot
      * be opened, or if the input data is inconsistent (e.g., different types in the same column).

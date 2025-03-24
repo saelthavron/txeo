@@ -4,6 +4,7 @@
 
 #include "txeo/Tensor.h"
 #include "txeo/TensorShape.h"
+#include "txeo/Vector.h"
 #include "txeo/types.h"
 
 #include <cstddef>
@@ -241,6 +242,12 @@ class Matrix : public txeo::Tensor<T> {
       this->reshape(std::vector<size_t>(shape));
     };
 
+    Matrix<T> &transpose();
+
+    Matrix<T> prod(const Matrix<T> &matrix);
+
+    Tensor<T> prod(const txeo::Vector<T> &vector);
+
     /**
      * @brief Converts a tensor to a matrix by moving data.
      *
@@ -325,7 +332,10 @@ class Matrix : public txeo::Tensor<T> {
     friend Matrix<U> operator-(const U &left, const Matrix<U> &right);
 
     template <typename U>
-    friend Matrix<U> operator*(const Matrix<U> &tensor, const U &scalar);
+    friend Matrix<U> operator*(const Matrix<U> &matrix, const U &scalar);
+
+    template <typename U>
+    friend Matrix<U> operator*(const U &scalar, const Matrix<U> &matrix);
 
     template <typename U>
     friend Matrix<U> operator/(const Matrix<U> &left, const U &right);

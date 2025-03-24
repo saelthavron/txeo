@@ -7,41 +7,41 @@
 namespace txeo {
 
 template <typename T>
-void Loss<T>::set_loss(txeo::LossFunc func) {
+void Loss<T>::set_loss(LossFunc func) {
   switch (func) {
   case LossFunc::MSE:
-    _loss_func = [this](const txeo::Tensor<T> &pred) -> T { return this->mse(pred); };
+    _loss_func = [this](const Tensor<T> &pred) -> T { return this->mse(pred); };
     break;
   case LossFunc::MAE:
-    _loss_func = [this](const txeo::Tensor<T> &pred) -> T { return this->mae(pred); };
+    _loss_func = [this](const Tensor<T> &pred) -> T { return this->mae(pred); };
     break;
   case LossFunc::MSLE:
-    _loss_func = [this](const txeo::Tensor<T> &pred) -> T { return this->msle(pred); };
+    _loss_func = [this](const Tensor<T> &pred) -> T { return this->msle(pred); };
     break;
   case LossFunc::LCHE:
-    _loss_func = [this](const txeo::Tensor<T> &pred) -> T { return this->lche(pred); };
+    _loss_func = [this](const Tensor<T> &pred) -> T { return this->lche(pred); };
     break;
   }
 }
 
 template <typename T>
-Loss<T>::Loss(const txeo::Tensor<T> &valid, txeo::LossFunc func) : _valid{&valid} {
+Loss<T>::Loss(const Tensor<T> &valid, LossFunc func) : _valid{&valid} {
   if (_valid->dim() == 0)
-    throw txeo::LossError("Tensor has dimension zero.");
+    throw LossError("Tensor has dimension zero.");
 
   this->set_loss(func);
 }
 
 template <typename T>
-void Loss<T>::verify_parameter(const txeo::Tensor<T> &pred) const {
+void Loss<T>::verify_parameter(const Tensor<T> &pred) const {
   if (pred.dim() == 0)
-    throw txeo::LossError("Tensor has dimension zero.");
+    throw LossError("Tensor has dimension zero.");
   if (pred.shape() != _valid->shape())
-    throw txeo::LossError("Incompatible shape.");
+    throw LossError("Incompatible shape.");
 }
 
 template <typename T>
-T Loss<T>::mean_squared_error(const txeo::Tensor<T> &pred) const {
+T Loss<T>::mean_squared_error(const Tensor<T> &pred) const {
   this->verify_parameter(pred);
 
   T resp = 0;
@@ -57,7 +57,7 @@ T Loss<T>::mean_squared_error(const txeo::Tensor<T> &pred) const {
 }
 
 template <typename T>
-T Loss<T>::mean_absolute_error(const txeo::Tensor<T> &pred) const {
+T Loss<T>::mean_absolute_error(const Tensor<T> &pred) const {
   this->verify_parameter(pred);
 
   T resp = 0;
@@ -71,7 +71,7 @@ T Loss<T>::mean_absolute_error(const txeo::Tensor<T> &pred) const {
 }
 
 template <>
-size_t Loss<size_t>::mean_absolute_error(const txeo::Tensor<size_t> &pred) const {
+size_t Loss<size_t>::mean_absolute_error(const Tensor<size_t> &pred) const {
   this->verify_parameter(pred);
 
   size_t resp = 0;
@@ -87,7 +87,7 @@ size_t Loss<size_t>::mean_absolute_error(const txeo::Tensor<size_t> &pred) const
 }
 
 template <typename T>
-T Loss<T>::mean_squared_logarithmic_error(const txeo::Tensor<T> &pred) const {
+T Loss<T>::mean_squared_logarithmic_error(const Tensor<T> &pred) const {
   this->verify_parameter(pred);
 
   T resp = 0;
@@ -96,7 +96,7 @@ T Loss<T>::mean_squared_logarithmic_error(const txeo::Tensor<T> &pred) const {
 
   for (size_t i{0}; i < pred.dim(); ++i) {
     if (pred_flat[i] < 0 || valid_flat[i] < 0)
-      throw txeo::LossError("A tensor element is negative.");
+      throw LossError("A tensor element is negative.");
 
     auto aux = std::log1p(pred_flat[i]) - std::log1p(valid_flat[i]);
     resp += aux * aux;
@@ -106,7 +106,7 @@ T Loss<T>::mean_squared_logarithmic_error(const txeo::Tensor<T> &pred) const {
 }
 
 template <typename T>
-T Loss<T>::log_cosh_error(const txeo::Tensor<T> &pred) const {
+T Loss<T>::log_cosh_error(const Tensor<T> &pred) const {
 
   this->verify_parameter(pred);
 
@@ -121,7 +121,7 @@ T Loss<T>::log_cosh_error(const txeo::Tensor<T> &pred) const {
 }
 
 template <typename T>
-T Loss<T>::get_loss(const txeo::Tensor<T> &pred) const {
+T Loss<T>::get_loss(const Tensor<T> &pred) const {
   return _loss_func(pred);
 }
 

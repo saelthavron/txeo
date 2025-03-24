@@ -1,12 +1,15 @@
 
 #include "txeo/Loss.h"
 #include "txeo/Matrix.h"
+#include "txeo/MatrixIO.h"
 #include "txeo/OlsGDTrainer.h"
 #include "txeo/Tensor.h"
 #include "txeo/TensorAgg.h"
 #include "txeo/TensorFunc.h"
+#include "txeo/TensorIO.h"
 #include "txeo/TensorOp.h"
 #include "txeo/TensorPart.h"
+#include "txeo/types.h"
 #include <cmath>
 #include <cstddef>
 #include <iostream>
@@ -84,16 +87,30 @@ int main() {
 
   //  MyLinearRegression();
 
-  txeo::Matrix<double> x_train(4, 1, {1, 2, 3, 4});
-  txeo::Matrix<double> y_train(4, 1, {5, 8, 11, 14});
+  // auto train_data =
+  //     txeo::MatrixIO::one_hot_encode_text_file("/home/roberto/Downloads/housing.csv", ',', true,
+  //                                              "/home/roberto/Downloads/housing_one_hot.csv");
 
-  txeo::Matrix<double> x_valid(4, 1, {10, 11, 12, 13});
-  txeo::Matrix<double> y_valid(4, 1, {32, 35, 38, 41});
+  // txeo::MatrixIO train_data{"/home/roberto/Downloads/housing_one_hot.csv"};
+  // auto x_train = train_data.read_text_file<double>(true).sub_matrix_cols({2, 3, 4, 5, 6, 7});
+  // auto y_train = train_data.read_text_file<double>(true).sub_matrix_cols({8});
 
-  txeo::OlsGDTrainer<double> ols{x_train, y_train, x_valid, y_valid};
+  // x_train.normalize_columns(txeo::NormalizationType::MIN_MAX);
+
+  txeo::MatrixIO x_train_data{"/home/roberto/Downloads/regression_x_train.csv"};
+  txeo::MatrixIO y_train_data{"/home/roberto/Downloads/regression_y_train.csv"};
+  auto x_train = x_train_data.read_text_file<double>(true);
+  auto y_train = y_train_data.read_text_file<double>(true);
+
+  std::cout << "X: " << x_train.shape() << std::endl;
+  std::cout << "Y: " << y_train.shape() << std::endl;
+  std::cout << "min Y:" << txeo::TensorAgg<double>::reduce_min(y_train, {0})() << std::endl;
+
+  txeo::OlsGDTrainer<double> ols{x_train, y_train};
 
   ols.enable_variable_lr();
-  ols.fit(50, txeo::LossFunc::MAE, 0.001, 5);
+  // //  ols.set_learning_rate(0.000001);
+  ols.fit(50, txeo::LossFunc::MAE);
 
   std::cout << ols.weight_bias() << std::endl;
 
