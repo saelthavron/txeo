@@ -129,8 +129,8 @@ class Matrix : public txeo::Tensor<T> {
      *
      * **Example Usage:**
      * @code
-     * txeo::Matrix<int> matrix({{1, 2, 3}, {4, 5, 6}});  // Creates a 2x3 matrix with values [1, 2,
-     * 3, 4, 5, 6]
+     * txeo::Matrix<int> matrix({{1, 2, 3}, {4, 5, 6}});
+     * // Creates a 2x3 matrix with values [1, 2, 3, 4, 5, 6]
      * @endcode
      */
     explicit Matrix(const std::initializer_list<std::initializer_list<T>> &values)
@@ -242,11 +242,69 @@ class Matrix : public txeo::Tensor<T> {
       this->reshape(std::vector<size_t>(shape));
     };
 
+    /**
+     * @brief Transposes the matrix (swaps rows and columns) in-place
+     * @return Reference to this matrix
+     *
+     * **Example Usage:**
+     * @code
+     * // Transpose a 2x3 matrix
+     * txeo::Matrix<int> mat(2, 3, {1, 2, 3, 4, 5, 6});
+     * mat.transpose();
+     * // mat becomes 3x2 matrix:
+     * // [1, 4]
+     * // [2, 5]
+     * // [3, 6]
+     *
+     * // Transpose a square matrix
+     * txeo::Matrix<double> square_mat({{1.5, 2.5}, {3.5, 4.5}});
+     * square_mat.transpose();
+     * // Result:
+     * // [1.5, 3.5]
+     * // [2.5, 4.5]
+     * @endcode
+     */
     Matrix<T> &transpose();
 
-    Matrix<T> prod(const Matrix<T> &matrix);
+    /**
+     * @brief Performs matrix multiplication with another matrix
+     * @param matrix The right-hand side matrix for multiplication
+     * @return New matrix resulting from the matrix product
+     *
+     * @throws MatrixError
+     *
+     * **Example Usage:**
+     * @code
+     * // Matrix-matrix multiplication
+     * txeo::Matrix<int> a(2, 3, {1, 2, 3, 4, 5, 6});  // 2x3
+     * txeo::Matrix<int> b(3, 2, {7, 8, 9, 10, 11, 12});  // 3x2
+     * txeo::Matrix<int> c = a.dot(b);  // Resulting 2x2 matrix:
+     * // [58,  64]
+     * // [139, 154]
+     *
+     * // Identity matrix multiplication
+     * txeo::Matrix<double> identity(2, 2, {1, 0, 0, 1});
+     * txeo::Matrix<double> mat(2, 3, {5, 6, 7, 8, 9, 10});
+     * auto result = identity.dot(mat);  // Returns unchanged mat
+     * @endcode
+     */
+    Matrix<T> dot(const Matrix<T> &matrix);
 
-    Tensor<T> prod(const txeo::Vector<T> &vector);
+    /**
+     * @brief Performs matrix-vector multiplication
+     * @param vector The right-hand side vector for multiplication
+     * @return New tensor (n x 1) resulting from the product
+     * @throws MatrixError if dimensions are incompatible
+     *
+     * **Example Usage:**
+     * @code
+     * // Matrix-vector multiplication
+     * txeo::Matrix<int> mat(2, 3, {1, 2, 3, 4, 5, 6});
+     * txeo::Vector<int> vec({7, 8, 9});
+     * txeo::Tensor<int> result = mat.dot(vec);  // Result: [[50][122]]
+     * @endcode
+     */
+    Tensor<T> dot(const txeo::Vector<T> &vector);
 
     /**
      * @brief Converts a tensor to a matrix by moving data.

@@ -365,8 +365,8 @@ txeo::Tensor<T> &Tensor<T>::normalize(txeo::NormalizationType type) {
 }
 
 template <typename T>
-T Tensor<T>::dot(const Tensor<T> &tensor) const {
-  return TensorOp<T>::dot(*this, tensor);
+T Tensor<T>::inner(const Tensor<T> &tensor) const {
+  return TensorOp<T>::inner(*this, tensor);
 }
 
 template <typename T>

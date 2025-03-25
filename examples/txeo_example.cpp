@@ -73,8 +73,8 @@ void MyLinearRegression() {
     B_prev = B;
     if (enable_barzelay_borwein) {
       auto LZ = txeo::TensorOp<float>::product(L, Z);
-      auto numerator = std::abs(txeo::TensorOp<float>::dot(L, LZ));
-      auto denominator = txeo::TensorOp<float>::dot(LZ, LZ);
+      auto numerator = std::abs(txeo::TensorOp<float>::inner(L, LZ));
+      auto denominator = txeo::TensorOp<float>::inner(LZ, LZ);
       learning_rate = numerator / denominator;
     };
     B -= (txeo::TensorOp<float>::product(B, Z) - K) * learning_rate;

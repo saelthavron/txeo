@@ -187,6 +187,7 @@ TEST(MatrixTest, SubMatrixColsSingleColumn) {
 TEST(MatrixTest, SubMatrixColsDuplicateColumns) {
   txeo::Matrix<int> mat(2, 3, {1, 2, 3, 4, 5, 6});
   auto sub = TensorPart<int>::sub_matrix_cols(mat, {0, 0});
+  auto subexclude = TensorPart<int>::sub_matrix_cols_exclude(mat, {0});
 
   ASSERT_EQ(sub.row_size(), 2);
   ASSERT_EQ(sub.col_size(), 2);
@@ -194,6 +195,13 @@ TEST(MatrixTest, SubMatrixColsDuplicateColumns) {
   EXPECT_EQ(sub(0, 1), 1);
   EXPECT_EQ(sub(1, 0), 4);
   EXPECT_EQ(sub(1, 1), 4);
+
+  ASSERT_EQ(subexclude.row_size(), 2);
+  ASSERT_EQ(subexclude.col_size(), 2);
+  EXPECT_EQ(subexclude(0, 0), 2);
+  EXPECT_EQ(subexclude(0, 1), 3);
+  EXPECT_EQ(subexclude(1, 0), 5);
+  EXPECT_EQ(subexclude(1, 1), 6);
 }
 
 TEST(MatrixTest, SubMatrixRowsSelectsCorrectRows) {

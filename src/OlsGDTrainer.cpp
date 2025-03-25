@@ -44,7 +44,7 @@ void OlsGDTrainer<T>::train(size_t epochs, LossFunc metric) {
   auto train_out = Matrix<T>::to_matrix(*this->_y_train).transpose();
 
   auto Z = TensorFunc<T>::compute_gram_matrix(train_in);
-  auto K = train_out.prod(train_in);
+  auto K = train_out.dot(train_in);
 
   auto norm_X = TensorAgg<T>::reduce_euclidean_norm(train_in, {0, 1})();
   auto norm_Y = TensorAgg<T>::reduce_euclidean_norm(train_out, {0, 1})();
@@ -53,7 +53,7 @@ void OlsGDTrainer<T>::train(size_t epochs, LossFunc metric) {
   if (_variable_lr)
     _learning_rate = 1.0 / (norm_X * norm_X);
 
-  auto B = B_prev - (_learning_rate * (B_prev.prod(Z) - K));
+  auto B = B_prev - (_learning_rate * (B_prev.dot(Z) - K));
   auto L = B - B_prev;
   _is_converged = false;
 
@@ -90,10 +90,10 @@ void OlsGDTrainer<T>::train(size_t epochs, LossFunc metric) {
     loss_value_prev = loss_value;
     B_prev = B;
     if (_variable_lr) {
-      auto LZ = L.prod(Z);
-      _learning_rate = std::fabs(L.dot(LZ)) / LZ.dot(LZ);
+      auto LZ = L.dot(Z);
+      _learning_rate = std::fabs(L.inner(LZ)) / LZ.inner(LZ);
     };
-    B -= _learning_rate * (B.prod(Z) - K);
+    B -= _learning_rate * (B.dot(Z) - K);
     L = B - B_prev;
   }
 

@@ -274,7 +274,7 @@ Tensor<T> &TensorOp<T>::hadamard_div_by(Tensor<T> &left, const Tensor<T> &right)
 }
 
 template <typename T>
-T TensorOp<T>::dot(const Tensor<T> &left, const Tensor<T> &right) {
+T TensorOp<T>::inner(const Tensor<T> &left, const Tensor<T> &right) {
   if (left.dim() == 0 || right.dim() == 0)
     throw TensorOpError("One of the operands has dimension zero.");
 

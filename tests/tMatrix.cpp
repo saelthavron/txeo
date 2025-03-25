@@ -337,7 +337,7 @@ TEST(MatrixTest, TransposeRowVectorToColumn) {
 TEST(MatrixTest, MatrixMatrixMultiplication) {
   txeo::Matrix<int> a(2, 3, {1, 2, 3, 4, 5, 6});
   txeo::Matrix<int> b(3, 2, {7, 8, 9, 10, 11, 12});
-  txeo::Matrix<int> result = a.prod(b);
+  txeo::Matrix<int> result = a.dot(b);
 
   ASSERT_EQ(result.row_size(), 2);
   ASSERT_EQ(result.col_size(), 2);
@@ -350,7 +350,7 @@ TEST(MatrixTest, MatrixMatrixMultiplication) {
 TEST(MatrixTest, MatrixVectorMultiplication) {
   txeo::Matrix<int> mat(2, 3, {1, 2, 3, 4, 5, 6});
   txeo::Vector<int> vec({7, 8, 9});
-  txeo::Tensor<int> result = mat.prod(vec);
+  txeo::Tensor<int> result = mat.dot(vec);
 
   ASSERT_EQ(result.shape().axis_dim(0), 2);
   EXPECT_EQ(result(0, 0), 1 * 7 + 2 * 8 + 3 * 9);
@@ -363,16 +363,16 @@ TEST(MatrixTest, InvalidDimensionsThrow) {
   txeo::Vector<int> vec(2);
 
   // Matrix-Matrix multiplication mismatch
-  EXPECT_THROW(a.prod(b), txeo::TensorOpError);
+  EXPECT_THROW(a.dot(b), txeo::TensorOpError);
 
   // Matrix-Vector multiplication mismatch
-  EXPECT_THROW(a.prod(vec), txeo::TensorOpError);
+  EXPECT_THROW(a.dot(vec), txeo::TensorOpError);
 }
 
 TEST(MatrixTest, SquareMatrixMultiplication) {
   txeo::Matrix<int> a(2, 2, {1, 2, 3, 4});
   txeo::Matrix<int> b(2, 2, {5, 6, 7, 8});
-  txeo::Matrix<int> result = a.prod(b);
+  txeo::Matrix<int> result = a.dot(b);
 
   ASSERT_EQ(result.row_size(), 2);
   ASSERT_EQ(result.col_size(), 2);
@@ -385,7 +385,7 @@ TEST(MatrixTest, SquareMatrixMultiplication) {
 TEST(MatrixTest, IdentityMatrixMultiplication) {
   txeo::Matrix<int> identity(2, 2, {1, 0, 0, 1});
   txeo::Matrix<int> mat(2, 3, {5, 6, 7, 8, 9, 10});
-  txeo::Matrix<int> result = identity.prod(mat);
+  txeo::Matrix<int> result = identity.dot(mat);
 
   ASSERT_EQ(result.row_size(), 2);
   ASSERT_EQ(result.col_size(), 3);

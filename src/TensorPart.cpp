@@ -3,6 +3,7 @@
 #include "txeo/detail/TensorHelper.h"
 #include "txeo/detail/utils.h"
 
+#include <algorithm>
 #include <cstddef>
 #include <cstdint>
 #include <tensorflow/cc/client/client_session.h>
@@ -121,6 +122,24 @@ Matrix<T> TensorPart<T>::sub_matrix_cols(const Matrix<T> &matrix, const std::vec
     for (size_t j{0}; j < cols.size(); ++j)
       resp(i, j) = matrix(i, cols[j]);
   return resp;
+}
+
+template <typename T>
+txeo::Matrix<T> TensorPart<T>::sub_matrix_cols_exclude(const txeo::Matrix<T> &matrix,
+                                                       const std::vector<size_t> &cols) {
+  if (cols.empty())
+    throw MatrixError("Column indexes vector cannot be empty.");
+  for (auto &item : cols)
+    if (item >= matrix.col_size())
+      throw MatrixError("Inconsistent column indexes");
+
+  std::vector<size_t> in_cols;
+  for (size_t i{0}; i < matrix.col_size(); ++i) {
+    if (std::ranges::find(cols, i) == std::cend(cols))
+      in_cols.emplace_back(i);
+  }
+
+  return TensorPart<T>::sub_matrix_cols(matrix, in_cols);
 }
 
 template <typename T>

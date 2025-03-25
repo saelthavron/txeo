@@ -335,7 +335,7 @@ TEST(TensorOpTest, DotProduct) {
   txeo::Vector<int> left({1, 2, 3});
   txeo::Vector<int> right({4, 5, 6});
 
-  auto result = TensorOp<int>::dot(left, right);
+  auto result = TensorOp<int>::inner(left, right);
 
   EXPECT_EQ(result, 1 * 4 + 2 * 5 + 3 * 6);
 }
@@ -344,14 +344,14 @@ TEST(TensorOpTest, DotProductDifferentSizes) {
   txeo::Vector<int> left({1, 2, 3});
   txeo::Vector<int> right({4, 5});
 
-  EXPECT_THROW(TensorOp<int>::dot(left, right), txeo::TensorOpError);
+  EXPECT_THROW(TensorOp<int>::inner(left, right), txeo::TensorOpError);
 }
 
 TEST(TensorOpTest, DotProductEmptyVectors) {
   txeo::Vector<int> left({});
   txeo::Vector<int> right({});
 
-  EXPECT_THROW(TensorOp<int>::dot(left, right), txeo::TensorOpError);
+  EXPECT_THROW(TensorOp<int>::inner(left, right), txeo::TensorOpError);
 }
 
 TEST(TensorOpTest, ValidMatrixVectorMultiplication) {

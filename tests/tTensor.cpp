@@ -738,7 +738,7 @@ TEST(TensorTest, VectorDotProduct) {
   Tensor<int> a({3}, {1, 2, 3});
   Tensor<int> b({3}, {4, 5, 6});
 
-  int result = a.dot(b);
+  int result = a.inner(b);
   EXPECT_EQ(result, 1 * 4 + 2 * 5 + 3 * 6);
 }
 
@@ -746,7 +746,7 @@ TEST(TensorTest, MatrixDotProduct) {
   Tensor<int> a({2, 3}, {1, 2, 3, 4, 5, 6});
   Tensor<int> b({3, 2}, {7, 8, 9, 10, 11, 12});
 
-  EXPECT_EQ(a.dot(b), 1 * 7 + 2 * 8 + 3 * 9 + 4 * 10 + 5 * 11 + 6 * 12);
+  EXPECT_EQ(a.inner(b), 1 * 7 + 2 * 8 + 3 * 9 + 4 * 10 + 5 * 11 + 6 * 12);
 }
 
 TEST(TensorTest, InvalidPermutationThrows) {
@@ -757,7 +757,7 @@ TEST(TensorTest, InvalidPermutationThrows) {
 TEST(TensorTest, DotProductDimensionMismatch) {
   Tensor<int> a({3}, {1, 2, 3});
   Tensor<int> b({4}, {1, 2, 3, 4});
-  EXPECT_THROW(a.dot(b), TensorOpError);
+  EXPECT_THROW(a.inner(b), TensorOpError);
 }
 
 } // namespace txeo

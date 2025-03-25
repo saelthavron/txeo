@@ -347,7 +347,7 @@ class TensorOp {
     static txeo::Tensor<T> &hadamard_div_by(txeo::Tensor<T> &left, const txeo::Tensor<T> &right);
 
     /**
-     * @brief Computes the dot product (inner product) of two tensors.
+     * @brief Computes the inner product of two tensors.
      *
      * @param left The first tensor.
      * @param right The second tensors.
@@ -359,12 +359,29 @@ class TensorOp {
      * @code
      * txeo::Tensor<int> left({1, 2, 3});  // Tensor [1, 2, 3]
      * txeo::Tensor<int> right({4, 5, 6}); // Tensor [4, 5, 6]
-     * auto result = TensorOp<int>::dot(left, right);
+     * auto result = TensorOp<int>::inner(left, right);
      * // result = 1*4 + 2*5 + 3*6 = 32
      * @endcode
      */
-    static T dot(const txeo::Tensor<T> &left, const txeo::Tensor<T> &right);
+    static T inner(const txeo::Tensor<T> &left, const txeo::Tensor<T> &right);
 
+    /**
+     * @brief Computes the matrix product of two second order tensors.
+     *
+     * @param left The left tensor (m x n).
+     * @param right The right tensor (n x p).
+     * @return A new tensor (m x p) containing the result of the matrix product.
+     *
+     * @throws txeo::TensorOpError
+     *
+     * **Example Usage:**
+     * @code
+     * txeo::Tensor<int> left({2, 3}, {1, 2, 3, 4, 5, 6});  // 2x3 tensor
+     * txeo::Tensor<int> right({3, 2}, {7, 8, 9, 10, 11, 12});  // 3x2 tensor
+     * auto result = TensorOp<int>::product_tensors(left, right);
+     * // result = [ [58, 64], [139, 154] ]
+     * @endcode
+     */
     static txeo::Tensor<T> product_tensors(const txeo::Tensor<T> &left,
                                            const txeo::Tensor<T> &right);
 
