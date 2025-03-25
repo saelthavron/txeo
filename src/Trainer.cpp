@@ -4,13 +4,13 @@ namespace txeo {
 
 template <typename T>
 inline Trainer<T>::Trainer(const Tensor<T> &x_train, const Tensor<T> &y_train,
-                           const Tensor<T> &x_valid, const Tensor<T> &y_valid)
-    : _x_train{&x_train}, _y_train{&y_train}, _x_valid{&x_valid}, _y_valid{&y_valid} {
-  if (x_train.dim() == 0 || y_train.dim() == 0 || x_valid.dim() == 0 || y_valid.dim() == 0)
+                           const Tensor<T> &x_eval, const Tensor<T> &y_eval)
+    : _x_train{&x_train}, _y_train{&y_train}, _x_eval{&x_eval}, _y_eval{&y_eval} {
+  if (x_train.dim() == 0 || y_train.dim() == 0 || x_eval.dim() == 0 || y_eval.dim() == 0)
     throw TrainerError("One of the tensors has zero dimension.");
 
   if (x_train.shape().axis_dim(0) != y_train.shape().axis_dim(0) ||
-      x_valid.shape().axis_dim(0) != y_valid.shape().axis_dim(0))
+      x_eval.shape().axis_dim(0) != y_eval.shape().axis_dim(0))
     throw TrainerError("Training or Validation tensor are incompatible.");
 };
 

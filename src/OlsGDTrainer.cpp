@@ -30,7 +30,8 @@ T OlsGDTrainer<T>::learning_rate() const {
 template <typename T>
   requires(std::floating_point<T>)
 Tensor<T> OlsGDTrainer<T>::predict(const Tensor<T> &input) {
-  return TensorOp<T>::product_tensors(input, this->weight_bias());
+  auto aux = TensorPart<T>::increase_dimension(input, 1, 1.0);
+  return TensorOp<T>::product_tensors(aux, this->weight_bias());
 }
 
 template <typename T>
@@ -40,14 +41,14 @@ void OlsGDTrainer<T>::train(size_t epochs, LossFunc metric) {
   size_t n = this->_x_train->shape().axis_dim(1);
   size_t m = this->_y_train->shape().axis_dim(1);
 
-  auto train_in = Matrix<T>::to_matrix(TensorPart<T>::increase_dimension(*this->_x_train, 1, 1.0));
-  auto train_out = Matrix<T>::to_matrix(*this->_y_train).transpose();
+  auto X = Matrix<T>::to_matrix(TensorPart<T>::increase_dimension(*this->_x_train, 1, 1.0));
+  auto Y = Matrix<T>::to_matrix(*this->_y_train).transpose();
 
-  auto Z = TensorFunc<T>::compute_gram_matrix(train_in);
-  auto K = train_out.dot(train_in);
+  auto Z = TensorFunc<T>::compute_gram_matrix(X);
+  auto K = Y.dot(X);
 
-  auto norm_X = TensorAgg<T>::reduce_euclidean_norm(train_in, {0, 1})();
-  auto norm_Y = TensorAgg<T>::reduce_euclidean_norm(train_out, {0, 1})();
+  auto norm_X = TensorAgg<T>::reduce_euclidean_norm(X, {0, 1})();
+  auto norm_Y = TensorAgg<T>::reduce_euclidean_norm(Y, {0, 1})();
   Matrix<T> B_prev{m, n + 1, norm_Y / norm_X};
 
   if (_variable_lr)
@@ -57,17 +58,17 @@ void OlsGDTrainer<T>::train(size_t epochs, LossFunc metric) {
   auto L = B - B_prev;
   _is_converged = false;
 
-  auto *valid_in = &train_in;
-  if (this->_x_train != this->_x_valid)
-    *valid_in = Matrix<T>::to_matrix(TensorPart<T>::increase_dimension(*this->_x_valid, 1, 1.0));
+  auto *X_eval = &X;
+  if (this->_x_train != this->_x_eval)
+    *X_eval = Matrix<T>::to_matrix(TensorPart<T>::increase_dimension(*this->_x_eval, 1, 1.0));
 
-  Loss<T> loss{*this->_y_valid, metric};
+  Loss<T> loss{*this->_y_eval, metric};
 
   T loss_value_prev = std::numeric_limits<T>::max();
   size_t patience = 0;
   for (size_t e{0}; e < epochs; ++e) {
     auto B_t = TensorFunc<T>::transpose(B);
-    auto loss_value = loss.get_loss(TensorOp<T>::product_tensors(*valid_in, B_t));
+    auto loss_value = loss.get_loss(TensorOp<T>::product_tensors(*X_eval, B_t));
     std::cout << "Epoch " << e << ", Loss: " << loss_value << ", Learning Rate: " << _learning_rate
               << std::endl;
     if (std::isnan(loss_value)) {

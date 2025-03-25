@@ -1,10 +1,10 @@
 #ifndef VECTOR_H
 #define VECTOR_H
-#include "txeo/types.h"
 #pragma once
 
 #include "txeo/Tensor.h"
 #include "txeo/TensorShape.h"
+#include "txeo/types.h"
 
 #include <cstddef>
 #include <initializer_list>

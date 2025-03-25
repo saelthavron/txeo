@@ -1,9 +1,8 @@
 #ifndef OLSGDTRAINER_H
 #define OLSGDTRAINER_H
-#include "txeo/Matrix.h"
 #pragma once
 
-#include "txeo/Loss.h"
+#include "txeo/Matrix.h"
 #include "txeo/TensorShape.h"
 #include "txeo/Trainer.h"
 
@@ -45,7 +44,7 @@ class OlsGDTrainer : public txeo::Trainer<T> {
 
   private:
     T _learning_rate{0.01};
-    T _tolerance{0.0001};
+    T _tolerance{0.001};
     txeo::Matrix<T> _weight_bias{};
     bool _variable_lr{false};
     bool _is_converged{false};

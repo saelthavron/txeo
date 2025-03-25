@@ -1,9 +1,9 @@
 #ifndef TRAINER_H
 #define TRAINER_H
-#include "txeo/Loss.h"
 #pragma once
 
 #include "txeo/Tensor.h"
+#include "types.h"
 
 #include <cstddef>
 
@@ -19,7 +19,7 @@ class Trainer {
     virtual ~Trainer() = default;
 
     Trainer(const txeo::Tensor<T> &x_train, const txeo::Tensor<T> &y_train,
-            const txeo::Tensor<T> &x_valid, const txeo::Tensor<T> &y_valid);
+            const txeo::Tensor<T> &x_eval, const txeo::Tensor<T> &y_eval);
 
     Trainer(const txeo::Tensor<T> &x_train, const txeo::Tensor<T> &y_train)
         : Trainer{x_train, y_train, x_train, y_train} {}
@@ -41,8 +41,8 @@ class Trainer {
 
     const txeo::Tensor<T> *_x_train;
     const txeo::Tensor<T> *_y_train;
-    const txeo::Tensor<T> *_x_valid;
-    const txeo::Tensor<T> *_y_valid;
+    const txeo::Tensor<T> *_x_eval;
+    const txeo::Tensor<T> *_y_eval;
 
     virtual void train(size_t epochs, txeo::LossFunc loss_func) = 0;
 };
