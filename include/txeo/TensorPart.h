@@ -1,5 +1,6 @@
 #ifndef TENSORPART_H
 #define TENSORPART_H
+#include "txeo/Matrix.h"
 #pragma once
 
 #include "txeo/Tensor.h"
@@ -98,6 +99,106 @@ class TensorPart {
      */
     static txeo::Tensor<T> slice(const txeo::Tensor<T> &tensor, size_t first_axis_begin,
                                  size_t first_axis_end);
+
+    /**
+     * @brief Increments the dimension of the tensor at the specified axis
+     *
+     * @param tensor Tensor which elements will generate the modified tensor
+     * @param axis Position where new dimension will be inserted
+     * @param value Value to fill the new dimension elements with
+     * @return A new modified modified tensor
+     *
+     * **Example Usage:**
+     * @code
+     * // Add new dimension to 2x3 matrix making it 2x1x3
+     * txeo::Tensor<float> t({2, 3}, {1,2,3,4,5,6});
+     * auto resp = txeo::TensorPart<float>::increase_dimension(t,1, -1.0f);
+     * // New shape: [2, 4]
+     * // resp(0,2) == -1.0f, resp(1,2) == -1.0f
+     * @endcode
+     */
+    static txeo::Tensor<T> increase_dimension(const txeo::Tensor<T> &tensor, size_t axis, T value);
+
+    /**
+     * @brief Increments the dimension of the tensor at the specified axis (in-place)
+     *
+     * @param tensor Tensor which shape will be altered
+     * @param axis Position where new dimension will be inserted
+     * @param value Value to fill the new dimension elements with
+     * @return Reference to the modified tensor
+     *
+     * **Example Usage:**
+     * @code
+     * // Add new dimension to 2x3 matrix making it 2x1x3
+     * txeo::Tensor<float> t({2, 3}, {1,2,3,4,5,6});
+     * txeo::TensorPart<float>::increase_dimension_by(t,1, -1.0f);
+     * // New shape: [2, 4]
+     * // t(0,2) == -1.0f, t(1,2) == -1.0f
+     * @endcode
+     */
+    static txeo::Tensor<T> &increase_dimension_by(txeo::Tensor<T> &tensor, size_t axis, T value);
+
+    /**
+     * @brief Creates a submatrix containing specified columns
+     *
+     * @param matrix Source matrix
+     * @param cols Vector of column indices to select
+     * @return New matrix with selected columns
+     * @throws TensorPartError
+     *
+     * **Example Usage:**
+     * @code
+     * txeo::Matrix<double> mat(2, 3, {1.1, 2.2, 3.3, 4.4, 5.5, 6.6});
+     * auto sub = TensorPart<double>::sub_matrix_cols(mat, {0, 2});
+     * // Resulting 2x2 matrix:
+     * // [1.1, 3.3]
+     * // [4.4, 6.6]
+     * @endcode
+     */
+    static txeo::Matrix<T> sub_matrix_cols(const txeo::Matrix<T> &matrix,
+                                           const std::vector<size_t> &cols);
+
+    /**
+     * @brief Creates a submatrix excluding the specified columns
+     *
+     * @param matrix Source matrix
+     * @param cols Vector of column indices to exclude
+     * @return New matrix with excluded columns
+     *
+     * @throws TensorPartError
+     *
+     * **Example Usage:**
+     * @code
+     * txeo::Matrix<double> mat(2, 3, {1.1, 2.2, 3.3, 4.4, 5.5, 6.6});
+     * auto sub = TensorPart<double>::sub_matrix_cols_exclude(mat, {0, 2});
+     * // Resulting 2x1 matrix:
+     * // [2.2]
+     * // [5.5]
+     * @endcode
+     */
+    static txeo::Matrix<T> sub_matrix_cols_exclude(const txeo::Matrix<T> &matrix,
+                                                   const std::vector<size_t> &cols);
+
+    /**
+     * @brief Creates a submatrix containing specified rows
+     *
+     * @param matrix Source matrix
+     * @param rows Vector of row indices to select
+     * @return New matrix with selected rows
+     *
+     * @throws TensorPartError
+     *
+     * **Example Usage:**
+     * @code
+     * txeo::Matrix<int> mat(3, 2, {1,2,3,4,5,6});
+     * auto sub = TensorPart<int>::sub_matrix_rows(mat, {2, 0});
+     * // Resulting 2x2 matrix:
+     * // [5, 6]
+     * // [1, 2]
+     * @endcode
+     */
+    static txeo::Matrix<T> sub_matrix_rows(const txeo::Matrix<T> &matrix,
+                                           const std::vector<size_t> &rows);
 
   private:
     TensorPart() = default;

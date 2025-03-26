@@ -29,6 +29,7 @@ class TensorHelper;
  */
 class TensorShape {
   public:
+    explicit TensorShape();
     TensorShape(const TensorShape &shape);
     TensorShape(TensorShape &&shape) noexcept;
     ~TensorShape();
@@ -107,6 +108,7 @@ class TensorShape {
      * @brief Constructs a tensor shape from an initializer list
      *
      * @param shape vector of dimensions
+     *
      * * **Example Usage:**
      * @code
      * #include <iostream>
@@ -320,8 +322,6 @@ class TensorShape {
 
     template <typename P>
     void create_from_vector(P &&shape);
-
-    explicit TensorShape();
 };
 
 /**

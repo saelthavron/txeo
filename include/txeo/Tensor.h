@@ -1,6 +1,7 @@
 #ifndef TENSOR_H
 #define TENSOR_H
 
+#include "txeo/types.h"
 #pragma once
 
 #include "TensorShape.h"
@@ -47,12 +48,13 @@ class TensorFunc;
 template <typename T>
 class Tensor {
   public:
+    explicit Tensor();
     /**
      * @note This copy constructor performs a deep copy, behaving differently from TensorFlow C++.
      */
     Tensor(const Tensor &tensor);
     Tensor(Tensor &&tensor) noexcept;
-    ~Tensor();
+    virtual ~Tensor();
 
     /**
      * @note This copy assignment performs a deep copy, behaving differently from TensorFlow C++.
@@ -862,6 +864,146 @@ class Tensor {
     void squeeze();
 
     /**
+     * @brief Increments the dimension of the specified axis
+     *
+     * @param axis Position where new dimension will be inserted
+     * @param value Value to fill the new dimension elements with
+     * @return Reference to this tensor
+     *
+     * **Example Usage:**
+     * @code
+     * // Add new dimension to 2x3 matrix making it 2x1x3
+     * txeo::Tensor<float> t({2, 3}, {1,2,3,4,5,6});
+     * t.increase_dimension(1, -1.0f);
+     * // New shape: [2, 4]
+     * // t(0,2) == -1.0f, t(1,2) == -1.0f
+     * @endcode
+     */
+    Tensor<T> &increase_dimension(size_t axis, T value);
+
+    /**
+     * @brief Raises all tensor elements to the specified power
+     *
+     * @param exponent Power to raise elements to
+     * @return Reference to modified tensor
+     *
+     * **Example Usage:**
+     * @code
+     * txeo::Tensor<int> t({2, 2}, {2, 3, 4, 5});
+     * t.power(3);
+     * // Result: [8, 27, 64, 125]
+     * @endcode
+     */
+    Tensor<T> &power(const T &exponent);
+
+    /**
+     * @brief Squares all tensor elements in-place
+     *
+     * @return Reference to modified tensor
+     *
+     * **Example Usage:**
+     * @code
+     * txeo::Tensor<double> t({3}, {-1.5, 2.0, 3.5});
+     * t.square();
+     * // Result: [2.25, 4.0, 12.25]
+     * @endcode
+     */
+    Tensor<T> &square();
+
+    /**
+     * @brief Computes square root of all tensor elements in-place
+     *
+     * @return Reference to modified tensor
+     *
+     * **Example Usage:**
+     * @code
+     * txeo::Tensor<float> t({2, 2}, {9.0f, 16.0f, 25.0f, 36.0f});
+     * t.sqrt();
+     * // Result: [3.0f, 4.0f, 5.0f, 6.0f]
+     * @endcode
+     */
+    Tensor<T> &sqrt();
+
+    /**
+     * @brief Computes absolute value of all tensor elements in-place
+     *
+     * @return Reference to this tensor
+     *
+     * **Example Usage:**
+     * @code
+     * txeo::Tensor<int> t({3}, {-5, 0, 8});
+     * t.abs();
+     * // Result: [5, 0, 8]
+     * @endcode
+     */
+    Tensor<T> &abs();
+
+    /**
+     * @brief Permutes tensor dimensions according to specified axis order
+     *
+     * @param axes New axis order (must be valid permutation of existing axes)
+     * @return Reference to this tensor
+     *
+     * @throws TensorFuncError for invalid permutation
+     *
+     * **Example Usage:**
+     * @code
+     * txeo::Tensor<int> t({2, 3, 4});  // Shape [2,3,4]
+     * t.permute({2, 0, 1});  // New shape [4,2,3]
+     * // Element at (i,j,k) moves to (k,i,j)
+     * @endcode
+     */
+    Tensor<T> &permute(const std::vector<size_t> &axes);
+
+    /**
+     * @brief Normalizes tensor along specified axis
+     *
+     * @param axis Axis to normalize along
+     * @param type Normalization type (MIN_MAX or Z_SCORE)
+     * @return Reference to this tensor
+     *
+     * **Example Usage:**
+     * @code
+     * // Z-score normalization along columns
+     * txeo::Tensor<float> t({3, 2}, {1, 2, 3, 4, 5, 6});
+     * t.normalize(1, txeo::NormalizationType::Z_SCORE);
+     * // Each column will have μ=0, σ=1
+     *
+     * // Min-max normalization of entire tensor
+     * t.normalize(txeo::NormalizationType::MIN_MAX);
+     * // All values scaled between 0 and 1
+     * @endcode
+     */
+    Tensor<T> &normalize(size_t axis, txeo::NormalizationType type);
+
+    /**
+     * @brief Normalizes entire tensor
+     *
+     * @param type Normalization type (MIN_MAX or Z_SCORE)
+     * @return Reference to modified tensor
+     */
+    Tensor<T> &normalize(txeo::NormalizationType type);
+
+    /**
+     * @brief Computes inner product with another tensor
+     *
+     * @param tensor Right-hand operand for dot product
+     * @return Inner product product result
+     *
+     * @throws TensorOpError
+     *
+     * **Example Usage:**
+     * @code
+     * // Matrix-matrix product
+     * txeo::Tensor<double> a({2,3}, {1,2,3,4,5,6});
+     * txeo::Tensor<double> b({2,3}, {6,5,4,3,2,1});
+     * auto mat_result = a.inner(b);
+     * // mat_result = 1*6 + 2*5 + 3*4 + 4*3 + 5*2 + 6*1
+     * @endcode
+     */
+    T inner(const Tensor<T> &tensor) const;
+
+    /**
      * @brief Assigns a specified value to this tensor elements
      *
      * @param value Value to be assigned
@@ -989,6 +1131,9 @@ class Tensor {
     template <typename U>
     friend txeo::Tensor<U> operator*(const txeo::Tensor<U> &tensor, const U &scalar);
 
+    template <typename U>
+    friend txeo::Tensor<U> operator*(const U &scalar, const txeo::Tensor<U> &tensor);
+
     /**
      * @brief Element-wise division operator (tensor / scalar)
      *
@@ -1058,8 +1203,6 @@ class Tensor {
         std::vector<T> &flat_data, std::vector<size_t> &shape);
 
     void check_indexes(const std::vector<size_t> &indexes);
-
-    explicit Tensor();
 };
 
 /**

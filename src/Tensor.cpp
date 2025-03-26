@@ -1,5 +1,6 @@
 
 #include "txeo/Tensor.h"
+#include "txeo/TensorFunc.h"
 #include "txeo/TensorOp.h"
 #include "txeo/TensorPart.h"
 #include "txeo/TensorShape.h"
@@ -22,7 +23,7 @@ namespace tf = tensorflow;
 template <typename T>
 void Tensor<T>::check_indexes(const std::vector<size_t> &indexes) {
   for (size_t i{0}; i < indexes.size(); ++i) {
-    auto aux = txeo::detail::to_int64(indexes[i]);
+    auto aux = detail::to_int64(indexes[i]);
     if (aux < 0 || aux >= _impl->txeo_shape.axis_dim(i))
       throw TensorError("Index out of bounds!");
   }
@@ -33,14 +34,16 @@ template <typename P>
 void Tensor<T>::create_from_shape(P &&shape) {
   auto aux = std::forward<P>(shape);
   auto shp = aux._impl->tf_shape != nullptr ? *aux._impl->tf_shape : *aux._impl->ext_tf_shape;
-  _impl->tf_tensor = std::make_unique<tf::Tensor>(txeo::detail::get_tf_dtype<T>(), shp);
+  _impl->tf_tensor = std::make_unique<tf::Tensor>(detail::get_tf_dtype<T>(), shp);
+  _impl->txeo_shape._impl->tf_shape = nullptr;
   _impl->txeo_shape._impl->ext_tf_shape = &_impl->tf_tensor->shape();
-  _impl->txeo_shape._impl->stride =
-      txeo::detail::calc_stride(*_impl->txeo_shape._impl->ext_tf_shape);
+  _impl->txeo_shape._impl->stride = detail::calc_stride(*_impl->txeo_shape._impl->ext_tf_shape);
 }
 
 template <typename T>
 Tensor<T>::Tensor() : _impl{std::make_unique<Impl>()} {
+  this->create_from_shape(TensorShape({}));
+  this->data()[0] = 0;
 }
 
 template <typename T>
@@ -63,35 +66,33 @@ template <typename T>
 Tensor<T>::~Tensor() = default;
 
 template <typename T>
-Tensor<T>::Tensor(const txeo::TensorShape &shape) : _impl{std::make_unique<Impl>()} {
+Tensor<T>::Tensor(const TensorShape &shape) : _impl{std::make_unique<Impl>()} {
   this->create_from_shape(shape);
 }
 
 template <typename T>
-Tensor<T>::Tensor(txeo::TensorShape &&shape) : _impl{std::make_unique<Impl>()} {
+Tensor<T>::Tensor(TensorShape &&shape) : _impl{std::make_unique<Impl>()} {
   this->create_from_shape(std::move(shape));
 }
 
 template <typename T>
 Tensor<T>::Tensor(const std::vector<size_t> &shape) : _impl{std::make_unique<Impl>()} {
-  this->create_from_shape(txeo::TensorShape(shape));
+  this->create_from_shape(TensorShape(shape));
 }
 
 template <typename T>
 Tensor<T>::Tensor(std::vector<size_t> &&shape) : _impl{std::make_unique<Impl>()} {
-  this->create_from_shape(txeo::TensorShape(std::move(shape)));
+  this->create_from_shape(TensorShape(std::move(shape)));
 }
 
 template <typename T>
-Tensor<T>::Tensor(const txeo::TensorShape &shape, const T &fill_value)
-    : _impl{std::make_unique<Impl>()} {
+Tensor<T>::Tensor(const TensorShape &shape, const T &fill_value) : _impl{std::make_unique<Impl>()} {
   this->create_from_shape(shape);
   this->fill(fill_value);
 }
 
 template <typename T>
-Tensor<T>::Tensor(txeo::TensorShape &&shape, const T &fill_value)
-    : _impl{std::make_unique<Impl>()} {
+Tensor<T>::Tensor(TensorShape &&shape, const T &fill_value) : _impl{std::make_unique<Impl>()} {
   this->create_from_shape(std::move(shape));
   this->fill(fill_value);
 }
@@ -99,22 +100,22 @@ Tensor<T>::Tensor(txeo::TensorShape &&shape, const T &fill_value)
 template <typename T>
 Tensor<T>::Tensor(const std::vector<size_t> &shape, const T &fill_value)
     : _impl{std::make_unique<Impl>()} {
-  this->create_from_shape(txeo::TensorShape(shape));
+  this->create_from_shape(TensorShape(shape));
   this->fill(fill_value);
 }
 
 template <typename T>
 Tensor<T>::Tensor(std::vector<size_t> &&shape, const T &fill_value)
     : _impl{std::make_unique<Impl>()} {
-  this->create_from_shape(txeo::TensorShape(std::move(shape)));
+  this->create_from_shape(TensorShape(std::move(shape)));
   this->fill(fill_value);
 }
 
 template <typename T>
-Tensor<T>::Tensor(const txeo::TensorShape &shape, const std::vector<T> &values)
+Tensor<T>::Tensor(const TensorShape &shape, const std::vector<T> &values)
     : _impl{std::make_unique<Impl>()} {
   if (values.size() != shape.calculate_capacity())
-    throw txeo::TensorError("Shape and number of values are incompatible!");
+    throw TensorError("Shape and number of values are incompatible!");
   create_from_shape(shape);
   std::copy(std::begin(values), std::end(values), this->data());
 }
@@ -122,9 +123,9 @@ Tensor<T>::Tensor(const txeo::TensorShape &shape, const std::vector<T> &values)
 template <typename T>
 Tensor<T>::Tensor(const std::vector<size_t> &shape, const std::vector<T> &values)
     : _impl{std::make_unique<Impl>()} {
-  txeo::TensorShape aux(shape);
+  TensorShape aux(shape);
   if (values.size() != aux.calculate_capacity())
-    throw txeo::TensorError("Shape and number of values are incompatible!");
+    throw TensorError("Shape and number of values are incompatible!");
   create_from_shape(aux);
   std::copy(std::begin(values), std::end(values), this->data());
 }
@@ -135,7 +136,7 @@ Tensor<T>::Tensor(const std::initializer_list<std::initializer_list<T>> &values)
   std::vector<T> flat_data;
   std::vector<size_t> shape;
   this->fill_data_shape(values, flat_data, shape);
-  create_from_shape(txeo::TensorShape(shape));
+  create_from_shape(TensorShape(shape));
   std::copy(std::begin(flat_data), std::end(flat_data), this->data());
 }
 
@@ -146,7 +147,7 @@ Tensor<T>::Tensor(
   std::vector<T> flat_data;
   std::vector<size_t> shape;
   this->fill_data_shape(values, flat_data, shape);
-  create_from_shape(txeo::TensorShape(shape));
+  create_from_shape(TensorShape(shape));
   std::copy(std::begin(flat_data), std::end(flat_data), this->data());
 }
 
@@ -173,7 +174,7 @@ bool Tensor<T>::operator==(const Tensor &tensor) {
   if (_impl->tf_tensor->shape() != tensor._impl->tf_tensor->shape())
     return false;
   for (size_t i{0}; i < this->dim(); ++i) {
-    if (!txeo::detail::is_zero(this->data()[i] - tensor.data()[i]))
+    if (!detail::is_zero(this->data()[i] - tensor.data()[i]))
       return false;
   }
 
@@ -193,7 +194,7 @@ bool Tensor<T>::operator!=(const Tensor &tensor) {
 }
 
 template <typename T>
-const txeo::TensorShape &Tensor<T>::shape() const {
+const TensorShape &Tensor<T>::shape() const {
   return _impl->txeo_shape;
 }
 
@@ -242,44 +243,44 @@ const T &Tensor<T>::at() const {
 }
 
 template <typename T>
-void Tensor<T>::reshape(const txeo::TensorShape &shape) {
+void Tensor<T>::reshape(const TensorShape &shape) {
   auto old_tensor = std::move(_impl->tf_tensor);
   create_from_shape(shape);
   if (!_impl->tf_tensor->CopyFrom(*old_tensor, _impl->tf_tensor->shape()))
-    throw txeo::TensorError("The number of axes do not match the dimension of this tensor!");
+    throw TensorError("The number of axes do not match the dimension of this tensor!");
 }
 
 template <typename T>
 void Tensor<T>::reshape(const std::vector<size_t> &shape) {
-  reshape(txeo::TensorShape(shape));
+  reshape(TensorShape(shape));
 }
 
 template <typename T>
 Tensor<T> Tensor<T>::slice(size_t first_axis_begin, size_t first_axis_end) const {
   try {
-    return txeo::TensorPart<T>::slice(*this, first_axis_begin, first_axis_end);
-  } catch (txeo::TensorPartError e) {
-    throw txeo::TensorError(e.what());
+    return TensorPart<T>::slice(*this, first_axis_begin, first_axis_end);
+  } catch (TensorPartError e) {
+    throw TensorError(e.what());
   }
 }
 
 template <typename T>
-void Tensor<T>::view_of(const Tensor<T> &tensor, const txeo::TensorShape &shape) {
+void Tensor<T>::view_of(const Tensor<T> &tensor, const TensorShape &shape) {
   if (this->dim() == 0)
     return;
   if (this->dim() != tensor.dim() || this->dim() != shape.calculate_capacity())
-    throw txeo::TensorError("Parameters do not match the dimension of this tensor!");
+    throw TensorError("Parameters do not match the dimension of this tensor!");
   this->reshape(shape);
   if (!_impl->tf_tensor->CopyFrom(*tensor._impl->tf_tensor, *shape._impl->tf_shape))
-    throw txeo::TensorError("This tensor could not be shared!");
+    throw TensorError("This tensor could not be shared!");
 }
 
 template <typename T>
 Tensor<T> Tensor<T>::flatten() const {
-  Tensor<T> resp(txeo::TensorShape({this->dim()}));
+  Tensor<T> resp(TensorShape({this->dim()}));
   if (this->dim() != 0)
     if (!resp._impl->tf_tensor->CopyFrom(*_impl->tf_tensor, resp._impl->tf_tensor->shape()))
-      throw txeo::TensorError("This tensor could not be flatten!");
+      throw TensorError("This tensor could not be flatten!");
 
   return resp;
 }
@@ -318,9 +319,54 @@ void Tensor<T>::squeeze() {
   const auto &aux = this->shape().axes_dims();
   for (auto &item : aux)
     if (item != 1)
-      new_shape.emplace_back(txeo::detail::to_size_t(item));
+      new_shape.emplace_back(detail::to_size_t(item));
 
-  this->reshape(txeo::TensorShape(new_shape));
+  this->reshape(TensorShape(new_shape));
+}
+
+template <typename T>
+Tensor<T> &Tensor<T>::increase_dimension(size_t axis, T value) {
+  return TensorPart<T>::increase_dimension_by(*this, axis, value);
+}
+
+template <typename T>
+txeo::Tensor<T> &Tensor<T>::power(const T &exponent) {
+  return TensorFunc<T>::power_elem_by(*this, exponent);
+}
+
+template <typename T>
+txeo::Tensor<T> &Tensor<T>::square() {
+  return TensorFunc<T>::square_by(*this);
+}
+
+template <typename T>
+txeo::Tensor<T> &Tensor<T>::sqrt() {
+  return TensorFunc<T>::sqrt_by(*this);
+}
+
+template <typename T>
+txeo::Tensor<T> &Tensor<T>::abs() {
+  return TensorFunc<T>::abs_by(*this);
+}
+
+template <typename T>
+txeo::Tensor<T> &Tensor<T>::permute(const std::vector<size_t> &axes) {
+  return TensorFunc<T>::permute_by(*this, axes);
+}
+
+template <typename T>
+txeo::Tensor<T> &Tensor<T>::normalize(size_t axis, txeo::NormalizationType type) {
+  return TensorFunc<T>::normalize_by(*this, axis, type);
+}
+
+template <typename T>
+txeo::Tensor<T> &Tensor<T>::normalize(txeo::NormalizationType type) {
+  return TensorFunc<T>::normalize_by(*this, type);
+}
+
+template <typename T>
+T Tensor<T>::inner(const Tensor<T> &tensor) const {
+  return TensorOp<T>::inner(*this, tensor);
 }
 
 template <typename T>
@@ -341,7 +387,7 @@ void Tensor<T>::fill_with_uniform_random(const T &min, const T &max, const size_
   if (this->dim() == 0)
     return;
   if (max <= min)
-    throw txeo::TensorError("The max value is not greater than the min value");
+    throw TensorError("The max value is not greater than the min value");
 
   auto aux_min = static_cast<double>(min);
   auto aux_max = static_cast<double>(max);
@@ -360,7 +406,7 @@ void Tensor<T>::fill_with_uniform_random(const T &min, const T &max) {
   if (this->dim() == 0)
     return;
   if (max <= min)
-    throw txeo::TensorError("The max value is not greater than the min value");
+    throw TensorError("The max value is not greater than the min value");
 
   auto aux_min = static_cast<double>(min);
   auto aux_max = static_cast<double>(max);
@@ -403,6 +449,11 @@ Tensor<U> operator*(const Tensor<U> &tensor, const U &scalar) {
 };
 
 template <typename U>
+Tensor<U> operator*(const U &scalar, const Tensor<U> &tensor) {
+  return TensorOp<U>::multiply(tensor, scalar);
+};
+
+template <typename U>
 Tensor<U> operator/(const Tensor<U> &tensor, const U &scalar) {
   return TensorOp<U>::divide(tensor, scalar);
 };
@@ -414,58 +465,58 @@ Tensor<U> operator/(const U &left, const Tensor<U> &right) {
 
 template <typename T>
 Tensor<T> &Tensor<T>::operator+=(const Tensor<T> &tensor) {
-  txeo::TensorOp<T>::sum_by(*this, tensor);
+  TensorOp<T>::sum_by(*this, tensor);
   return *this;
 }
 
 template <typename T>
 Tensor<T> &Tensor<T>::operator-=(const Tensor<T> &tensor) {
-  txeo::TensorOp<T>::subtract_by(*this, tensor);
+  TensorOp<T>::subtract_by(*this, tensor);
   return *this;
 }
 
 template <typename T>
 Tensor<T> &Tensor<T>::operator*=(const T &scalar) {
-  txeo::TensorOp<T>::multiply_by(*this, scalar);
+  TensorOp<T>::multiply_by(*this, scalar);
   return *this;
 }
 
 template <typename T>
-inline Tensor<T> &Tensor<T>::operator/=(const T &scalar) {
-  txeo::TensorOp<T>::divide_by(*this, scalar);
+Tensor<T> &Tensor<T>::operator/=(const T &scalar) {
+  TensorOp<T>::divide_by(*this, scalar);
   return *this;
 }
 
 template <typename T>
-inline Tensor<T> &Tensor<T>::operator+=(const T &scalar) {
-  txeo::TensorOp<T>::sum_by(*this, scalar);
+Tensor<T> &Tensor<T>::operator+=(const T &scalar) {
+  TensorOp<T>::sum_by(*this, scalar);
   return *this;
 }
 
 template <typename T>
-inline Tensor<T> &Tensor<T>::operator-=(const T &scalar) {
-  txeo::TensorOp<T>::subtract_by(*this, scalar);
+Tensor<T> &Tensor<T>::operator-=(const T &scalar) {
+  TensorOp<T>::subtract_by(*this, scalar);
   return *this;
 }
 
 template <typename T>
-txeo::TensorIterator<T> Tensor<T>::begin() {
-  return txeo::TensorIterator<T>{this->data()};
+TensorIterator<T> Tensor<T>::begin() {
+  return TensorIterator<T>{this->data()};
 }
 
 template <typename T>
-txeo::TensorIterator<T> Tensor<T>::end() {
-  return txeo::TensorIterator<T>{this->data() + this->dim()};
+TensorIterator<T> Tensor<T>::end() {
+  return TensorIterator<T>{this->data() + this->dim()};
 }
 
 template <typename T>
-txeo::TensorIterator<const T> Tensor<T>::begin() const {
-  return txeo::TensorIterator<const T>{this->data()};
+TensorIterator<const T> Tensor<T>::begin() const {
+  return TensorIterator<const T>{this->data()};
 }
 
 template <typename T>
-txeo::TensorIterator<const T> Tensor<T>::end() const {
-  return txeo::TensorIterator<const T>{this->data() + this->dim()};
+TensorIterator<const T> Tensor<T>::end() const {
+  return TensorIterator<const T>{this->data() + this->dim()};
 }
 
 // Avoiding problems in linking
@@ -559,5 +610,14 @@ template Tensor<long long> operator/(const long long &, const Tensor<long long> 
 template Tensor<float> operator/(const float &, const Tensor<float> &);
 template Tensor<double> operator/(const double &, const Tensor<double> &);
 template Tensor<size_t> operator/(const size_t &, const Tensor<size_t> &);
+
+template Tensor<short> operator*(const short &, const Tensor<short> &);
+template Tensor<int> operator*(const int &, const Tensor<int> &);
+template Tensor<bool> operator*(const bool &, const Tensor<bool> &);
+template Tensor<long> operator*(const long &, const Tensor<long> &);
+template Tensor<long long> operator*(const long long &, const Tensor<long long> &);
+template Tensor<float> operator*(const float &, const Tensor<float> &);
+template Tensor<double> operator*(const double &, const Tensor<double> &);
+template Tensor<size_t> operator*(const size_t &, const Tensor<size_t> &);
 
 } // namespace txeo

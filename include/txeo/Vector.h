@@ -1,10 +1,10 @@
 #ifndef VECTOR_H
 #define VECTOR_H
-#include "txeo/types.h"
 #pragma once
 
 #include "txeo/Tensor.h"
 #include "txeo/TensorShape.h"
+#include "txeo/types.h"
 
 #include <cstddef>
 #include <initializer_list>
@@ -42,6 +42,7 @@ class TensorFunc;
 template <typename T>
 class Vector : public txeo::Tensor<T> {
   public:
+    explicit Vector();
     ~Vector() = default;
 
     Vector(const Vector &Vector) : txeo::Tensor<T>{Vector} {};
@@ -166,6 +167,19 @@ class Vector : public txeo::Tensor<T> {
     };
 
     /**
+     * @brief Returns the size of the vector.
+     *
+     * @return The total number of elements in the vector.
+     *
+     * **Example Usage:**
+     * @code
+     * txeo::Vector<int> vec(3);
+     * size_t size = vec.size();  // size = 3
+     * @endcode
+     */
+    [[nodiscard]] size_t size() const { return this->dim(); }
+
+    /**
      * @brief Converts a tensor to a vector by moving data.
      *
      * This function moves the data from the input tensor to a new vector.
@@ -231,9 +245,34 @@ class Vector : public txeo::Tensor<T> {
      */
     static txeo::Tensor<T> to_tensor(const Vector<T> &vector);
 
-  private:
-    Vector() = default;
+    template <typename U>
+    friend txeo::Vector<U> operator+(const txeo::Vector<U> &left, const txeo::Vector<U> &right);
 
+    template <typename U>
+    friend txeo::Vector<U> operator+(const txeo::Vector<U> &left, const U &right);
+
+    template <typename U>
+    friend txeo::Vector<U> operator-(const txeo::Vector<U> &left, const txeo::Vector<U> &right);
+
+    template <typename U>
+    friend txeo::Vector<U> operator-(const txeo::Vector<U> &left, const U &right);
+
+    template <typename U>
+    friend txeo::Vector<U> operator-(const U &left, const txeo::Vector<U> &right);
+
+    template <typename U>
+    friend txeo::Vector<U> operator*(const txeo::Vector<U> &vector, const U &scalar);
+
+    template <typename U>
+    friend txeo::Vector<U> operator*(const U &scalar, const txeo::Vector<U> &vector);
+
+    template <typename U>
+    friend txeo::Vector<U> operator/(const txeo::Vector<U> &left, const U &right);
+
+    template <typename U>
+    friend txeo::Vector<U> operator/(const U &left, const txeo::Vector<U> &right);
+
+  private:
     friend class txeo::Predictor<T>;
     friend class txeo::TensorAgg<T>;
     friend class txeo::TensorPart<T>;

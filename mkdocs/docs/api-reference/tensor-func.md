@@ -10,18 +10,18 @@ The class `TensorFunc` of **txeo** provides common mathematical functions that c
 
 | Method                      | Description                                                  |
 |-----------------------------|--------------------------------------------------------------|
-| `power_elem`                | Computes element-wise power of tensor elements               |
-| `power_elem_by`             | Computes element-wise power in-place                         |
-| `square`                    | Computes element-wise square                                 |
-| `square_by`                 | Computes element-wise square in-place                        |
-| `sqrt`                      | Computes element-wise square root                            |
-| `sqrt_by`                   | Computes element-wise square root in-place                   |
-| `abs`                       | Computes element-wise absolute value                         |
 | `abs_by`                    | Computes element-wise absolute value in-place                |
-| `permute`                   | Permutes axes of a tensor                                    |
+| `abs`                       | Computes element-wise absolute value                         |
 | `permute_by`                | Permutes axes of a tensor in-place                           |
-| `transpose`                 | Transposes a matrix                                          |
+| `permute`                   | Permutes axes of a tensor                                    |
+| `power_elem_by`             | Computes element-wise power in-place                         |
+| `power_elem`                | Computes element-wise power of tensor elements               |
+| `sqrt_by`                   | Computes element-wise square root in-place                   |
+| `sqrt`                      | Computes element-wise square root                            |
+| `square_by`                 | Computes element-wise square in-place                        |
+| `square`                    | Computes element-wise square                                 |
 | `transpose_by`              | Transposes a matrix in-place                                 |
+| `transpose`                 | Transposes a matrix                                          |
 
 ---
 

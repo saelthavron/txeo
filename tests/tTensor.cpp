@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "txeo/Tensor.h"
+#include "txeo/TensorFunc.h"
 #include "txeo/TensorOp.h"
 #include "txeo/TensorShape.h"
 
@@ -409,10 +410,12 @@ TEST(TensorTest, ScalarMultiplication) {
   Tensor<int> t1({2, 3}, {1, 2, 3, 4, 5, 6});
 
   Tensor<int> result = t1 * 2;
+  Tensor<int> result2 = 3 * t1;
 
   ASSERT_EQ(result.shape(), txeo::TensorShape({2, 3}));
   EXPECT_EQ(result(0, 0), 2);
   EXPECT_EQ(result(1, 2), 12);
+  EXPECT_TRUE(result2 == txeo::Tensor<int>({2, 3}, {3, 6, 9, 12, 15, 18}));
 }
 
 TEST(TensorTest, CompoundAddition) {
@@ -455,7 +458,7 @@ TEST(TensorTest, ShapeMismatchAddition) {
   EXPECT_THROW(t1 + t2, TensorOpError);
 }
 
-TEST(TensorTest, EmptyTensorOperations) {
+TEST(TensorTest, EmptyTensorTest) {
   Tensor<float> empty({0});
   Tensor<float> t1({0});
 
@@ -543,7 +546,7 @@ TEST(TensorTest, DivideByOne) {
   EXPECT_EQ(t.data()[2], 15);
 }
 
-TEST(TensorTest, EmptyTensorOperations2) {
+TEST(TensorTest, EmptyTensorTest2) {
   Tensor<float> t({0});
   EXPECT_THROW(t += 10.0f, TensorOpError);
 }
@@ -656,6 +659,105 @@ TEST(TensorTest, Immutability) {
   EXPECT_EQ(orig.data()[1], 10);
   EXPECT_EQ(result.data()[0], 8);
   EXPECT_EQ(result.data()[1], 13);
+}
+
+TEST(TensorTest, IncreaseDimensionAddsNewAxis) {
+  Tensor<int> t({2, 3}, {1, 2, 3, 4, 5, 6});
+  t.increase_dimension(1, -1);
+
+  Tensor<int> resp({2, 4}, {1, 2, 3, -1, 4, 5, 6, -1});
+
+  EXPECT_TRUE(t == resp);
+}
+
+TEST(TensorTest, PowerRaisesElements) {
+  Tensor<float> t({2}, {2.0f, 3.0f});
+  t.power(3.0f);
+
+  EXPECT_FLOAT_EQ(t(0), 8.0f);
+  EXPECT_FLOAT_EQ(t(1), 27.0f);
+}
+
+TEST(TensorTest, SquareSquaresElements) {
+  Tensor<double> t({3}, {3.0, 4.0, -5.0});
+  t.square();
+
+  EXPECT_DOUBLE_EQ(t(0), 9.0);
+  EXPECT_DOUBLE_EQ(t(1), 16.0);
+  EXPECT_DOUBLE_EQ(t(2), 25.0);
+}
+
+TEST(TensorTest, SqrtComputesSquareRoot) {
+  Tensor<float> t({4}, {9.0f, 16.0f, 2.0f, 5.0f});
+  t.sqrt();
+
+  EXPECT_FLOAT_EQ(t(0), 3.0f);
+  EXPECT_FLOAT_EQ(t(1), 4.0f);
+  EXPECT_NEAR(t(2), 1.4142f, 0.0001f);
+  EXPECT_NEAR(t(3), 2.2361f, 0.0001f);
+}
+
+TEST(TensorTest, AbsComputesAbsoluteValues) {
+  Tensor<int> t({2, 2}, {1, -2, -3, 4});
+  t.abs();
+
+  EXPECT_EQ(t(0, 0), 1);
+  EXPECT_EQ(t(0, 1), 2);
+  EXPECT_EQ(t(1, 0), 3);
+  EXPECT_EQ(t(1, 1), 4);
+}
+
+TEST(TensorTest, PermuteReordersDimensions) {
+  Tensor<int> t({2, 3}, {1, 2, 3, 4, 5, 6});
+  t.permute({1, 0});
+
+  ASSERT_EQ(t.shape().axis_dim(0), 3);
+  ASSERT_EQ(t.shape().axis_dim(1), 2);
+  EXPECT_EQ(t(0, 0), 1);
+  EXPECT_EQ(t(2, 1), 6);
+}
+
+TEST(TensorTest, MinMaxNormalization) {
+  Tensor<float> t({3}, {10.0f, 20.0f, 30.0f});
+  t.normalize(0, NormalizationType::MIN_MAX);
+
+  EXPECT_FLOAT_EQ(t(0), 0.0f);
+  EXPECT_FLOAT_EQ(t(1), 0.5f);
+  EXPECT_FLOAT_EQ(t(2), 1.0f);
+}
+
+TEST(TensorTest, ZScoreNormalization) {
+
+  txeo::Tensor<double> tens7({3, 3}, {1., 2., 3., 4., 5., 6., 7., 8., 9.});
+  tens7.normalize(0, txeo::NormalizationType::Z_SCORE);
+  txeo::Tensor<double> resp7({3, 3}, {-1, -1, -1, 0, 0, 0, 1, 1, 1});
+  EXPECT_TRUE(tens7 == resp7);
+}
+
+TEST(TensorTest, VectorDotProduct) {
+  Tensor<int> a({3}, {1, 2, 3});
+  Tensor<int> b({3}, {4, 5, 6});
+
+  int result = a.inner(b);
+  EXPECT_EQ(result, 1 * 4 + 2 * 5 + 3 * 6);
+}
+
+TEST(TensorTest, MatrixDotProduct) {
+  Tensor<int> a({2, 3}, {1, 2, 3, 4, 5, 6});
+  Tensor<int> b({3, 2}, {7, 8, 9, 10, 11, 12});
+
+  EXPECT_EQ(a.inner(b), 1 * 7 + 2 * 8 + 3 * 9 + 4 * 10 + 5 * 11 + 6 * 12);
+}
+
+TEST(TensorTest, InvalidPermutationThrows) {
+  Tensor<int> t({2, 3});
+  EXPECT_THROW(t.permute({2, 0}), TensorFuncError);
+}
+
+TEST(TensorTest, DotProductDimensionMismatch) {
+  Tensor<int> a({3}, {1, 2, 3});
+  Tensor<int> b({4}, {1, 2, 3, 4});
+  EXPECT_THROW(a.inner(b), TensorOpError);
 }
 
 } // namespace txeo

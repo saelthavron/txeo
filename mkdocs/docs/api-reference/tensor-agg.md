@@ -14,24 +14,24 @@ The `TensorAgg` class of **txeo** library provides aggregation functions to simp
 
 | Method                           | Description                                      |
 |----------------------------------|--------------------------------------------------|
-| `reduce_sum(tensor, axes)`       | Computes sum along axes                          |
-| `reduce_prod(tensor, axes)`      | Computes product along axes                      |
-| `reduce_mean(tensor, axes)`      | Computes mean along axes                         |
-| `reduce_max(tensor, axes)`       | Finds maximum values along axes                  |
-| `reduce_min(tensor, axes)`       | Finds minimum values along axes                  |
-| `reduce_euclidean_norm(tensor, axes)` | Computes Euclidean norm along axes             |
-| `reduce_maximum_norm(tensor, axis)`   | Computes maximum norm along axis               |
-| `reduce_variance(tensor, axis)`  | Computes variance along axis                     |
-| `reduce_standard_deviation(tensor, axis)` | Computes standard deviation along axis      |
-| `reduce_median(tensor, axis)`    | Computes median along axis                       |
-| `reduce_geometric_mean(tensor, axis)` | Computes geometric mean along axis            |
-| `reduce_all(tensor, axes)`       | Computes logical AND along axes                  |
-| `reduce_any(tensor, axes)`       | Computes logical OR along axes                   |
-| `cumulative_sum(tensor, axis)`   | Computes cumulative sum along axis               |
-| `cumulative_prod(tensor, axis)`  | Computes cumulative product along axis           |
 | `arg_max(tensor, axis)`          | Indices of max values along axis                 |
 | `arg_min(tensor, axis)`          | Indices of min values along axis                 |
 | `count_non_zero(tensor, axis)`   | Counts non-zero elements along axis              |
+| `cumulative_prod(tensor, axis)`  | Computes cumulative product along axis           |
+| `cumulative_sum(tensor, axis)`   | Computes cumulative sum along axis               |
+| `reduce_all(tensor, axes)`       | Computes logical AND along axes                  |
+| `reduce_any(tensor, axes)`       | Computes logical OR along axes                   |
+| `reduce_euclidean_norm(tensor, axes)` | Computes Euclidean norm along axes             |
+| `reduce_geometric_mean(tensor, axis)` | Computes geometric mean along axis            |
+| `reduce_max(tensor, axes)`       | Finds maximum values along axes                  |
+| `reduce_maximum_norm(tensor, axis)`   | Computes maximum norm along axis               |
+| `reduce_mean(tensor, axes)`      | Computes mean along axes                         |
+| `reduce_median(tensor, axis)`    | Computes median along axis                       |
+| `reduce_min(tensor, axes)`       | Finds minimum values along axes                  |
+| `reduce_prod(tensor, axes)`      | Computes product along axes                      |
+| `reduce_standard_deviation(tensor, axis)` | Computes standard deviation along axis      |
+| `reduce_sum(tensor, axes)`       | Computes sum along axes                          |
+| `reduce_variance(tensor, axis)`  | Computes variance along axis                     |
 | `sum_all(tensor)`                | Sums all elements in tensor                      |
 
 ---

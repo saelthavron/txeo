@@ -12,11 +12,14 @@ The `Matrix` class in **txeo** is a specialized tensor explicitly tailored for s
 
 | Method                   | Description                                                |
 |---------------------------|-------------------------------------------------------------|
+| `col_size()` | Returns the column size of the matrix. |
+| `normalize_columns(type)` | Normalize all the columns of this matrix according to a normalization type |
+| `normalize_rows(type)` | Normalize all the rows of this matrix according to a normalization type |
+| `row_size()` | Returns the row size of the matrix. |
 | `size()`                  | Returns total number of matrix elements                      |
 | `to_matrix(tensor)`   | Converts a second-order tensor to matrix (move semantics)  |
 | `to_tensor(matrix)`  | Converts a matrix to tensor, supports copy and move semantics |
-| `normalize_columns(type)` | Normalize all the columns of this matrix according to a normalization type |
-| `normalize_rows(type)` | Normalize all the rows of this matrix according to a normalization type |
+| `transpose()` | Transposes the matrix (swaps rows and columns) in-place. |
 
 ---
 

@@ -34,10 +34,10 @@
 - **Model and other info:**
   - **279,610 parameters**
   - **1 Softmax Output Layer** with 10 classes
-  - **3 Fully-Connected ReLU Convolutional Layers** with 200 nodes each
+  - **3 Fully-Connected ReLU Convolutional Layers** with 200 units each
   - **Input**: 210,000 grayscale images (28×28).
   - **CPU**: AMD Ryzen 7 5700X CPU
-  - **TensorFlow**: Compiled with CPU optimization
+  - **TensorFlow 2.0**: Compiled with CPU optimization
 
 ### 🔎 **Results Overview**
 

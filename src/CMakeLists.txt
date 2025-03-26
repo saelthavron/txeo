@@ -11,7 +11,10 @@ set(TXEO_SOURCES
     MatrixIO.cpp
     TensorPart.cpp 
     TensorFunc.cpp
-    Predictor.cpp)
+    Predictor.cpp
+    Trainer.cpp
+    OlsGDTrainer.cpp
+    Loss.cpp)
 
 
 #################################################### Finding Tensorflow ####################################################

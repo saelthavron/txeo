@@ -14,10 +14,10 @@ The `Vector` class simplifies handling 1st-order tensor operations, offering int
 
 | Method                          | Description                                           |
 |---------------------------------|-------------------------------------------------------|
-| `reshape(shape)`                | Changes the shape of the vector                        |
-| `to_vector(tensor)`             | Converts a first-order tensor to vector (copy/move)    |
-| `to_tensor(vector)`             | Converts a vector to tensor (copy/move)                |
 | `normalize(type)` | Normalize this vector according to a normalization type |
+| `reshape(shape)`                | Changes the shape of the vector                        |
+| `to_tensor(vector)`             | Converts a vector to tensor (copy/move)                |
+| `to_vector(tensor)`             | Converts a first-order tensor to vector (copy/move)    |
 
 ---
 

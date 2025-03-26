@@ -11,7 +11,7 @@
 namespace txeo {
 
 template <typename T>
-txeo::Matrix<T> MatrixIO::read_text_file(bool has_header) const {
+Matrix<T> MatrixIO::read_text_file(bool has_header) const {
   std::string line;
   std::string word;
   size_t n_rows{0};
@@ -23,16 +23,16 @@ txeo::Matrix<T> MatrixIO::read_text_file(bool has_header) const {
     while (std::getline(rf, line)) {
       if (line.empty())
         continue;
-      if (std::count(line.begin(), line.end(), _separator) == 0) {
-        rf.close();
-        throw txeo::MatrixIOError("Separator not found!");
-      };
+      // if (std::count(line.begin(), line.end(), _separator) == 0) {
+      //   rf.close();
+      //   throw MatrixIOError("Separator not found!");
+      // };
       std::stringstream line_stream{line};
       while (std::getline(line_stream, word, _separator))
         ++aux;
       if (n_cols != 0 && aux != n_cols) {
         rf.close();
-        throw txeo::MatrixIOError("Inconsistent number of columns!");
+        throw MatrixIOError("Inconsistent number of columns!");
       }
       n_cols = aux;
       aux = 0;
@@ -40,31 +40,33 @@ txeo::Matrix<T> MatrixIO::read_text_file(bool has_header) const {
     }
     if (n_rows == 0) {
       rf.close();
-      throw txeo::MatrixIOError("File can not be empty!");
+      throw MatrixIOError("File can not be empty!");
     }
     if (has_header)
       --n_rows;
   } else
-    throw txeo::MatrixIOError("Could not open file!");
+    throw MatrixIOError("Could not open file!");
 
-  txeo::Matrix<T> resp{n_rows, n_cols};
+  Matrix<T> resp{n_rows, n_cols};
   rf.clear();
   rf.seekg(0);
-  auto iterator = std::begin(resp);
+  auto resp_ite = std::begin(resp);
   if (has_header)
     std::getline(rf, line);
+  size_t line_number{0};
   while (std::getline(rf, line)) {
+    ++line_number;
     if (line.empty())
       continue;
     std::stringstream line_stream{line};
     while (std::getline(line_stream, word, _separator)) {
       try {
-        *iterator = static_cast<T>(std::stod(word));
+        *resp_ite = static_cast<T>(std::stod(word));
       } catch (...) {
         rf.close();
-        throw txeo::MatrixIOError("Invalid element!");
+        throw MatrixIOError("Invalid element at line " + std::to_string(line_number));
       }
-      ++iterator;
+      ++resp_ite;
     }
   }
   rf.close();
@@ -72,13 +74,13 @@ txeo::Matrix<T> MatrixIO::read_text_file(bool has_header) const {
 }
 
 template <typename T>
-void MatrixIO::write_text_file(const txeo::Matrix<T> &tensor) const {
+void MatrixIO::write_text_file(const Matrix<T> &tensor) const {
   if (tensor.order() != 2)
-    throw txeo::MatrixIOError("Tensor is not a matrix!");
+    throw MatrixIOError("Tensor is not a matrix!");
   std::ofstream wf{_path, std::ios::out};
   if (wf.is_open()) {
-    size_t n_rows = txeo::detail::to_size_t(tensor.shape().axis_dim(0));
-    size_t n_cols = txeo::detail::to_size_t(tensor.shape().axis_dim(1));
+    size_t n_rows = detail::to_size_t(tensor.shape().axis_dim(0));
+    size_t n_cols = detail::to_size_t(tensor.shape().axis_dim(1));
     auto iterator = std::cbegin(tensor);
     size_t aux_r{0};
     while (aux_r < n_rows) {
@@ -94,27 +96,27 @@ void MatrixIO::write_text_file(const txeo::Matrix<T> &tensor) const {
     }
     wf.close();
   } else
-    throw txeo::MatrixIOError("Could not open file!");
+    throw MatrixIOError("Could not open file!");
 }
 
 template <typename T>
   requires(std::is_floating_point_v<T>)
-void MatrixIO::write_text_file(const txeo::Matrix<T> &tensor, size_t precision) const {
+void MatrixIO::write_text_file(const Matrix<T> &tensor, size_t precision) const {
   if (precision <= 1)
-    throw txeo::MatrixIOError("Precision must be greater than 1!");
+    throw MatrixIOError("Precision must be greater than 1!");
   auto prec = precision - 1;
   if (tensor.order() != 2)
-    throw txeo::MatrixIOError("Tensor is not a matrix!");
+    throw MatrixIOError("Tensor is not a matrix!");
   std::ofstream wf{_path, std::ios::out};
   if (wf.is_open()) {
-    size_t n_rows = txeo::detail::to_size_t(tensor.shape().axis_dim(0));
-    size_t n_cols = txeo::detail::to_size_t(tensor.shape().axis_dim(1));
+    size_t n_rows = detail::to_size_t(tensor.shape().axis_dim(0));
+    size_t n_cols = detail::to_size_t(tensor.shape().axis_dim(1));
     auto iterator = std::cbegin(tensor);
     size_t aux_r{0};
     while (aux_r < n_rows) {
       size_t aux_c{0};
       while (aux_c < n_cols) {
-        wf << txeo::detail::format(*iterator, prec);
+        wf << detail::format(*iterator, prec);
         ++iterator;
         if (++aux_c < n_cols)
           wf << _separator;
@@ -124,7 +126,7 @@ void MatrixIO::write_text_file(const txeo::Matrix<T> &tensor, size_t precision) 
     }
     wf.close();
   } else
-    throw txeo::MatrixIOError("Could not open file!");
+    throw MatrixIOError("Could not open file!");
 }
 
 std::map<size_t, std::unordered_set<std::string>>
@@ -133,7 +135,7 @@ MatrixIO::build_lookups_map(const std::filesystem::path &source_path, char separ
   std::ifstream rf{source_path};
 
   if (!rf.is_open())
-    throw txeo::MatrixIOError("Could not open file to read!");
+    throw MatrixIOError("Could not open file to read!");
 
   std::string line;
   std::string word;
@@ -150,11 +152,11 @@ MatrixIO::build_lookups_map(const std::filesystem::path &source_path, char separ
       continue;
     if (std::count(line.begin(), line.end(), separator) == 0) {
       rf.close();
-      throw txeo::MatrixIOError("Separator not found!");
+      throw MatrixIOError("Separator not found!");
     };
     std::stringstream line_stream{line};
     while (std::getline(line_stream, word, separator)) {
-      if (!txeo::detail::is_numeric(word)) {
+      if (!detail::is_numeric(word)) {
         auto item = resp.find(col);
         if (item != std::end(resp)) {
           auto &lookups = item->second;
@@ -165,7 +167,7 @@ MatrixIO::build_lookups_map(const std::filesystem::path &source_path, char separ
         } else {
           if (!first_line) {
             rf.close();
-            throw txeo::MatrixIOError("Different types in the same column!");
+            throw MatrixIOError("Different types in the same column!");
           }
           std::unordered_set<std::string> lookup;
           lookup.emplace(word);
@@ -176,7 +178,7 @@ MatrixIO::build_lookups_map(const std::filesystem::path &source_path, char separ
     }
     if (n_cols != 0 && col != n_cols) {
       rf.close();
-      throw txeo::MatrixIOError("Inconsistent number of columns!");
+      throw MatrixIOError("Inconsistent number of columns!");
     }
     n_cols = col;
     col = 0;
@@ -191,7 +193,7 @@ std::string MatrixIO::build_target_header(
   std::ifstream rf{source_path};
 
   if (!rf.is_open())
-    throw txeo::MatrixIOError("Could not open file to read!");
+    throw MatrixIOError("Could not open file to read!");
 
   std::string line;
   std::string word;
@@ -223,20 +225,20 @@ std::string MatrixIO::build_target_header(
   return resp;
 }
 
-txeo::MatrixIO MatrixIO::one_hot_encode_text_file(const std::filesystem::path &source_path,
-                                                  char separator, bool has_header,
-                                                  const std::filesystem::path &target_path) {
+MatrixIO MatrixIO::one_hot_encode_text_file(const std::filesystem::path &source_path,
+                                            char separator, bool has_header,
+                                            const std::filesystem::path &target_path) {
   if (source_path == target_path)
-    throw txeo::MatrixIOError("Source and target paths cannot be equal!");
+    throw MatrixIOError("Source and target paths cannot be equal!");
 
   std::ifstream rf{source_path};
   std::ofstream wf{target_path};
 
   if (!rf.is_open())
-    throw txeo::MatrixIOError("Could not open file to read!");
+    throw MatrixIOError("Could not open file to read!");
 
   if (!wf.is_open())
-    throw txeo::MatrixIOError("Could not open file to write!");
+    throw MatrixIOError("Could not open file to write!");
 
   auto lookups_map = MatrixIO::build_lookups_map(source_path, separator, has_header);
 
@@ -262,7 +264,7 @@ txeo::MatrixIO MatrixIO::one_hot_encode_text_file(const std::filesystem::path &s
     while (std::getline(line_stream, word, separator)) {
       if (!target_line.empty())
         target_line += separator;
-      if (!txeo::detail::is_numeric(word)) {
+      if (!detail::is_numeric(word)) {
         auto &lookup_set = lookups_map.find(col)->second;
         for (auto &item : lookup_set) {
           if (target_line.back() != ',')
@@ -286,25 +288,25 @@ txeo::MatrixIO MatrixIO::one_hot_encode_text_file(const std::filesystem::path &s
   return resp;
 }
 
-template txeo::Matrix<short> MatrixIO::read_text_file<short>(bool has_header) const;
-template txeo::Matrix<int> MatrixIO::read_text_file<int>(bool has_header) const;
-template txeo::Matrix<bool> MatrixIO::read_text_file<bool>(bool has_header) const;
-template txeo::Matrix<long> MatrixIO::read_text_file<long>(bool has_header) const;
-template txeo::Matrix<long long> MatrixIO::read_text_file<long long>(bool has_header) const;
-template txeo::Matrix<float> MatrixIO::read_text_file<float>(bool has_header) const;
-template txeo::Matrix<double> MatrixIO::read_text_file<double>(bool has_header) const;
-template txeo::Matrix<size_t> MatrixIO::read_text_file<size_t>(bool has_header) const;
+template Matrix<short> MatrixIO::read_text_file<short>(bool has_header) const;
+template Matrix<int> MatrixIO::read_text_file<int>(bool has_header) const;
+template Matrix<bool> MatrixIO::read_text_file<bool>(bool has_header) const;
+template Matrix<long> MatrixIO::read_text_file<long>(bool has_header) const;
+template Matrix<long long> MatrixIO::read_text_file<long long>(bool has_header) const;
+template Matrix<float> MatrixIO::read_text_file<float>(bool has_header) const;
+template Matrix<double> MatrixIO::read_text_file<double>(bool has_header) const;
+template Matrix<size_t> MatrixIO::read_text_file<size_t>(bool has_header) const;
 
-template void MatrixIO::write_text_file(const txeo::Matrix<short> &tensor) const;
-template void MatrixIO::write_text_file(const txeo::Matrix<int> &tensor) const;
-template void MatrixIO::write_text_file(const txeo::Matrix<bool> &tensor) const;
-template void MatrixIO::write_text_file(const txeo::Matrix<long> &tensor) const;
-template void MatrixIO::write_text_file(const txeo::Matrix<long long> &tensor) const;
-template void MatrixIO::write_text_file(const txeo::Matrix<float> &tensor) const;
-template void MatrixIO::write_text_file(const txeo::Matrix<double> &tensor) const;
-template void MatrixIO::write_text_file(const txeo::Matrix<size_t> &tensor) const;
+template void MatrixIO::write_text_file(const Matrix<short> &tensor) const;
+template void MatrixIO::write_text_file(const Matrix<int> &tensor) const;
+template void MatrixIO::write_text_file(const Matrix<bool> &tensor) const;
+template void MatrixIO::write_text_file(const Matrix<long> &tensor) const;
+template void MatrixIO::write_text_file(const Matrix<long long> &tensor) const;
+template void MatrixIO::write_text_file(const Matrix<float> &tensor) const;
+template void MatrixIO::write_text_file(const Matrix<double> &tensor) const;
+template void MatrixIO::write_text_file(const Matrix<size_t> &tensor) const;
 
-template void MatrixIO::write_text_file(const txeo::Matrix<float> &tensor, size_t precision) const;
-template void MatrixIO::write_text_file(const txeo::Matrix<double> &tensor, size_t precision) const;
+template void MatrixIO::write_text_file(const Matrix<float> &tensor, size_t precision) const;
+template void MatrixIO::write_text_file(const Matrix<double> &tensor, size_t precision) const;
 
 } // namespace txeo

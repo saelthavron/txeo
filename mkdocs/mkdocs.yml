@@ -48,6 +48,9 @@ nav:
       - TensorFunc: api-reference/tensor-func.md
       - TensorPart: api-reference/tensor-part.md
       - Predictor: api-reference/predictor.md
+      - Loss: api-reference/loss.md
+      - Trainer: api-reference/trainer.md
+      - OlsTrainer: api-reference/ols_gd_trainer.md
   # - Tutorials:
   #     - Intro to Tensors: tutorials/intro-to-tensors.md
   #     - Matrix Math: tutorials/matrix-math.md
@@ -65,6 +68,9 @@ markdown_extensions:
   - pymdownx.highlight
   - pymdownx.tasklist:
       custom_checkbox: true
+  - pymdownx.arithmatex:
+      generic: true
 
-extra_css:
-  - stylesheets/extra.css
+extra_javascript:
+  - https://polyfill.io/v3/polyfill.min.js?features=es6
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js

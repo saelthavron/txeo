@@ -56,7 +56,7 @@ class TensorFunc {
      * TensorOp<double>::power_elem_by(a, 3.0);  // a becomes [27.0, 64.0]
      * @endcode
      */
-    static txeo::Tensor<T> power_elem_by(txeo::Tensor<T> &tensor, const T &exponent);
+    static txeo::Tensor<T> &power_elem_by(txeo::Tensor<T> &tensor, const T &exponent);
 
     /**
      * @brief Computes the element-wise square of a tensor.
@@ -301,6 +301,45 @@ class TensorFunc {
      * @endcode
      */
     static txeo::Matrix<T> &transpose_by(txeo::Matrix<T> &matrix);
+
+    /**
+     * @brief Computes the Gram matrix (\f$A^TA\f$) of the input matrix
+     *
+     * @param matrix Input matrix where rows represent samples and columns represent features
+     * @return New matrix containing the Gram matrix (square matrix of size n x n, where n is the
+     * number of columns)
+     *
+     * @throws TensorFuncError
+     *
+     * The Gram matrix is calculated as the matrix product of the transpose of the input matrix
+     * with the original matrix. This produces a symmetric positive semi-definite matrix where
+     * each element (i,j) represents the inner product of column i and column j from the original
+     * matrix.
+     *
+     * **Example Usage:**
+     * @code
+     * // Create a 2x3 matrix (2 samples, 3 features)
+     * txeo::Matrix<double> A(2, 3, {1.0, 2.0, 3.0,
+     *                               4.0, 5.0, 6.0});
+     *
+     * // Compute Gram matrix (will be 3x3)
+     * auto G = txeo::Matrix<double>::compute_gram_matrix(A);
+     *
+     * // Resulting Gram matrix:
+     * // [17.0  22.0  27.0]
+     * // [22.0  29.0  36.0]
+     * // [27.0  36.0  45.0]
+     *
+     * // Verify diagonal elements (squared norms of columns)
+     * assert(G(0,0) == 1.0*1.0 + 4.0*4.0); // 17.0
+     * assert(G(1,1) == 2.0*2.0 + 5.0*5.0); // 29.0
+     * assert(G(2,2) == 3.0*3.0 + 6.0*6.0); // 45.0
+     * @endcode
+     *
+     * @note Common applications include covariance matrices in statistics and kernel methods in
+     * machine learning.
+     */
+    static txeo::Matrix<T> compute_gram_matrix(const txeo::Matrix<T> &matrix);
 
   private:
     TensorFunc() = default;

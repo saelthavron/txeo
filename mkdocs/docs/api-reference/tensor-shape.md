@@ -22,16 +22,16 @@ Examples:
 
 | Method                      | Description                                     |
 |-----------------------------|-------------------------------------------------|
-| `size()`                    | Returns number of axes                          |
-| `number_of_axes()`          | Synonym for `size()`                            |
 | `axes_dims()`               | Returns dimensions of each axis                 |
-| `stride()`                  | Returns strides for efficient indexing          |
-| `set_dim(axis, dim)`        | Changes size of specified axis                  |
-| `insert_axis(axis, dim)`    | Inserts axis at specified position              |
-| `push_axis_back(dim)`       | Adds an axis at the end                         |
-| `remove_axis(axis)`         | Removes specified axis                          |
-| `remove_all_axes()`         | Removes all axes                                |
 | `clone()`                   | Returns a deep copy of shape                    |
+| `insert_axis(axis, dim)`    | Inserts axis at specified position              |
+| `number_of_axes()`          | Synonym for `size()`                            |
+| `push_axis_back(dim)`       | Adds an axis at the end                         |
+| `remove_all_axes()`         | Removes all axes                                |
+| `remove_axis(axis)`         | Removes specified axis                          |
+| `set_dim(axis, dim)`        | Changes size of specified axis                  |
+| `size()`                    | Returns number of axes                          |
+| `stride()`                  | Returns strides for efficient indexing          |
 
 ---
 

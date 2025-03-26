@@ -17,6 +17,8 @@ add_executable(
   tTensorFunc.cpp
   tMatrix.cpp
   tVector.cpp
+  tLoss.cpp
+  tOlsGDTrainer.cpp
 )  
 
 target_link_libraries(
