@@ -21,20 +21,25 @@ A tensor in **txeo** generalizes scalars, vectors, and matrices to higher dimens
 
 | Method                      | Description                                     |
 |-----------------------------|-------------------------------------------------|
-| `shape()`                   | Returns the shape of the tensor as a `TensorShape` object. |
-| `reshape(new_shape)`        | Reshapes the tensor to the specified shape.     |
-| `slice(start_indices, sizes)` | Extracts a sub-tensor from the tensor.          |
-| `flatten()`                 | Returns a 1D view of the tensor.                |
-| `fill(value)`               | Fills the tensor with the specified value.      |
-| `operator()(indices...)`    | Accesses or modifies tensor elements using multi-dimensional indexing. |
+| `abs()`                 | Computes absolute value of all tensor elements in-place.   |
 | `at(indices...)`            | Accesses tensor elements with bounds checking.  |
-| `data()`                    | Returns a pointer to the underlying data.       |
+| `begin()`, `end()`          | Returns iterators for traversing tensor elements. |
 | `clone()`                   | Returns a deep copy of the tensor.              |
+| `data()`                    | Returns a pointer to the underlying data.       |
+| `fill_with_uniform_random(min, max)` | Fills the tensor with uniformly distributed random values. |
+| `fill(value)`               | Fills the tensor with the specified value.      |
+| `flatten()`                 | Returns a 1D view of the tensor.                |
+| `is_equal_shape(other)`     | Checks if the tensor has the same shape as another tensor. |
+| `operator()(indices...)`    | Accesses or modifies tensor elements using multi-dimensional indexing. |
 | `operator+`, `operator-`, `operator*`, `operator/` | Performs element-wise arithmetic operations. |
 | `operator+=`, `operator-=`, `operator*=`, `operator/=` | Performs in-place arithmetic operations. |
-| `begin()`, `end()`          | Returns iterators for traversing tensor elements. |
-| `is_equal_shape(other)`     | Checks if the tensor has the same shape as another tensor. |
-| `fill_with_uniform_random(min, max)` | Fills the tensor with uniformly distributed random values. |
+| `permute()`                 | Permutes tensor dimensions according to specified axis order.  |
+| `power()`                 | Raises all tensor elements to the specified power.   |
+| `reshape(new_shape)`        | Reshapes the tensor to the specified shape.     |
+| `shape()`                   | Returns the shape of the tensor as a `TensorShape` object. |
+| `slice(start_indices, sizes)` | Extracts a sub-tensor from the tensor.          |
+| `sqrt()`                 | Computes square root of all tensor elements in-place.   |
+| `square()`                 | Squares all tensor elements in-place.   |
 | `squeeze()`                 | Removes singleton dimensions from the tensor.   |
 
 ---

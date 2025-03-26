@@ -402,7 +402,7 @@ class TensorOp {
      * // result = [ [58, 64], [139, 154] ]
      * @endcode
      */
-    static txeo::Matrix<T> product(const txeo::Matrix<T> &left, const txeo::Matrix<T> &right);
+    static txeo::Matrix<T> dot(const txeo::Matrix<T> &left, const txeo::Matrix<T> &right);
 
     /**
      * @brief Computes the matrix product of a matrix and a vector.
@@ -420,7 +420,7 @@ class TensorOp {
      * auto result = TensorOp<int>::product(left, right);
      * @endcode
      */
-    static txeo::Tensor<T> product(const txeo::Matrix<T> &left, const txeo::Vector<T> &right);
+    static txeo::Tensor<T> dot(const txeo::Matrix<T> &left, const txeo::Vector<T> &right);
 
   private:
     TensorOp() = default;

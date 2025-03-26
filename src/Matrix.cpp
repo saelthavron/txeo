@@ -45,12 +45,12 @@ Matrix<T> &Matrix<T>::transpose() {
 
 template <typename T>
 Matrix<T> Matrix<T>::dot(const Matrix<T> &matrix) const {
-  return TensorOp<T>::product(*this, matrix);
+  return TensorOp<T>::dot(*this, matrix);
 }
 
 template <typename T>
 Tensor<T> Matrix<T>::dot(const Vector<T> &vector) const {
-  return TensorOp<T>::product(*this, vector);
+  return TensorOp<T>::dot(*this, vector);
 }
 
 template <typename T>

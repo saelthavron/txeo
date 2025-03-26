@@ -324,7 +324,7 @@ template <typename T>
 Matrix<T> TensorFunc<T>::compute_gram_matrix(const Matrix<T> &matrix) {
   auto resp = TensorFunc<T>::transpose(matrix);
 
-  return TensorOp<T>::product(resp, matrix);
+  return TensorOp<T>::dot(resp, matrix);
 }
 
 template class TensorFunc<size_t>;

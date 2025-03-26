@@ -14,14 +14,14 @@ The `TensorOp` class provides utility methods for performing common mathematical
 
 | Method                           | Description                                               |
 |----------------------------------|-----------------------------------------------------------|
-| `sum(tensor1, tensor2)`          | Element-wise sum                                          |
-| `sum(tensor, scalar)`            | Adds scalar to each tensor element                        |
-| `subtract(tensor1, tensor2)`     | Element-wise subtraction                                  |
-| `multiply(tensor, scalar)`       | Scalar multiplication                                     |
 | `divide(tensor, scalar)`         | Scalar division                                           |
+| `dot(matrix1, matrix2)`      | Matrix multiplication                                     |
 | `hadamard_prod(tensor1, tensor2)`| Element-wise multiplication                              |
-| `product(matrix1, matrix2)`      | Matrix multiplication                                     |
-| `dot(vector1, vector2)`          | Computes the dot product of two vectors                   |
+| `inner(vector1, vector2)`        | Computes the inner product of two vectors                   |
+| `multiply(tensor, scalar)`       | Scalar multiplication                                     |
+| `subtract(tensor1, tensor2)`     | Element-wise subtraction                                  |
+| `sum(tensor, scalar)`            | Adds scalar to each tensor element                        |
+| `sum(tensor1, tensor2)`          | Element-wise sum                                          |
 
 ---
 
@@ -82,7 +82,7 @@ txeo::Tensor<float> result = txeo::TensorOp<float>::hadamard_prod(tensor1, tenso
 txeo::Matrix<int> mat1(2, 3, {1, 2, 3, 4, 5, 6});
 txeo::Matrix<int> mat2(3, 2, {7, 8, 9, 10, 11, 12});
 
-auto result = txeo::TensorOp<int>::product(mat1, mat2); // [[58, 64], [139, 154]]
+auto result = txeo::TensorOp<int>::dot(mat1, mat2); // [[58, 64], [139, 154]]
 ```
 
 ### Vector Dot Product
@@ -91,7 +91,7 @@ auto result = txeo::TensorOp<int>::product(mat1, mat2); // [[58, 64], [139, 154]
 txeo::Vector<int> vec1({1, 2, 3});
 txeo::Vector<int> vec2({4, 5, 6});
 
-int dot_product = txeo::TensorOp<int>::dot(vec1, vec2); // 32
+int dot_product = txeo::TensorOp<int>::inner(vec1, vec2); // 32
 ```
 
 ---

@@ -1,9 +1,12 @@
 # Trainer
 
 ## Overview
+
 The `txeo::Trainer` class is an **abstract base class** that provides the interface for training machine learning models in **txeo**. It handles training/evaluation data, common training parameters, and the training lifecycle.
 
 Derived classes must implement the `predict()` and `train()` methods.
+
+---
 
 ## Features
 
@@ -12,9 +15,13 @@ Derived classes must implement the `predict()` and `train()` methods.
 - Supports early stopping.
 - Tracks whether the model has been trained.
 
+---
+
 ## Template Parameter
 
 - `T`: The numeric type used in tensors (e.g., `float`, `double`).
+
+---
 
 ## Constructors
 
@@ -37,6 +44,8 @@ Initializes the trainer using the training data for evaluation as well.
 Trainer(const txeo::Tensor<T>& x_train,
         const txeo::Tensor<T>& y_train);
 ```
+
+---
 
 ## Public Methods
 
@@ -73,6 +82,8 @@ Returns `true` if the model has been trained.
 bool is_trained() const;
 ```
 
+---
+
 ## Exceptions
 
 ### **TrainerError**
@@ -101,4 +112,4 @@ class MyTrainer : public txeo::Trainer<float> {
 };
 ```
 
-For detailed API references, see individual method documentation at [txeo::Predictor](https://txeo-doc.netlify.app/classtxeo_1_1_predictor.html).
+For detailed API references, see individual method documentation at [txeo::Predictor](https://txeo-doc.netlify.app/classtxeo_1_1_trainer.html).

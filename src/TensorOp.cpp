@@ -313,13 +313,13 @@ Tensor<T> TensorOp<T>::product_tensors(const Tensor<T> &left, const Tensor<T> &r
 }
 
 template <typename T>
-Matrix<T> TensorOp<T>::product(const Matrix<T> &left, const Matrix<T> &right) {
+Matrix<T> TensorOp<T>::dot(const Matrix<T> &left, const Matrix<T> &right) {
   auto resp = Matrix<T>::to_matrix(TensorOp<T>::product_tensors(left, right));
   return resp;
 }
 
 template <typename T>
-Tensor<T> TensorOp<T>::product(const Matrix<T> &left, const Vector<T> &right) {
+Tensor<T> TensorOp<T>::dot(const Matrix<T> &left, const Vector<T> &right) {
 
   if (left.dim() == 0 || right.dim() == 0)
     throw TensorOpError("One of the operands has dimension zero.");
