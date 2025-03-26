@@ -37,7 +37,7 @@ Tensor<T> OlsGDTrainer<T>::predict(const Tensor<T> &input) {
 template <typename T>
   requires(std::floating_point<T>)
 void OlsGDTrainer<T>::train(size_t epochs, LossFunc metric) {
-
+  // Input and Output data variables
   size_t n = this->_x_train->shape().axis_dim(1);
   size_t m = this->_y_train->shape().axis_dim(1);
 
@@ -47,6 +47,15 @@ void OlsGDTrainer<T>::train(size_t epochs, LossFunc metric) {
   auto Z = TensorFunc<T>::compute_gram_matrix(X);
   auto K = Y.dot(X);
 
+  _is_converged = false;
+
+  // Initializing the loss class
+  auto *X_eval = &X;
+  if (this->_x_train != this->_x_eval)
+    *X_eval = Matrix<T>::to_matrix(TensorPart<T>::increase_dimension(*this->_x_eval, 1, 1.0));
+  Loss<T> loss{*this->_y_eval, metric};
+
+  // Initial Guesses
   auto norm_X = TensorAgg<T>::reduce_euclidean_norm(X, {0, 1})();
   auto norm_Y = TensorAgg<T>::reduce_euclidean_norm(Y, {0, 1})();
   Matrix<T> B_prev{m, n + 1, norm_Y / norm_X};
@@ -56,19 +65,19 @@ void OlsGDTrainer<T>::train(size_t epochs, LossFunc metric) {
 
   auto B = B_prev - (_learning_rate * (B_prev.dot(Z) - K));
   auto L = B - B_prev;
-  _is_converged = false;
 
-  auto *X_eval = &X;
-  if (this->_x_train != this->_x_eval)
-    *X_eval = Matrix<T>::to_matrix(TensorPart<T>::increase_dimension(*this->_x_eval, 1, 1.0));
-
-  Loss<T> loss{*this->_y_eval, metric};
-
+  // Declaring variables to capture trainer params
+  T loss_value = std::numeric_limits<T>::max();
   T loss_value_prev = std::numeric_limits<T>::max();
+  T min_loss = std::numeric_limits<T>::max();
   size_t patience = 0;
+  Matrix<T> B_best{};
+  bool found_best{false};
+
+  // Iterate OLS
   for (size_t e{0}; e < epochs; ++e) {
     auto B_t = TensorFunc<T>::transpose(B);
-    auto loss_value = loss.get_loss(TensorOp<T>::product_tensors(*X_eval, B_t));
+    loss_value = loss.get_loss(TensorOp<T>::product_tensors(*X_eval, B_t));
     std::cout << "Epoch " << e << ", Loss: " << loss_value << ", Learning Rate: " << _learning_rate
               << std::endl;
     if (std::isnan(loss_value)) {
@@ -88,6 +97,11 @@ void OlsGDTrainer<T>::train(size_t epochs, LossFunc metric) {
       }
       patience = 0;
     }
+    if (loss_value < min_loss) {
+      found_best = true;
+      min_loss = loss_value;
+      B_best = B;
+    }
     loss_value_prev = loss_value;
     B_prev = B;
     if (_variable_lr) {
@@ -98,7 +112,14 @@ void OlsGDTrainer<T>::train(size_t epochs, LossFunc metric) {
     L = B - B_prev;
   }
 
-  _weight_bias = std::move(TensorFunc<T>::transpose_by(B));
+  if (found_best) {
+    _min_loss = min_loss;
+    _weight_bias = std::move(TensorFunc<T>::transpose_by(B_best));
+
+  } else {
+    _min_loss = loss_value;
+    _weight_bias = std::move(TensorFunc<T>::transpose_by(B));
+  }
 }
 
 template <typename T>
@@ -107,6 +128,14 @@ const Matrix<T> &OlsGDTrainer<T>::weight_bias() const {
   if (!this->_is_trained)
     throw OlsGDTrainerError("Trainer is not trained.");
   return _weight_bias;
+}
+
+template <typename T>
+  requires(std::floating_point<T>)
+T OlsGDTrainer<T>::min_loss() const {
+  if (!this->_is_trained)
+    throw OlsGDTrainerError("Trainer is not trained.");
+  return _min_loss;
 }
 
 template <typename T>

@@ -288,7 +288,7 @@ class Matrix : public txeo::Tensor<T> {
      * auto result = identity.dot(mat);  // Returns unchanged mat
      * @endcode
      */
-    Matrix<T> dot(const Matrix<T> &matrix);
+    Matrix<T> dot(const Matrix<T> &matrix) const;
 
     /**
      * @brief Performs matrix-vector multiplication
@@ -304,7 +304,7 @@ class Matrix : public txeo::Tensor<T> {
      * txeo::Tensor<int> result = mat.dot(vec);  // Result: [[50][122]]
      * @endcode
      */
-    Tensor<T> dot(const txeo::Vector<T> &vector);
+    Tensor<T> dot(const txeo::Vector<T> &vector) const;
 
     /**
      * @brief Converts a tensor to a matrix by moving data.

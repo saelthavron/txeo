@@ -10,6 +10,47 @@
 #include <cstddef>
 namespace txeo {
 
+/**
+ * @class OlsGDTrainer
+ * @brief Ordinary Least Squares trainer using Gradient Descent optimization
+ *
+ * @tparam T Floating-point type for calculations (float, double, etc.)
+ *
+ * Implements linear regression training through gradient descent with:
+ * - Configurable learning rate
+ * - Convergence tolerance
+ * - Variable learning rate support (Barzilai-Borwein Method)
+ * - Weight/bias matrix access
+ *
+ * Inherits from txeo::Trainer<T> and implements required virtual methods.
+ *
+ * Implements algorithms based on paper:
+ * Algarte, R.D., "Tensor-Based Foundations of Ordinary Least Squares and Neural Network Regression
+ * Models" (https://arxiv.org/abs/2411.12873)
+ *
+ * **Example Usage:**
+ * @code
+ * // Create training data (y = 2x + 1)
+ * txeo::Matrix<double> X({{1.0}, {2.0}, {3.0}}); // 3x1
+ * txeo::Matrix<double> y({{3.0}, {5.0}, {7.0}}); // 3x1
+ *
+ * OlsGDTrainer<double> trainer(X, y);
+ * trainer.set_tolerance(1e-5);
+ *
+ * // Train with early stopping
+ * trainer.fit(1000, LossFunc::MSE, 10);
+ *
+ * if(trainer.is_converged()) {
+ *     auto weights = trainer.weight_bias();
+ *     std::cout << "Model: y = " << weights(0,0) << "x + " << weights(1,0) << std::endl;
+ *
+ *     // Make prediction
+ *     txeo::Matrix<double> test_input(1,1,{4.0});
+ *     auto prediction = trainer.predict(test_input);
+ *     std::cout << "Prediction for x=4: " << prediction(0,0) << std::endl;
+ * }
+ * @endcode
+ */
 template <typename T>
   requires(std::floating_point<T>)
 class OlsGDTrainer : public txeo::Trainer<T> {
@@ -20,31 +61,106 @@ class OlsGDTrainer : public txeo::Trainer<T> {
     OlsGDTrainer &operator=(OlsGDTrainer &&) = delete;
     ~OlsGDTrainer() = default;
 
+    /**
+     * @brief Constructs trainer with separate validation data
+     *
+     * @param x_train Training features matrix (shape: [samples, features])
+     * @param y_train Training labels matrix (shape: [samples, outputs])
+     * @param x_valid Validation features matrix (shape: [samples, features])
+     * @param y_valid Validation labels matrix (shape: [samples, outputs])
+     */
     OlsGDTrainer(const txeo::Matrix<T> &x_train, const txeo::Matrix<T> &y_train,
                  const txeo::Matrix<T> &x_valid, const txeo::Matrix<T> &y_valid)
         : txeo::Trainer<T>{x_train, y_train, x_valid, y_valid} {};
 
+    /**
+     * @brief Constructs trainer using training data for validation
+     *
+     * @param x_train Training features matrix (shape: [samples, features])
+     * @param y_train Training labels matrix (shape: [samples, outputs])
+     */
     OlsGDTrainer(const txeo::Matrix<T> &x_train, const txeo::Matrix<T> &y_train)
         : OlsGDTrainer{x_train, y_train, x_train, y_train} {}
 
+    /**
+     * @brief Makes predictions using learned weights
+     *
+     * @param input Feature matrix (shape: [samples, features])
+     * @return Prediction matrix (shape: [samples, outputs])
+     *
+     * @throws OlsGDTrainerError
+     */
     txeo::Tensor<T> predict(const txeo::Tensor<T> &input) override;
 
+    /**
+     * @brief Gets current learning rate
+     *
+     * @return Current learning rate value
+     */
     [[nodiscard]] T learning_rate() const;
+
+    /**
+     * @brief Sets learning rate for gradient descent
+     *
+     * @param learning_rate Must be > 0
+     *
+     * @throws OlsGDTrainerError for invalid values
+     */
     void set_learning_rate(T learning_rate);
 
+    /**
+     * @brief Enables adaptive learning rate adjustment (Barzilai-Borwein Method).
+     * When enabled, learning rate automatically reduces when loss plateaus. For the majority of the
+     * cases, convergence drastically increases.
+     */
     void enable_variable_lr() { _variable_lr = true; }
+
+    /**
+     * @brief Disables adaptive learning rate adjustment (Barzilai-Borwein Method)
+     */
     void disable_variable_lr() { _variable_lr = false; }
 
+    /**
+     * @brief Gets weight/bias matrix related to the minimum loss during fit
+     *
+     * @return Matrix containing model parameters (shape: [features+1, outputs])
+     *
+     * @throws OlsGDTrainerError
+     */
     const txeo::Matrix<T> &weight_bias() const;
 
+    /**
+     * @brief Gets convergence tolerance
+     *
+     * @return Current tolerance value
+     */
     T tolerance() const { return _tolerance; }
+
+    /**
+     * @brief Sets convergence tolerance
+     *
+     * @param tolerance Minimum loss difference to consider converged (>0)
+     */
     void set_tolerance(const T &tolerance);
 
+    /**
+     * @brief Checks convergence status
+     *
+     * @return true if training converged before max epochs
+     */
     [[nodiscard]] bool is_converged() const { return _is_converged; }
+
+    /**
+     * @brief Gets the minimum loss during training
+     *
+     * @return Value of the minimum loss
+     */
+    T min_loss() const;
 
   private:
     T _learning_rate{0.01};
     T _tolerance{0.001};
+    T _min_loss{0};
     txeo::Matrix<T> _weight_bias{};
     bool _variable_lr{false};
     bool _is_converged{false};
