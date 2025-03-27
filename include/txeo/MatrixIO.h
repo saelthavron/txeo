@@ -4,7 +4,6 @@
 
 #include "txeo/Matrix.h"
 
-#include <cstddef>
 #include <filesystem>
 #include <map>
 #include <type_traits>

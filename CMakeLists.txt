@@ -8,6 +8,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF) #Turns off compiler non-standard features  
 
 
+
 #################################################### Source Directories ####################################################
 
 
@@ -95,3 +96,6 @@ if(TXEO_ENABLE_COVERAGE)
 
   add_dependencies(coverage txeo_tests)
 endif()
+
+
+

@@ -7,7 +7,7 @@
 #include "txeo/TensorPart.h"
 
 #include <cmath>
-#include <cstddef>
+
 #include <iostream>
 #include <limits>
 #include <utility>

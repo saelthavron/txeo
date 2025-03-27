@@ -1,13 +1,12 @@
 #ifndef TENSOR_H
 #define TENSOR_H
 
-#include "txeo/types.h"
 #pragma once
 
 #include "TensorShape.h"
 #include "txeo/TensorIterator.h"
+#include "txeo/types.h"
 
-#include <cstddef>
 #include <exception>
 #include <initializer_list>
 #include <memory>

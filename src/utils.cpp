@@ -1,7 +1,5 @@
 #include "txeo/detail/utils.h"
 
-#include <cstddef>
-#include <cstdint>
 #include <tensorflow/core/framework/tensor_shape.h>
 #include <tensorflow/core/framework/tensor_shape.pb.h>
 

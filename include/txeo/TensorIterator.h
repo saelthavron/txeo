@@ -2,7 +2,6 @@
 #define TENSOR_ITERATOR_H
 #pragma once
 
-#include <cstddef>
 #include <iterator>
 
 namespace txeo {

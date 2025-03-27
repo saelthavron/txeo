@@ -1,7 +1,7 @@
 #include "txeo/Tensor.h"
 #include "txeo/TensorOp.h"
 #include "txeo/TensorShape.h"
-#include <cstdint>
+
 #include <gtest/gtest.h>
 
 namespace txeo {

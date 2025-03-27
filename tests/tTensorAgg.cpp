@@ -2,7 +2,7 @@
 #include "txeo/TensorAgg.h"
 #include "txeo/TensorShape.h"
 #include <cmath>
-#include <cstdint>
+
 #include <gtest/gtest.h>
 
 namespace txeo {

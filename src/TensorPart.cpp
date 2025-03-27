@@ -4,8 +4,7 @@
 #include "txeo/detail/utils.h"
 
 #include <algorithm>
-#include <cstddef>
-#include <cstdint>
+
 #include <tensorflow/cc/client/client_session.h>
 #include <tensorflow/cc/framework/ops.h>
 #include <tensorflow/cc/framework/scope.h>

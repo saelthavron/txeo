@@ -7,7 +7,7 @@
 #include "txeo/Trainer.h"
 
 #include <concepts>
-#include <cstddef>
+
 namespace txeo {
 
 /**

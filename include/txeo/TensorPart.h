@@ -1,8 +1,8 @@
 #ifndef TENSORPART_H
 #define TENSORPART_H
-#include "txeo/Matrix.h"
 #pragma once
 
+#include "txeo/Matrix.h"
 #include "txeo/Tensor.h"
 
 namespace txeo {

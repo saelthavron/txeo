@@ -5,8 +5,6 @@
 #include "txeo/Tensor.h"
 #include "types.h"
 
-#include <cstddef>
-
 namespace txeo {
 
 /**

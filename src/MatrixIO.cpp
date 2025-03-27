@@ -3,7 +3,7 @@
 #include "txeo/detail/utils.h"
 
 #include <algorithm>
-#include <cstddef>
+
 #include <fstream>
 #include <sstream>
 #include <string>

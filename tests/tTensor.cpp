@@ -1,7 +1,6 @@
 #include <algorithm>
 #include <cmath>
-#include <cstddef>
-#include <cstdint>
+
 #include <gtest/gtest.h>
 #include <vector>
 

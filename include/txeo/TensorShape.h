@@ -2,11 +2,8 @@
 #define TENSOR_SHAPE_H
 #pragma once
 
-#include <cstddef>
-#include <cstdint>
 #include <memory>
 #include <ostream>
-#include <stdexcept>
 #include <vector>
 
 namespace txeo {

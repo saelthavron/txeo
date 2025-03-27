@@ -9,7 +9,6 @@
 #include "txeo/detail/utils.h"
 
 #include <algorithm>
-#include <cstddef>
 #include <initializer_list>
 #include <iterator>
 #include <memory>

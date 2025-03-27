@@ -1,7 +1,7 @@
 
 #include "txeo/detail/utils.h"
 #include "gtest/gtest.h"
-#include <cstddef>
+
 #include <tensorflow/core/framework/types.pb.h>
 
 namespace tf = tensorflow;

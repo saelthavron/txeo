@@ -8,8 +8,7 @@
 
 #include <algorithm>
 #include <cmath>
-#include <cstddef>
-#include <cstdint>
+
 #include <queue>
 #include <tensorflow/cc/ops/array_ops.h>
 #include <utility>

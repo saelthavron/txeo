@@ -8,8 +8,6 @@
 
 #include "txeo/detail/utils.h"
 
-#include <cstddef>
-#include <cstdint>
 #include <initializer_list>
 #include <stdexcept>
 #include <tensorflow/cc/client/client_session.h>

@@ -6,7 +6,7 @@
 #include "txeo/detail/utils.h"
 
 #include <cmath>
-#include <cstddef>
+
 #include <tensorflow/cc/ops/math_ops.h>
 
 namespace txeo {

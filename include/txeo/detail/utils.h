@@ -4,8 +4,6 @@
 
 #include "txeo/TensorShape.h"
 
-#include <cstddef>
-#include <cstdint>
 #include <tensorflow/core/framework/tensor.h>
 #include <tensorflow/core/framework/tensor_shape.h>
 #include <tensorflow/core/framework/types.h>

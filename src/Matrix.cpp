@@ -5,7 +5,6 @@
 #include "txeo/detail/utils.h"
 
 #include <algorithm>
-#include <cstddef>
 
 namespace txeo {
 

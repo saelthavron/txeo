@@ -1,7 +1,7 @@
 #include "txeo/Loss.h"
 
 #include <cmath>
-#include <cstddef>
+
 #include <cstdlib>
 
 namespace txeo {

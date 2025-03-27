@@ -11,7 +11,7 @@
 #include "txeo/TensorPart.h"
 #include "txeo/types.h"
 #include <cmath>
-#include <cstddef>
+
 #include <iostream>
 #include <ostream>
 #include <tensorflow/cc/client/client_session.h>

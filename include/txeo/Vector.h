@@ -6,7 +6,6 @@
 #include "txeo/TensorShape.h"
 #include "txeo/types.h"
 
-#include <cstddef>
 #include <initializer_list>
 
 namespace txeo {
