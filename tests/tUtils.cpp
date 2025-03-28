@@ -1,8 +1,15 @@
 
+#include <cstddef>
+#include <cstdint>
+#include <limits>
+#include <stdexcept>
+#include <tensorflow/core/framework/tensor_shape.h>
+#include <tensorflow/core/framework/types.pb.h>
+#include <vector>
+
+#include "txeo/TensorShape.h"
 #include "txeo/detail/utils.h"
 #include "gtest/gtest.h"
-
-#include <tensorflow/core/framework/types.pb.h>
 
 namespace tf = tensorflow;
 

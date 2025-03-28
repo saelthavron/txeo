@@ -1,8 +1,14 @@
+#include <gtest/gtest.h>
+#include <initializer_list>
+#include <utility>
+#include <vector>
+
 #include "txeo/Matrix.h"
 #include "txeo/Tensor.h"
 #include "txeo/TensorOp.h"
 #include "txeo/TensorShape.h"
-#include <gtest/gtest.h>
+#include "txeo/Vector.h"
+#include "txeo/types.h"
 
 TEST(MatrixTest, ParameterizedConstructor) {
   txeo::Matrix<int> matrix(2, 3);
@@ -362,10 +368,8 @@ TEST(MatrixTest, InvalidDimensionsThrow) {
   txeo::Matrix<int> b(2, 3);
   txeo::Vector<int> vec(2);
 
-  // Matrix-Matrix multiplication mismatch
   EXPECT_THROW(a.dot(b), txeo::TensorOpError);
 
-  // Matrix-Vector multiplication mismatch
   EXPECT_THROW(a.dot(vec), txeo::TensorOpError);
 }
 

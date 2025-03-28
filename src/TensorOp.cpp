@@ -1,15 +1,21 @@
 #include "txeo/TensorOp.h"
 #include "txeo/Matrix.h"
 #include "txeo/Tensor.h"
-#include "txeo/Vector.h"
 #include "txeo/detail/TensorHelper.h"
 #include "txeo/detail/utils.h"
 
-#include <cmath>
-
+#include <cstddef>
+#include <memory>
+#include <tensorflow/cc/framework/ops.h>
 #include <tensorflow/cc/ops/math_ops.h>
 
+namespace tensorflow {
+class Scope;
+} // namespace tensorflow
+
 namespace txeo {
+template <typename T>
+class Vector;
 
 template <typename T>
 Tensor<T> TensorOp<T>::sum(const Tensor<T> &left, const Tensor<T> &right) {

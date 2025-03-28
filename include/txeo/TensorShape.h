@@ -2,8 +2,12 @@
 #define TENSOR_SHAPE_H
 #pragma once
 
+#include <cstddef>
+#include <cstdint>
+#include <initializer_list>
 #include <memory>
 #include <ostream>
+#include <stdexcept>
 #include <vector>
 
 namespace txeo {
@@ -304,6 +308,7 @@ class TensorShape {
 
   private:
     struct Impl;
+
     std::unique_ptr<Impl> _impl{nullptr};
 
     template <typename T>

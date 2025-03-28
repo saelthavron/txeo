@@ -1,9 +1,12 @@
+#include <cmath>
+#include <cstdint>
+#include <gtest/gtest.h>
+#include <initializer_list>
+#include <vector>
+
 #include "txeo/Tensor.h"
 #include "txeo/TensorAgg.h"
 #include "txeo/TensorShape.h"
-#include <cmath>
-
-#include <gtest/gtest.h>
 
 namespace txeo {
 

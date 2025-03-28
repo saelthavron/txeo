@@ -7,13 +7,19 @@
 #include "txeo/TensorIterator.h"
 #include "txeo/types.h"
 
+#include <concepts>
+#include <cstddef>
 #include <exception>
 #include <initializer_list>
+#include <iosfwd>
 #include <memory>
+#include <stdexcept>
 #include <type_traits>
 #include <vector>
 
 namespace txeo {
+class TensorShape;
+enum class NormalizationType;
 
 template <typename T>
 concept c_numeric = std::is_arithmetic_v<T> && !std::is_same_v<T, bool>;
@@ -24,18 +30,14 @@ class TensorHelper;
 
 template <typename T>
 class Predictor;
-
 template <typename T>
 class TensorAgg;
-
-template <typename T>
-class TensorPart;
-
-template <typename T>
-class TensorOp;
-
 template <typename T>
 class TensorFunc;
+template <typename T>
+class TensorOp;
+template <typename T>
+class TensorPart;
 
 /**
  * @brief Implements the mathematical concept of tensor, which is a magnitude of multiple order. A
@@ -1182,6 +1184,7 @@ class Tensor {
 
   protected:
     struct Impl;
+
     std::unique_ptr<Impl> _impl{nullptr};
 
     friend class txeo::Predictor<T>;

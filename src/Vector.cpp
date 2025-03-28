@@ -5,6 +5,7 @@
 #include "txeo/detail/utils.h"
 
 namespace txeo {
+enum class NormalizationType;
 
 template <typename T>
 Vector<T>::Vector() {

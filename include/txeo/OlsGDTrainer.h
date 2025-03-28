@@ -3,12 +3,16 @@
 #pragma once
 
 #include "txeo/Matrix.h"
+#include "txeo/Tensor.h"
 #include "txeo/TensorShape.h"
 #include "txeo/Trainer.h"
 
 #include <concepts>
+#include <cstddef>
+#include <stdexcept>
 
 namespace txeo {
+enum class LossFunc;
 
 /**
  * @class OlsGDTrainer

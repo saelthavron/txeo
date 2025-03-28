@@ -7,12 +7,12 @@
 #include "txeo/TensorPart.h"
 
 #include <cmath>
-
 #include <iostream>
 #include <limits>
 #include <utility>
 
 namespace txeo {
+enum class LossFunc;
 
 template <typename T>
   requires(std::floating_point<T>)

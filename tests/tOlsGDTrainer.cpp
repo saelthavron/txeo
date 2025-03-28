@@ -1,6 +1,10 @@
+#include <gtest/gtest.h>
+
 #include "txeo/Matrix.h"
 #include "txeo/OlsGDTrainer.h"
-#include <gtest/gtest.h>
+#include "txeo/Tensor.h"
+#include "txeo/TensorShape.h"
+#include "txeo/types.h"
 
 namespace txeo {
 
@@ -48,7 +52,7 @@ TEST(OlsGDTrainerTest, WeightBiasMatrixDimensions) {
   trainer.fit(100, LossFunc::MSE);
   const auto &wb = trainer.weight_bias();
 
-  ASSERT_EQ(wb.row_size(), 3); // 2 features + 1 bias
+  ASSERT_EQ(wb.row_size(), 3);
   ASSERT_EQ(wb.col_size(), 1);
 }
 
@@ -87,7 +91,7 @@ TEST(OlsGDTrainerTest, EarlyConvergenceWithHighTolerance) {
   Matrix<double> y_train(3, 1, {2.0, 4.0, 6.0});
   OlsGDTrainer<double> trainer(x_train, y_train);
 
-  trainer.set_tolerance(0.1); // High tolerance
+  trainer.set_tolerance(0.1);
   trainer.enable_variable_lr();
   trainer.fit(30, LossFunc::MSE);
   EXPECT_TRUE(trainer.is_converged());

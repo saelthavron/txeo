@@ -1,6 +1,10 @@
+#include <gtest/gtest.h>
+#include <vector>
+
+#include "txeo/Matrix.h"
 #include "txeo/Tensor.h"
 #include "txeo/TensorPart.h"
-#include <gtest/gtest.h>
+#include "txeo/TensorShape.h"
 
 namespace txeo {
 

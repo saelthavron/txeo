@@ -1,7 +1,8 @@
 #include "txeo/Loss.h"
+#include "txeo/Tensor.h"
+#include "txeo/TensorShape.h"
 
 #include <cmath>
-
 #include <cstdlib>
 
 namespace txeo {

@@ -2,11 +2,23 @@
 #define TXEO_UTILS_H
 #pragma once
 
-#include "txeo/TensorShape.h"
-
+#include <stdint.h>                              // for int64_t
 #include <tensorflow/core/framework/tensor.h>
 #include <tensorflow/core/framework/tensor_shape.h>
-#include <tensorflow/core/framework/types.h>
+#include <tensorflow/core/framework/types.h>     // for DataTypeToEnum, Enum...
+#include <tensorflow/core/framework/types.pb.h>  // for DataType
+#include <cstdlib>                               // for size_t, abs
+#include <limits>                                // for numeric_limits
+#include <string>                                // for string
+#include <type_traits>                           // for is_floating_point_v
+#include <vector>                                // for vector
+
+#include "txeo/TensorShape.h"                    // for TensorShape
+
+namespace tensorflow {
+class TensorShape;
+class TensorShapeProto;
+}  // namespace tensorflow
 
 namespace tf = tensorflow;
 

@@ -1,10 +1,9 @@
 #include "txeo/MatrixIO.h"
-#include "txeo/TensorShape.h"
 #include "txeo/detail/utils.h"
 
 #include <algorithm>
-
 #include <fstream>
+#include <iterator>
 #include <sstream>
 #include <string>
 
@@ -23,10 +22,7 @@ Matrix<T> MatrixIO::read_text_file(bool has_header) const {
     while (std::getline(rf, line)) {
       if (line.empty())
         continue;
-      // if (std::count(line.begin(), line.end(), _separator) == 0) {
-      //   rf.close();
-      //   throw MatrixIOError("Separator not found!");
-      // };
+
       std::stringstream line_stream{line};
       while (std::getline(line_stream, word, _separator))
         ++aux;

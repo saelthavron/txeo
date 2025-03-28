@@ -6,8 +6,10 @@
 #include "txeo/types.h"
 
 #include <functional>
-
+#include <stdexcept>
 namespace txeo {
+template <typename T>
+class Tensor;
 
 /**
  * @class Loss

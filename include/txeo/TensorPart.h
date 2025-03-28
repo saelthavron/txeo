@@ -5,6 +5,10 @@
 #include "txeo/Matrix.h"
 #include "txeo/Tensor.h"
 
+#include <cstddef>
+#include <stdexcept>
+#include <vector>
+
 namespace txeo {
 
 /**

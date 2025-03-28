@@ -1,19 +1,18 @@
 #include "txeo/TensorPart.h"
+
+#include <algorithm>
+#include <cstdint>
+#include <iterator>
+#include <memory>
+#include <tensorflow/cc/client/client_session.h>
+#include <tensorflow/cc/framework/scope.h>
+#include <tensorflow/cc/ops/array_ops.h>
+#include <tensorflow/core/framework/tensor.h>
+#include <utility>
+
 #include "txeo/TensorShape.h"
 #include "txeo/detail/TensorHelper.h"
 #include "txeo/detail/utils.h"
-
-#include <algorithm>
-
-#include <tensorflow/cc/client/client_session.h>
-#include <tensorflow/cc/framework/ops.h>
-#include <tensorflow/cc/framework/scope.h>
-#include <tensorflow/cc/ops/math_ops.h>
-#include <tensorflow/cc/ops/standard_ops.h>
-#include <tensorflow/core/framework/tensor.h>
-#include <tensorflow/core/framework/tensor_shape.h>
-#include <tensorflow/core/platform/env.h>
-#include <tensorflow/core/public/session.h>
 
 namespace tf = tensorflow;
 

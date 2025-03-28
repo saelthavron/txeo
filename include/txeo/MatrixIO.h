@@ -4,10 +4,14 @@
 
 #include "txeo/Matrix.h"
 
+#include <cstddef>
 #include <filesystem>
 #include <map>
+#include <stdexcept>
+#include <string>
 #include <type_traits>
 #include <unordered_set>
+#include <utility>
 
 namespace txeo {
 

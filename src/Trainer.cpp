@@ -1,6 +1,7 @@
 #include "txeo/Trainer.h"
 
 namespace txeo {
+enum class LossFunc;
 
 template <typename T>
 inline Trainer<T>::Trainer(const Tensor<T> &x_train, const Tensor<T> &y_train,

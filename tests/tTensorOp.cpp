@@ -1,8 +1,14 @@
+#include <cstddef>
+#include <cstdint>
+#include <gtest/gtest.h>
+#include <initializer_list>
+#include <vector>
+
+#include "txeo/Matrix.h"
 #include "txeo/Tensor.h"
 #include "txeo/TensorOp.h"
 #include "txeo/TensorShape.h"
-
-#include <gtest/gtest.h>
+#include "txeo/Vector.h"
 
 namespace txeo {
 

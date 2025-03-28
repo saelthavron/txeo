@@ -1,7 +1,9 @@
-
-
+#include <cstddef>
+#include <cstdint>
 #include <gtest/gtest.h>
+#include <initializer_list>
 #include <sstream>
+#include <utility>
 #include <vector>
 
 #include "txeo/TensorShape.h"
@@ -54,13 +56,13 @@ TEST(TensorShapeTest, AxisAccess) {
   EXPECT_THROW(
       {
         auto result = shape.axis_dim(3);
-        (void)result; // Avoiding incompatibility of gtest with [[nodiscard]]
+        (void)result;
       },
       TensorShapeError);
   EXPECT_THROW(
       {
         auto result = shape.axis_dim(-1);
-        (void)result; // Avoiding incompatibility of gtest with [[nodiscard]]
+        (void)result;
       },
       TensorShapeError);
 }
@@ -134,7 +136,7 @@ TEST(TensorShapeTest, NumberOfElements) {
 TEST(TensorShapeTest, EmptyShape) {
   TensorShape empty_shape(0, 0);
   EXPECT_EQ(empty_shape.number_of_axes(), 0);
-  EXPECT_EQ(empty_shape.calculate_capacity(), 1); // Scalar
+  EXPECT_EQ(empty_shape.calculate_capacity(), 1);
   EXPECT_TRUE(empty_shape.is_fully_defined());
 }
 

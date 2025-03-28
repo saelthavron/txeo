@@ -5,7 +5,11 @@
 #include "txeo/Tensor.h"
 #include "types.h"
 
+#include <cstddef>
+#include <stdexcept>
+
 namespace txeo {
+enum class LossFunc;
 
 /**
  * @class Trainer

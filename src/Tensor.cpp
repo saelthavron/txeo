@@ -1,4 +1,3 @@
-
 #include "txeo/Tensor.h"
 #include "txeo/TensorFunc.h"
 #include "txeo/TensorOp.h"
@@ -12,8 +11,14 @@
 #include <initializer_list>
 #include <iterator>
 #include <memory>
+#include <random>
+#include <tensorflow/core/framework/tensor_shape.h>
 #include <utility>
 #include <vector>
+
+namespace tensorflow {
+class Tensor;
+} // namespace tensorflow
 
 namespace txeo {
 

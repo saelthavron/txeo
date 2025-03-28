@@ -1,7 +1,12 @@
+#include <gtest/gtest.h>
+#include <initializer_list>
+#include <utility>
+#include <vector>
+
 #include "txeo/Tensor.h"
 #include "txeo/TensorShape.h"
 #include "txeo/Vector.h"
-#include <gtest/gtest.h>
+#include "txeo/types.h"
 
 TEST(VectorTest, ParameterizedConstructor) {
   txeo::Vector<int> vector(3);
