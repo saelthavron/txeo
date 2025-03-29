@@ -22,7 +22,7 @@
 txeo::Matrix<double> X({{1.0}, {2.0}, {3.0}});
 txeo::Matrix<double> y({{3.0}, {5.0}, {7.0}});
 
-OlsGDTrainer<double> trainer(X, y);
+OlsGDTrainer<double> trainer(txeo::DataTable<double>(X, y));
 trainer.set_tolerance(1e-5);
 trainer.fit(1000, LossFunc::MSE, 10);
 
@@ -40,24 +40,12 @@ if (trainer.is_converged()) {
 
 ## Constructors
 
-### `OlsGDTrainer(x_train, y_train)`
+### `Trainer(const txeo::DataTable<T> &data)`
 
-Creates a trainer using training data also for evaluation.
-
-```cpp
-OlsGDTrainer(const txeo::Matrix<T>& x_train,
-             const txeo::Matrix<T>& y_train);
-```
-
-### `OlsGDTrainer(x_train, y_train, x_valid, y_valid)`
-
-Creates a trainer with separate training and evaluation datasets.
+Creates a trainer using a data table object.
 
 ```cpp
-OlsGDTrainer(const txeo::Matrix<T>& x_train,
-             const txeo::Matrix<T>& y_train,
-             const txeo::Matrix<T>& x_valid,
-             const txeo::Matrix<T>& y_valid);
+txeo::Trainer(const txeo::DataTable<T> &data);
 ```
 
 ---

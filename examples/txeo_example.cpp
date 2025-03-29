@@ -1,4 +1,5 @@
 
+#include "txeo/DataTable.h"
 #include "txeo/Loss.h"
 #include "txeo/Matrix.h"
 #include "txeo/MatrixIO.h"
@@ -24,9 +25,14 @@ using namespace tensorflow::ops;
 
 int main() {
 
-  txeo::Tensor<double> t;
+  // txeo::Matrix<double> data(100, 5);
+  // txeo::DataTable<double> dt(data, {0, 1, 2}, {3, 4}, 30);
 
-  std::cout << t.shape().calculate_capacity() << std::endl;
+  // std::cout << dt.x_eval()->row_size() << std::endl;
+
+  // txeo::Tensor<double> t;
+
+  // std::cout << t.shape().calculate_capacity() << std::endl;
 
   // txeo::Matrix<double> X({{1.0}, {2.0}, {3.0}}); // 3x1
   // txeo::Matrix<double> y({{3.0}, {5.0}, {7.0}}); // 3x1

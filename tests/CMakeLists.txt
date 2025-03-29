@@ -19,6 +19,7 @@ add_executable(
   tVector.cpp
   tLoss.cpp
   tOlsGDTrainer.cpp
+  tDataTable.cpp
 )  
 
 target_link_libraries(

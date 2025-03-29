@@ -29,7 +29,7 @@ T OlsGDTrainer<T>::learning_rate() const {
 
 template <typename T>
   requires(std::floating_point<T>)
-Tensor<T> OlsGDTrainer<T>::predict(const Tensor<T> &input) {
+Tensor<T> OlsGDTrainer<T>::predict(const Tensor<T> &input) const {
   auto aux = TensorPart<T>::increase_dimension(input, 1, 1.0);
   return TensorOp<T>::product_tensors(aux, this->weight_bias());
 }
@@ -37,12 +37,19 @@ Tensor<T> OlsGDTrainer<T>::predict(const Tensor<T> &input) {
 template <typename T>
   requires(std::floating_point<T>)
 void OlsGDTrainer<T>::train(size_t epochs, LossFunc metric) {
-  // Input and Output data variables
-  size_t n = this->_x_train->shape().axis_dim(1);
-  size_t m = this->_y_train->shape().axis_dim(1);
 
-  auto X = Matrix<T>::to_matrix(TensorPart<T>::increase_dimension(*this->_x_train, 1, 1.0));
-  auto Y = Matrix<T>::to_matrix(*this->_y_train).transpose();
+  auto x_train = this->_data_table->x_train();
+  auto y_train = this->_data_table->y_train();
+
+  auto &x_eval = this->_data_table->x_eval() != nullptr ? *this->_data_table->x_eval() : x_train;
+  auto &y_eval = this->_data_table->y_eval() != nullptr ? *this->_data_table->y_eval() : y_train;
+
+  // Input and Output data variables
+  size_t n = x_train.shape().axis_dim(1);
+  size_t m = y_train.shape().axis_dim(1);
+
+  auto X = Matrix<T>::to_matrix(TensorPart<T>::increase_dimension(x_train, 1, 1.0));
+  auto Y = Matrix<T>::to_matrix(y_train).transpose();
 
   auto Z = TensorFunc<T>::compute_gram_matrix(X);
   auto K = Y.dot(X);
@@ -50,10 +57,8 @@ void OlsGDTrainer<T>::train(size_t epochs, LossFunc metric) {
   _is_converged = false;
 
   // Initializing the loss class
-  auto *X_eval = &X;
-  if (this->_x_train != this->_x_eval)
-    *X_eval = Matrix<T>::to_matrix(TensorPart<T>::increase_dimension(*this->_x_eval, 1, 1.0));
-  Loss<T> loss{*this->_y_eval, metric};
+  auto X_eval = Matrix<T>::to_matrix(TensorPart<T>::increase_dimension(x_eval, 1, 1.0));
+  Loss<T> loss{y_eval, metric};
 
   // Initial Guesses
   auto norm_X = TensorAgg<T>::reduce_euclidean_norm(X, {0, 1})();
@@ -77,7 +82,7 @@ void OlsGDTrainer<T>::train(size_t epochs, LossFunc metric) {
   // Iterate OLS
   for (size_t e{0}; e < epochs; ++e) {
     auto B_t = TensorFunc<T>::transpose(B);
-    loss_value = loss.get_loss(TensorOp<T>::product_tensors(*X_eval, B_t));
+    loss_value = loss.get_loss(TensorOp<T>::product_tensors(X_eval, B_t));
     std::cout << "Epoch " << e << ", Loss: " << loss_value << ", Learning Rate: " << _learning_rate
               << std::endl;
     if (std::isnan(loss_value)) {
