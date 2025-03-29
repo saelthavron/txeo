@@ -3,15 +3,28 @@
 #include "txeo/Tensor.h"
 #include "txeo/TensorOp.h"
 #include "txeo/detail/TensorHelper.h"
-#include "txeo/detail/TensorPrivate.h"
 #include "txeo/detail/utils.h"
+#include "txeo/types.h"
 
+#include <Eigen/Core>
 #include <algorithm>
 #include <cmath>
-
+#include <cstdint>
+#include <cstdlib>
+#include <memory>
 #include <queue>
+#include <tensorflow/cc/framework/ops.h>
 #include <tensorflow/cc/ops/array_ops.h>
+#include <tensorflow/cc/ops/math_ops.h>
+#include <tensorflow/core/framework/tensor.h>
+#include <tensorflow/core/framework/tensor_shape.h>
+#include <tensorflow/core/framework/types.pb.h>
+#include <unsupported/Eigen/CXX11/Tensor>
 #include <utility>
+
+namespace tensorflow {
+class Scope;
+} // namespace tensorflow
 
 namespace txeo {
 

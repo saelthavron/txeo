@@ -1,8 +1,14 @@
-#include "txeo/MatrixIO.h"
-#include "txeo/TensorShape.h"
+#include <cstddef>
 #include <filesystem>
 #include <fstream>
 #include <gtest/gtest.h>
+#include <iterator>
+#include <string>
+
+#include "txeo/Matrix.h"
+#include "txeo/MatrixIO.h"
+#include "txeo/Tensor.h"
+#include "txeo/TensorShape.h"
 
 namespace txeo {
 namespace {

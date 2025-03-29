@@ -14,7 +14,8 @@ set(TXEO_SOURCES
     Predictor.cpp
     Trainer.cpp
     OlsGDTrainer.cpp
-    Loss.cpp)
+    Loss.cpp
+    DataTable.cpp)
 
 
 #################################################### Finding Tensorflow ####################################################
@@ -26,9 +27,9 @@ find_package(TensorFlow REQUIRED COMPONENTS CXX SHARED)
 #################################################### Static Library ####################################################
 
 add_library(txeo_static STATIC ${TXEO_SOURCES})
-# target_precompile_headers(txeo_static PRIVATE
-#     "$<$<COMPILE_LANGUAGE:CXX>:${CMAKE_SOURCE_DIR}/include/txeo/detail/pch.h>"
-# )
+target_precompile_headers(txeo_static PRIVATE
+    "$<$<COMPILE_LANGUAGE:CXX>:${CMAKE_SOURCE_DIR}/include/txeo/detail/pch.h>"
+)
 target_include_directories(txeo_static PUBLIC
     $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:/include>
@@ -47,9 +48,9 @@ if(CMAKE_GENERATOR STREQUAL "Ninja" AND $ENV{CXX} STREQUAL "icpx")
 endif()
   
 add_library(txeo_shared SHARED ${TXEO_SOURCES})
-# target_precompile_headers(txeo_shared PRIVATE
-#     "$<$<COMPILE_LANGUAGE:CXX>:${CMAKE_SOURCE_DIR}/include/txeo/detail/pch.h>"
-# )
+target_precompile_headers(txeo_shared PRIVATE
+    "$<$<COMPILE_LANGUAGE:CXX>:${CMAKE_SOURCE_DIR}/include/txeo/detail/pch.h>"
+)
 target_compile_definitions(txeo_shared PUBLIC TXEO_SHARED)
 target_include_directories(txeo_shared PUBLIC
     $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>

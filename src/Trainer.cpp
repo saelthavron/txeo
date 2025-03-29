@@ -1,18 +1,8 @@
 #include "txeo/Trainer.h"
+#include "txeo/Loss.h"
 
 namespace txeo {
-
-template <typename T>
-inline Trainer<T>::Trainer(const Tensor<T> &x_train, const Tensor<T> &y_train,
-                           const Tensor<T> &x_eval, const Tensor<T> &y_eval)
-    : _x_train{&x_train}, _y_train{&y_train}, _x_eval{&x_eval}, _y_eval{&y_eval} {
-  if (x_train.dim() == 0 || y_train.dim() == 0 || x_eval.dim() == 0 || y_eval.dim() == 0)
-    throw TrainerError("One of the tensors has zero dimension.");
-
-  if (x_train.shape().axis_dim(0) != y_train.shape().axis_dim(0) ||
-      x_eval.shape().axis_dim(0) != y_eval.shape().axis_dim(0))
-    throw TrainerError("Training or Validation tensor are incompatible.");
-};
+enum class LossFunc;
 
 template <typename T>
 void Trainer<T>::fit(size_t epochs, LossFunc metric) {
@@ -21,11 +11,27 @@ void Trainer<T>::fit(size_t epochs, LossFunc metric) {
 };
 
 template <typename T>
-inline void Trainer<T>::fit(size_t epochs, LossFunc metric, size_t patience) {
+void Trainer<T>::fit(size_t epochs, LossFunc metric, size_t patience) {
   _is_early_stop = true;
   _patience = patience;
   this->fit(epochs, metric);
   _is_early_stop = false;
+}
+
+template <typename T>
+T Trainer<T>::compute_test_loss(txeo::LossFunc metric) const {
+  if (!this->_is_trained)
+    throw TrainerError("Trainer is not trained.");
+
+  auto *x_test = this->_data_table->x_test();
+  auto *y_test = this->_data_table->y_test();
+
+  if (x_test == nullptr)
+    throw TrainerError("Test data was not specified.");
+
+  Loss<T> loss{*y_test, metric};
+
+  return loss.get_loss(this->predict(*x_test));
 }
 
 template class Trainer<size_t>;

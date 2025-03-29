@@ -1,5 +1,9 @@
 #include "txeo/detail/utils.h"
 
+#include <algorithm>
+#include <iterator>
+#include <sstream>
+#include <stdexcept>
 #include <tensorflow/core/framework/tensor_shape.h>
 #include <tensorflow/core/framework/tensor_shape.pb.h>
 

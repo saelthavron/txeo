@@ -4,8 +4,9 @@
 #include "txeo/detail/utils.h"
 
 #include <algorithm>
-
 #include <fstream>
+#include <initializer_list>
+#include <iterator>
 #include <sstream>
 #include <string>
 

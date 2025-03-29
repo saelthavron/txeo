@@ -7,7 +7,11 @@
 #include "txeo/Vector.h"
 #include "txeo/types.h"
 
+#include <cstddef>
 #include <initializer_list>
+#include <stdexcept>
+#include <utility>
+#include <vector>
 
 namespace txeo {
 
@@ -15,20 +19,19 @@ namespace detail {
 class TensorHelper;
 }
 
+enum class NormalizationType;
 template <typename T>
 class Predictor;
-
 template <typename T>
 class TensorAgg;
-
-template <typename T>
-class TensorPart;
-
-template <typename T>
-class TensorOp;
-
 template <typename T>
 class TensorFunc;
+template <typename T>
+class TensorOp;
+template <typename T>
+class TensorPart;
+template <typename T>
+class Vector;
 
 /**
  * @class Matrix

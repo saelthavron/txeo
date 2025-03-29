@@ -1,4 +1,5 @@
 
+#include "txeo/DataTable.h"
 #include "txeo/Loss.h"
 #include "txeo/Matrix.h"
 #include "txeo/MatrixIO.h"
@@ -24,6 +25,15 @@ using namespace tensorflow::ops;
 
 int main() {
 
+  // txeo::Matrix<double> data(100, 5);
+  // txeo::DataTable<double> dt(data, {0, 1, 2}, {3, 4}, 30);
+
+  // std::cout << dt.x_eval()->row_size() << std::endl;
+
+  // txeo::Tensor<double> t;
+
+  // std::cout << t.shape().calculate_capacity() << std::endl;
+
   // txeo::Matrix<double> X({{1.0}, {2.0}, {3.0}}); // 3x1
   // txeo::Matrix<double> y({{3.0}, {5.0}, {7.0}}); // 3x1
 
@@ -46,26 +56,26 @@ int main() {
 
   // Data downloaded at
   // https://media.geeksforgeeks.org/wp-content/uploads/20240319120216/housing.csv
-  auto train_data =
-      txeo::MatrixIO::one_hot_encode_text_file("/home/roberto/Downloads/housing.csv", ',', true,
-                                               "/home/roberto/Downloads/housing_one_hot.csv");
+  // auto train_data =
+  //     txeo::MatrixIO::one_hot_encode_text_file("/home/roberto/Downloads/housing.csv", ',', true,
+  //                                              "/home/roberto/Downloads/housing_one_hot.csv");
 
-  auto x_train = txeo::TensorPart<double>::sub_matrix_cols_exclude(
-      train_data.read_text_file<double>(true), {8});
-  auto y_train =
-      txeo::TensorPart<double>::sub_matrix_cols(train_data.read_text_file<double>(true), {8});
+  // auto x_train = txeo::TensorPart<double>::sub_matrix_cols_exclude(
+  //     train_data.read_text_file<double>(true), {8});
+  // auto y_train =
+  //     txeo::TensorPart<double>::sub_matrix_cols(train_data.read_text_file<double>(true), {8});
 
-  x_train.normalize_columns(txeo::NormalizationType::MIN_MAX);
+  // x_train.normalize_columns(txeo::NormalizationType::MIN_MAX);
 
-  std::cout << "X: " << x_train.shape() << std::endl;
-  std::cout << "Y: " << y_train.shape() << std::endl;
+  // std::cout << "X: " << x_train.shape() << std::endl;
+  // std::cout << "Y: " << y_train.shape() << std::endl;
 
-  txeo::OlsGDTrainer<double> ols{x_train, y_train};
+  // txeo::OlsGDTrainer<double> ols{x_train, y_train};
 
-  ols.enable_variable_lr();
-  ols.fit(100, txeo::LossFunc::MAE);
+  // ols.enable_variable_lr();
+  // ols.fit(100, txeo::LossFunc::MAE);
 
-  std::cout << "Weight-Bias: " << ols.weight_bias() << std::endl;
-  std::cout << "Minimun loss: " << ols.min_loss() << std::endl;
-  std::cout << "min Y:" << txeo::TensorAgg<double>::reduce_min(y_train, {0})() << std::endl;
+  // std::cout << "Weight-Bias: " << ols.weight_bias() << std::endl;
+  // std::cout << "Minimun loss: " << ols.min_loss() << std::endl;
+  // std::cout << "min Y:" << txeo::TensorAgg<double>::reduce_min(y_train, {0})() << std::endl;
 }

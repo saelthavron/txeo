@@ -5,8 +5,10 @@
 #include "txeo/detail/utils.h"
 
 #include <algorithm>
-
 namespace txeo {
+enum class NormalizationType;
+template <typename T>
+class Vector;
 
 template <typename T>
 Matrix<T>::Matrix() {

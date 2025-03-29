@@ -1,7 +1,11 @@
-#include "txeo/Loss.h"
-#include "txeo/TensorShape.h"
 #include <cmath>
 #include <gtest/gtest.h>
+#include <vector>
+
+#include "txeo/Loss.h"
+#include "txeo/Tensor.h"
+#include "txeo/TensorShape.h"
+#include "txeo/types.h"
 
 TEST(LossTest, MeanSquaredError) {
   txeo::Tensor<float> valid({3}, {1.0f, 2.0f, 3.0f});
@@ -91,7 +95,7 @@ TEST(LossTest, ShorthandEquivalence) {
 
 TEST(LossTest, DefaultLossFunction) {
   txeo::Tensor<float> valid({3}, {1.0f, 2.0f, 3.0f});
-  txeo::Loss<float> loss(valid); // Default to MSE
+  txeo::Loss<float> loss(valid);
 
   txeo::Tensor<float> pred({3}, {1.1f, 1.9f, 3.05f});
   EXPECT_FLOAT_EQ(loss.get_loss(pred), loss.mse(pred));

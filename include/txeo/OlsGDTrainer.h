@@ -3,12 +3,16 @@
 #pragma once
 
 #include "txeo/Matrix.h"
+#include "txeo/Tensor.h"
 #include "txeo/TensorShape.h"
 #include "txeo/Trainer.h"
 
 #include <concepts>
+#include <cstddef>
+#include <stdexcept>
 
 namespace txeo {
+enum class LossFunc;
 
 /**
  * @class OlsGDTrainer
@@ -62,25 +66,11 @@ class OlsGDTrainer : public txeo::Trainer<T> {
     ~OlsGDTrainer() = default;
 
     /**
-     * @brief Constructs trainer with separate validation data
+     * @brief Construct a new OlsGD Trainer object from a data table
      *
-     * @param x_train Training features matrix (shape: [samples, features])
-     * @param y_train Training labels matrix (shape: [samples, outputs])
-     * @param x_valid Validation features matrix (shape: [samples, features])
-     * @param y_valid Validation labels matrix (shape: [samples, outputs])
+     * @param data Training/Evaluation/Test data
      */
-    OlsGDTrainer(const txeo::Matrix<T> &x_train, const txeo::Matrix<T> &y_train,
-                 const txeo::Matrix<T> &x_valid, const txeo::Matrix<T> &y_valid)
-        : txeo::Trainer<T>{x_train, y_train, x_valid, y_valid} {};
-
-    /**
-     * @brief Constructs trainer using training data for validation
-     *
-     * @param x_train Training features matrix (shape: [samples, features])
-     * @param y_train Training labels matrix (shape: [samples, outputs])
-     */
-    OlsGDTrainer(const txeo::Matrix<T> &x_train, const txeo::Matrix<T> &y_train)
-        : OlsGDTrainer{x_train, y_train, x_train, y_train} {}
+    OlsGDTrainer(const txeo::DataTable<T> &data) : txeo::Trainer<T>(data) {};
 
     /**
      * @brief Makes predictions using learned weights
@@ -90,7 +80,7 @@ class OlsGDTrainer : public txeo::Trainer<T> {
      *
      * @throws OlsGDTrainerError
      */
-    txeo::Tensor<T> predict(const txeo::Tensor<T> &input) override;
+    txeo::Tensor<T> predict(const txeo::Tensor<T> &input) const override;
 
     /**
      * @brief Gets current learning rate

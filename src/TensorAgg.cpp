@@ -1,27 +1,26 @@
 #include "txeo/TensorAgg.h"
-#include "txeo/Tensor.h"
-#include "txeo/TensorFunc.h"
-#include "txeo/detail/TensorHelper.h"
-#include "txeo/detail/TensorPrivate.h"
-#include "txeo/detail/utils.h"
 
+#include <Eigen/Core>
 #include <algorithm>
 #include <cmath>
-
+#include <cstdint>
 #include <cstdlib>
 #include <iterator>
+#include <memory>
 #include <queue>
 #include <stdexcept>
 #include <string>
-#include <tensorflow/cc/client/client_session.h>
 #include <tensorflow/cc/framework/ops.h>
-#include <tensorflow/cc/framework/scope.h>
 #include <tensorflow/cc/ops/math_ops.h>
-#include <tensorflow/cc/ops/standard_ops.h>
-#include <tensorflow/core/framework/tensor.h>
-#include <tensorflow/core/framework/tensor_shape.h>
-#include <tensorflow/core/platform/env.h>
-#include <tensorflow/core/public/session.h>
+
+#include "txeo/Tensor.h"
+#include "txeo/TensorFunc.h"
+#include "txeo/detail/TensorHelper.h"
+#include "txeo/detail/utils.h"
+
+namespace tensorflow {
+class Scope;
+} // namespace tensorflow
 
 namespace txeo {
 

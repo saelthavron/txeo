@@ -1,13 +1,19 @@
 #include <algorithm>
-#include <cmath>
-
+#include <cstddef>
+#include <cstdint>
 #include <gtest/gtest.h>
+#include <initializer_list>
+#include <iterator>
+#include <string>
+#include <utility>
 #include <vector>
 
 #include "txeo/Tensor.h"
 #include "txeo/TensorFunc.h"
+#include "txeo/TensorIterator.h"
 #include "txeo/TensorOp.h"
 #include "txeo/TensorShape.h"
+#include "txeo/types.h"
 
 namespace txeo {
 

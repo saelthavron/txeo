@@ -6,7 +6,11 @@
 #include "txeo/Tensor.h"
 #include "txeo/Vector.h"
 
+#include <stdexcept>
+
 namespace txeo {
+template <typename T>
+class Vector;
 
 /**
  * @class TensorOp

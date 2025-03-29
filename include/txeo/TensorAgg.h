@@ -4,7 +4,11 @@
 
 #include "txeo/Tensor.h"
 
+#include <concepts>
+#include <cstddef>
 #include <functional>
+#include <stdexcept>
+#include <vector>
 
 namespace txeo {
 

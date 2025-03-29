@@ -4,12 +4,10 @@
 #include "txeo/detail/utils.h"
 
 #include <algorithm>
-
 #include <iterator>
 #include <memory>
 #include <string>
 #include <tensorflow/core/framework/tensor_shape.h>
-#include <tensorflow/core/platform/errors.h>
 #include <utility>
 #include <vector>
 
@@ -92,6 +90,7 @@ int TensorShape::number_of_axes() const noexcept {
 }
 
 size_t TensorShape::calculate_capacity() const noexcept {
+
   return _impl->tf_shape != nullptr ? _impl->tf_shape->num_elements()
                                     : _impl->ext_tf_shape->num_elements();
 }

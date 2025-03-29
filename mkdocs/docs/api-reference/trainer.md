@@ -27,22 +27,10 @@ Derived classes must implement the `predict()` and `train()` methods.
 
 ### **Trainer(x_train, y_train, x_eval, y_eval)**
 
-Initializes the trainer with training and evaluation datasets.
+Initializes the trainer with a data table object.
 
 ```cpp
-Trainer(const txeo::Tensor<T>& x_train,
-        const txeo::Tensor<T>& y_train,
-        const txeo::Tensor<T>& x_eval,
-        const txeo::Tensor<T>& y_eval);
-```
-
-### **Trainer(x_train, y_train)**
-
-Initializes the trainer using the training data for evaluation as well.
-
-```cpp
-Trainer(const txeo::Tensor<T>& x_train,
-        const txeo::Tensor<T>& y_train);
+Trainer(const txeo::DataTable<T> &data);
 ```
 
 ---
@@ -74,12 +62,28 @@ Must be implemented in derived classes.
 txeo::Tensor<T> predict(const txeo::Tensor<T>& input) = 0;
 ```
 
+### **compute_test_loss(txeo::LossFunc metric) const**
+
+Computes the loss of the trained model for test data.
+
+```cpp
+virtual T compute_test_loss(txeo::LossFunc metric) const;
+```
+
 ### **is_trained()**
 
 Returns `true` if the model has been trained.
 
 ```cpp
 bool is_trained() const;
+```
+
+### **data_table()**
+
+Returns `std::DataTable` object owned by the trainer.
+
+```cpp
+const txeo::DataTable<T> &data_table() const;
 ```
 
 ---
