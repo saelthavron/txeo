@@ -1,5 +1,6 @@
 #include "txeo/DataTable.h"
 #include "txeo/TensorPart.h"
+#include "txeo/detail/utils.h"
 
 #include <utility>
 

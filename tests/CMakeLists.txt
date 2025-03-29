@@ -22,10 +22,15 @@ add_executable(
   tDataTable.cpp
 )  
 
+target_precompile_headers(txeo_tests PRIVATE
+    "$<$<COMPILE_LANGUAGE:CXX>:${CMAKE_SOURCE_DIR}/include/txeo/detail/pch.h>"
+)
+
 target_link_libraries(
   txeo_tests  
   GTest::gtest GTest::gtest_main txeo_shared 
 )
+
 
 include(GoogleTest)
 gtest_discover_tests(txeo_tests)
