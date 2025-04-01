@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include "TensorShape.h"
 #include "txeo/TensorIterator.h"
+#include "txeo/TensorShape.h"
 #include "txeo/types.h"
 
 #include <concepts>

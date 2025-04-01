@@ -360,12 +360,14 @@ txeo::Tensor<T> &Tensor<T>::permute(const std::vector<size_t> &axes) {
 
 template <typename T>
 txeo::Tensor<T> &Tensor<T>::normalize(size_t axis, txeo::NormalizationType type) {
-  return TensorFunc<T>::normalize_by(*this, axis, type);
+  TensorFunc<T>::normalize_by(*this, axis, type);
+  return *this;
 }
 
 template <typename T>
 txeo::Tensor<T> &Tensor<T>::normalize(txeo::NormalizationType type) {
-  return TensorFunc<T>::normalize_by(*this, type);
+  TensorFunc<T>::normalize_by(*this, type);
+  return *this;
 }
 
 template <typename T>

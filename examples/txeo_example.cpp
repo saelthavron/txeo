@@ -25,6 +25,15 @@ using namespace tensorflow::ops;
 
 int main() {
 
+  txeo::Matrix<double> data(5, 2, {1, 5, 2, 6, 3, 7, 5, 8, 10, 10});
+
+  auto funcs = txeo::TensorFunc<double>::normalize_by(data, 0, txeo::NormalizationType::MIN_MAX);
+
+  std::cout << "Size: " << funcs.size() << std::endl;
+
+  std::cout << funcs[0](4) << std::endl;
+  std::cout << funcs[1](9) << std::endl;
+
   // txeo::Matrix<double> data(100, 5);
   // txeo::DataTable<double> dt(data, {0, 1, 2}, {3, 4}, 30);
 
