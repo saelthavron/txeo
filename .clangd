@@ -1,6 +1,6 @@
 CompileFlags:
   Add: [-Xclang, -include-pch, -Xclang, pch.h]
-#  Remove: [-include, pch.h]
+  #Remove: [-include, pch.h]
 
 Diagnostics:
   ClangTidy:

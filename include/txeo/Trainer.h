@@ -4,7 +4,7 @@
 
 #include "txeo/DataTable.h"
 #include "txeo/Tensor.h"
-#include "types.h"
+#include "txeo/types.h"
 
 #include <cstddef>
 #include <stdexcept>
@@ -28,9 +28,9 @@ enum class LossFunc;
 template <typename T>
 class Trainer {
   public:
-    Trainer(const Trainer &) = default;
+    Trainer(const Trainer &) = delete;
     Trainer(Trainer &&) = default;
-    Trainer &operator=(const Trainer &) = default;
+    Trainer &operator=(const Trainer &) = delete;
     Trainer &operator=(Trainer &&) = default;
     virtual ~Trainer() = default;
 

@@ -23,16 +23,36 @@
 namespace tf = tensorflow;
 using namespace tensorflow::ops;
 
+class Foo {
+  private:
+    const int *_num;
+
+  public:
+    Foo(const int &num) : _num{&num} {};
+
+    [[nodiscard]] const int &num() const { return *_num; }
+};
+
 int main() {
 
-  txeo::Matrix<double> data(5, 2, {1, 5, 2, 6, 3, 7, 5, 8, 10, 10});
+  int a = 3;
 
-  auto funcs = txeo::TensorFunc<double>::normalize_by(data, 0, txeo::NormalizationType::MIN_MAX);
+  Foo f(a);
 
-  std::cout << "Size: " << funcs.size() << std::endl;
+  auto dd = f.num();
 
-  std::cout << funcs[0](4) << std::endl;
-  std::cout << funcs[1](9) << std::endl;
+  auto xx = std::make_unique<int>(std::move(dd));
+
+  std::cout << *xx << std::endl;
+
+  // txeo::Matrix<double> data(5, 2, {1, 5, 2, 6, 3, 7, 5, 8, 10, 10});
+
+  // auto funcs = txeo::TensorFunc<double>::normalize_by(data, 0, txeo::NormalizationType::MIN_MAX);
+
+  // std::cout << "Size: " << funcs.size() << std::endl;
+
+  // std::cout << funcs[0](4) << std::endl;
+  // std::cout << funcs[1](9) << std::endl;
 
   // txeo::Matrix<double> data(100, 5);
   // txeo::DataTable<double> dt(data, {0, 1, 2}, {3, 4}, 30);

@@ -213,8 +213,8 @@ class TensorFunc {
      * // Column 0 becomes [-1.0, 1.0], Column 1 becomes [-1.0, 1.0]
      * @endcode
      */
-    static std::vector<std::function<T(const T &)>>
-    normalize_by(txeo::Tensor<T> &tensor, size_t axis, txeo::NormalizationType type);
+    static txeo::Tensor<T> &normalize_by(txeo::Tensor<T> &tensor, size_t axis,
+                                         txeo::NormalizationType type);
 
     /**
      * @brief Creates a normalized copy of the input tensor along a specified axis
@@ -237,6 +237,10 @@ class TensorFunc {
     static txeo::Tensor<T> normalize(const txeo::Tensor<T> &tensor, size_t axis,
                                      txeo::NormalizationType type);
 
+    static std::vector<std::function<T(const T &)>>
+    compute_normalize_functions(const txeo::Tensor<T> &tensor, size_t axis,
+                                txeo::NormalizationType type);
+
     /**
      * @brief Normalizes the entire tensor in-place (global normalization)
      *
@@ -254,8 +258,7 @@ class TensorFunc {
      * // data now contains [[0.0, 0.333], [0.666, 1.0]]
      * @endcode
      */
-    static std::function<T(const T &)> normalize_by(txeo::Tensor<T> &tensor,
-                                                    txeo::NormalizationType type);
+    static Tensor<T> &normalize_by(txeo::Tensor<T> &tensor, txeo::NormalizationType type);
 
     /**
      * @brief Creates a normalized copy of the entire tensor (global normalization)
@@ -275,6 +278,9 @@ class TensorFunc {
      * @endcode
      */
     static txeo::Tensor<T> normalize(const txeo::Tensor<T> &tensor, txeo::NormalizationType type);
+
+    static std::function<T(const T &)> compute_normalize_function(const txeo::Tensor<T> &tensor,
+                                                                  txeo::NormalizationType type);
 
     /**
      * @brief Transposes a matrix.
@@ -351,9 +357,9 @@ class TensorFunc {
     static void
     axis_func(txeo::Tensor<T> &tensor, size_t axis,
               std::function<void(const std::vector<T> &, const std::vector<T *> &)> func);
-    static std::vector<std::function<T(const T &)>> new_axis_func(
-        txeo::Tensor<T> &tensor, size_t axis,
-        std::function<void(const std::vector<T> &, const std::vector<T *> &, T &, T &)> func);
+    static std::vector<std::function<T(const T &)>>
+    new_axis_func(const txeo::Tensor<T> &tensor, size_t axis,
+                  std::function<void(const std::vector<T> &, T &, T &)> func);
 
     static void min_max_normalize(const std::vector<T> &values, const std::vector<T *> &adresses);
     static void z_score_normalize(const std::vector<T> &values, const std::vector<T *> &adresses);
@@ -365,8 +371,14 @@ class TensorFunc {
                                       const std::vector<T *> &adresses, T &subtractor,
                                       T &denominator);
 
-    static void min_max_normalize(txeo::Tensor<T> &tensor, T &subtractor, T &denominator);
-    static void z_score_normalize(txeo::Tensor<T> &tensor, T &subtractor, T &denominator);
+    static void min_max_normalize(const txeo::Tensor<T> &tensor, T &subtractor, T &denominator);
+    static void z_score_normalize(const txeo::Tensor<T> &tensor, T &subtractor, T &denominator);
+
+    static void min_max_subtractor_denominator(const std::vector<T> &values, T &subtractor,
+                                               T &denominator);
+
+    static void z_score_subtractor_denominator(const std::vector<T> &values, T &subtractor,
+                                               T &denominator);
 };
 
 /**
