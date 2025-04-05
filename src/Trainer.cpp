@@ -34,6 +34,12 @@ T Trainer<T>::compute_test_loss(txeo::LossFunc metric) const {
   return loss.get_loss(this->predict(*x_test));
 }
 
+template <typename T>
+void Trainer<T>::enable_data_table_norm(txeo::NormalizationType type) {
+  _data_table_norm = txeo::DataTableNorm<T>{*_data_table, type};
+  _is_norm_enabled = true;
+}
+
 template class Trainer<size_t>;
 template class Trainer<short>;
 template class Trainer<int>;

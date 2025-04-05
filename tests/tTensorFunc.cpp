@@ -235,9 +235,9 @@ TEST(TensorFuncTest, NormalizationAll) {
 
   txeo::Tensor<double> tens2({3, 3}, {1., 2., 3., 4., 5., 6., 7., 8., 9.});
   txeo::TensorFunc<double>::normalize_by(tens2, txeo::NormalizationType::Z_SCORE);
-  EXPECT_NEAR(tens2(0, 0), -1.46059, 1e-5);
+  EXPECT_NEAR(tens2(0, 0), -1.5492, 1e-5);
   EXPECT_NEAR(tens2(1, 1), 0.00000, 1e-5);
-  EXPECT_NEAR(tens2(2, 1), 1.09544, 1e-5);
+  EXPECT_NEAR(tens2(2, 1), 1.16189, 1e-5);
 
   txeo::Tensor<double> tens3(txeo::TensorShape({0}));
   EXPECT_THROW(txeo::TensorFunc<double>::normalize_by(tens3, txeo::NormalizationType::Z_SCORE),
@@ -262,7 +262,99 @@ TEST(TensorFuncTest, NormalizationAxis) {
 
   txeo::Tensor<double> tens7({3, 3}, {1., 2., 3., 4., 5., 6., 7., 8., 9.});
   auto tens7_norm = txeo::TensorFunc<double>::normalize(tens7, 0, txeo::NormalizationType::Z_SCORE);
-  txeo::Tensor<double> resp7({3, 3}, {-1, -1, -1, 0, 0, 0, 1, 1, 1});
-  EXPECT_TRUE(tens7_norm == resp7);
+  EXPECT_NEAR(tens7_norm(0, 0), -1.2247448, 1e-5);
+  EXPECT_NEAR(tens7_norm(1, 0), 0.00000, 1e-5);
+  EXPECT_NEAR(tens7_norm(2, 0), 1.2247448, 1e-5);
 }
+
+TEST(TensorFuncTest, MakeNormalizeFunctionMinMaxGlobal) {
+
+  Tensor<float> tensor({4}, {2.0f, 4.0f, 6.0f, 8.0f});
+  auto norm_fn = TensorFunc<float>::make_normalize_function(tensor, NormalizationType::MIN_MAX);
+
+  EXPECT_FLOAT_EQ(norm_fn(2.0f), 0.0f);
+  EXPECT_FLOAT_EQ(norm_fn(5.0f), 0.5f);
+  EXPECT_FLOAT_EQ(norm_fn(8.0f), 1.0f);
+}
+
+TEST(TensorFuncTest, MakeNormalizeFunctionZScoreGlobal) {
+
+  Tensor<double> tensor({4}, {1.0, 2.0, 3.0, 4.0});
+  auto norm_fn = TensorFunc<double>::make_normalize_function(tensor, NormalizationType::Z_SCORE);
+
+  const double epsilon = 1e-5;
+  EXPECT_NEAR(norm_fn(1.0), (1.0 - 2.5) / 1.11803, epsilon);
+  EXPECT_NEAR(norm_fn(2.5), 0.0, epsilon);
+  EXPECT_NEAR(norm_fn(4.0), (4.0 - 2.5) / 1.11803, epsilon);
+}
+
+TEST(TensorFuncTest, MakeNormalizeFunctionEdgeCaseConstant) {
+
+  Tensor<int> tensor({3}, {5, 5, 5});
+  auto norm_fn = TensorFunc<int>::make_normalize_function(tensor, NormalizationType::MIN_MAX);
+
+  EXPECT_EQ(norm_fn(5), 0);
+  EXPECT_EQ(norm_fn(10), 0);
+}
+
+TEST(TensorFuncTest, MakeNormalizeFunctionsMinMaxAxis0) {
+  Tensor<float> tensor({3, 2}, {1.0f, 4.0f, 3.0f, 6.0f, 5.0f, 8.0f});
+  auto norm_fns =
+      TensorFunc<float>::make_normalize_functions(tensor, 0, NormalizationType::MIN_MAX);
+
+  ASSERT_EQ(norm_fns.size(), 2);
+
+  auto &col0_fn = norm_fns[0];
+  EXPECT_FLOAT_EQ(col0_fn(1.0f), 0.0f);
+  EXPECT_FLOAT_EQ(col0_fn(3.0f), 0.5f);
+  EXPECT_FLOAT_EQ(col0_fn(5.0f), 1.0f);
+
+  auto &col1_fn = norm_fns[1];
+  EXPECT_FLOAT_EQ(col1_fn(4.0f), 0.0f);
+  EXPECT_FLOAT_EQ(col1_fn(6.0f), 0.5f);
+  EXPECT_FLOAT_EQ(col1_fn(8.0f), 1.0f);
+}
+
+TEST(TensorFuncTest, MakeNormalizeFunctionsZScoreAxis1) {
+  Tensor<double> tensor({2, 3}, {1.0, 2.0, 3.0, 4.0, 5.0, 6.0});
+  auto norm_fns =
+      TensorFunc<double>::make_normalize_functions(tensor, 1, NormalizationType::Z_SCORE);
+
+  ASSERT_EQ(norm_fns.size(), 2);
+
+  auto &row0_fn = norm_fns[0];
+  const double row0_eps = 1e-6;
+  EXPECT_NEAR(row0_fn(1.0), (1.0 - 2.0) / 0.81649658, row0_eps);
+  EXPECT_NEAR(row0_fn(2.0), 0.0, row0_eps);
+  EXPECT_NEAR(row0_fn(3.0), (3.0 - 2.0) / 0.81649658, row0_eps);
+
+  auto &row1_fn = norm_fns[1];
+  EXPECT_NEAR(row1_fn(4.0), (4.0 - 5.0) / 0.81649658, row0_eps);
+  EXPECT_NEAR(row1_fn(5.0), 0.0, row0_eps);
+  EXPECT_NEAR(row1_fn(6.0), (6.0 - 5.0) / 0.81649658, row0_eps);
+}
+
+TEST(TensorFuncTest, MakeNormalizeFunctions3DTensor) {
+
+  Tensor<int> tensor({2, 2, 3}, {
+
+                                    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12});
+
+  auto norm_fns = TensorFunc<int>::make_normalize_functions(tensor, 2, NormalizationType::MIN_MAX);
+
+  ASSERT_EQ(norm_fns.size(), 4);
+
+  EXPECT_FLOAT_EQ(norm_fns[0](1), 0.0f);
+  EXPECT_FLOAT_EQ(norm_fns[0](3), 1.0f);
+
+  EXPECT_FLOAT_EQ(norm_fns[1](4), 0.0f);
+  EXPECT_FLOAT_EQ(norm_fns[1](6), 1.0f);
+
+  EXPECT_FLOAT_EQ(norm_fns[2](7), 0.0f);
+  EXPECT_FLOAT_EQ(norm_fns[2](9), 1.0f);
+
+  EXPECT_FLOAT_EQ(norm_fns[3](10), 0.0f);
+  EXPECT_FLOAT_EQ(norm_fns[3](12), 1.0f);
+}
+
 } // namespace txeo

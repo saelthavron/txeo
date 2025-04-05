@@ -35,15 +35,22 @@ class Foo {
 
 int main() {
 
-  int a = 3;
+  // txeo::Tensor<int> tensor({2, 2, 3}, {
+  //                                         // Shape: 2x2x3
+  //                                         1, 2, 3, 4, 5, 6,   // First 2x3 slice
+  //                                         7, 8, 9, 10, 11, 12 // Second 2x3 slice
+  //                                     });
 
-  Foo f(a);
+  // auto norm_fns =
+  //     txeo::TensorFunc<int>::make_normalize_functions(tensor, 2,
+  //     txeo::NormalizationType::MIN_MAX);
 
-  auto dd = f.num();
+  txeo::Tensor<int> tensor({3, 2}, {1, 3, 2, 4, 2, 4});
 
-  auto xx = std::make_unique<int>(std::move(dd));
+  auto norm_fns =
+      txeo::TensorFunc<int>::make_normalize_functions(tensor, 1, txeo::NormalizationType::MIN_MAX);
 
-  std::cout << *xx << std::endl;
+  std::cout << norm_fns.size() << std::endl;
 
   // txeo::Matrix<double> data(5, 2, {1, 5, 2, 6, 3, 7, 5, 8, 10, 10});
 

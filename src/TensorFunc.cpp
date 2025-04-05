@@ -174,8 +174,11 @@ void TensorFunc<T>::min_max_normalize(const std::vector<T> &values,
                                       const std::vector<T *> &addresses) {
   auto [min_it, max_it] = std::ranges::minmax_element(values);
   auto dif = *max_it - *min_it;
-  if (detail::is_zero(dif))
+  if (detail::is_zero(dif)) {
+    for (size_t i{0}; i < addresses.size(); ++i)
+      *(addresses[i]) = 0;
     return;
+  }
 
   auto min = *min_it;
   for (size_t i{0}; i < addresses.size(); ++i)
@@ -198,10 +201,13 @@ void TensorFunc<T>::z_score_normalize(const std::vector<T> &values,
     auto dif = (item - mean);
     variance_num += dif * dif;
   }
-  auto std_dev = std::sqrt(variance_num / (values.size() - 1.));
+  auto std_dev = std::sqrt(variance_num / values.size());
 
-  if (detail::is_zero(std_dev))
+  if (detail::is_zero(std_dev)) {
+    for (size_t i{0}; i < addresses.size(); ++i)
+      *(addresses[i]) = 0;
     return;
+  }
 
   for (size_t i{0}; i < addresses.size(); ++i)
     *(addresses[i]) = (*(addresses[i]) - mean) / std_dev;
@@ -257,8 +263,6 @@ void TensorFunc<T>::min_max_subtractor_denominator(const std::vector<T> &values,
   denominator = 1;
   auto [min_it, max_it] = std::ranges::minmax_element(values);
   auto dif = *max_it - *min_it;
-  if (detail::is_zero(dif))
-    return;
 
   subtractor = *min_it;
   denominator = dif;
@@ -282,10 +286,7 @@ void TensorFunc<T>::z_score_subtractor_denominator(const std::vector<T> &values,
     auto dif = (item - mean);
     variance_num += dif * dif;
   }
-  auto std_dev = std::sqrt(variance_num / (values.size() - 1.));
-
-  if (detail::is_zero(std_dev))
-    return;
+  auto std_dev = std::sqrt(variance_num / (values.size()));
 
   subtractor = mean;
   denominator = std_dev;
@@ -295,7 +296,6 @@ template <typename T>
 std::vector<std::function<T(const T &)>>
 TensorFunc<T>::new_axis_func(const Tensor<T> &tensor, size_t axis,
                              std::function<void(const std::vector<T> &, T &, T &)> func) {
-
   if (tensor.dim() == 0)
     throw TensorFuncError("Tensor has dimension zero.");
 
@@ -326,7 +326,11 @@ TensorFunc<T>::new_axis_func(const Tensor<T> &tensor, size_t axis,
     T denominator;
     func(values, subtractor, denominator);
 
-    resp.emplace_back([=](const T &value) -> T { return (value - subtractor) / denominator; });
+    if (detail::is_zero(denominator))
+      // In order to avoid unused parameter messages (compiler does not perform calculation)
+      resp.emplace_back([=](const T &value) -> T { return value * 0; });
+    else
+      resp.emplace_back([=](const T &value) -> T { return (value - subtractor) / denominator; });
 
     values.clear();
     ++p;
@@ -364,8 +368,8 @@ Tensor<T> TensorFunc<T>::normalize(const Tensor<T> &tensor, size_t axis, Normali
 
 template <typename T>
 std::vector<std::function<T(const T &)>>
-TensorFunc<T>::compute_normalize_functions(const txeo::Tensor<T> &tensor, size_t axis,
-                                           txeo::NormalizationType type) {
+TensorFunc<T>::make_normalize_functions(const txeo::Tensor<T> &tensor, size_t axis,
+                                        txeo::NormalizationType type) {
   if (type == NormalizationType::MIN_MAX)
     return new_axis_func(tensor, axis,
                          [](const std::vector<T> &values, T &subtractor, T &denominator) -> void {
@@ -384,9 +388,6 @@ void TensorFunc<T>::min_max_normalize(const Tensor<T> &tensor, T &subtractor, T 
   denominator = 1;
   auto [min_it, max_it] = std::ranges::minmax_element(tensor);
   auto dif = *max_it - *min_it;
-
-  if (detail::is_zero(dif))
-    return;
 
   subtractor = *min_it;
   denominator = dif;
@@ -409,9 +410,7 @@ void TensorFunc<T>::z_score_normalize(const Tensor<T> &tensor, T &subtractor, T 
     auto dif = (element - mean);
     variance_num += dif * dif;
   }
-  auto std_dev = std::sqrt(variance_num / (tensor.dim() - 1.));
-  if (detail::is_zero(std_dev))
-    return;
+  auto std_dev = std::sqrt(variance_num / tensor.dim());
 
   subtractor = mean;
   denominator = std_dev;
@@ -423,23 +422,26 @@ Tensor<T> &TensorFunc<T>::normalize_by(Tensor<T> &tensor, NormalizationType type
   if (tensor.dim() == 0)
     throw TensorFuncError("Tensor has dimension zero.");
 
-  T subtractor;
-  T denominator;
+  T subtractor{0};
+  T denominator{1};
   if (type == NormalizationType::MIN_MAX)
     min_max_normalize(tensor, subtractor, denominator);
   else
     z_score_normalize(tensor, subtractor, denominator);
 
-  for (auto &element : tensor)
-    element = (element - subtractor) / denominator;
+  if (detail::is_zero(denominator))
+    for (auto &element : tensor)
+      element = 0;
+  else
+    for (auto &element : tensor)
+      element = (element - subtractor) / denominator;
 
   return tensor;
 }
 
 template <typename T>
-std::function<T(const T &)>
-TensorFunc<T>::compute_normalize_function(const txeo::Tensor<T> &tensor,
-                                          txeo::NormalizationType type) {
+std::function<T(const T &)> TensorFunc<T>::make_normalize_function(const txeo::Tensor<T> &tensor,
+                                                                   txeo::NormalizationType type) {
   if (tensor.dim() == 0)
     throw TensorFuncError("Tensor has dimension zero.");
 
@@ -450,7 +452,11 @@ TensorFunc<T>::compute_normalize_function(const txeo::Tensor<T> &tensor,
   else
     z_score_normalize(tensor, subtractor, denominator);
 
-  return [=](const T &value) -> T { return (value - subtractor) / denominator; };
+  if (detail::is_zero(denominator))
+    // In order to avoid unused parameter messages (compiler does not perform calculation)
+    return [=](const T &value) -> T { return value * 0; };
+  else
+    return [=](const T &value) -> T { return (value - subtractor) / denominator; };
 }
 
 template <typename T>

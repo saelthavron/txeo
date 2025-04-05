@@ -308,6 +308,8 @@ class Matrix : public txeo::Tensor<T> {
      */
     Tensor<T> dot(const txeo::Vector<T> &vector) const;
 
+    Matrix<T> clone() const;
+
     /**
      * @brief Converts a tensor to a matrix by moving data.
      *

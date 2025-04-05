@@ -1,5 +1,6 @@
 #ifndef TRAINER_H
 #define TRAINER_H
+#include "txeo/DataTableNorm.h"
 #pragma once
 
 #include "txeo/DataTable.h"
@@ -95,6 +96,10 @@ class Trainer {
      */
     const txeo::DataTable<T> &data_table() const { return *_data_table; }
 
+    void enable_data_table_norm(txeo::NormalizationType type);
+
+    void disable_data_table_norm() { _is_norm_enabled = false; };
+
   protected:
     Trainer() = default;
 
@@ -103,6 +108,9 @@ class Trainer {
     size_t _patience{0};
 
     std::unique_ptr<txeo::DataTable<T>> _data_table;
+
+    txeo::DataTableNorm<T> _data_table_norm;
+    bool _is_norm_enabled{false};
 
     virtual void train(size_t epochs, txeo::LossFunc loss_func) = 0;
 };

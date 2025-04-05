@@ -182,8 +182,9 @@ TEST(MatrixTest, Normalization) {
 
   txeo::Matrix<double> mat1(3, 3, {1., 2., 3., 4., 5., 6., 7., 8., 9.});
   mat1.normalize_rows(txeo::NormalizationType::Z_SCORE);
-  txeo::Matrix<double> resp1(3, 3, {-1, 0, 1, -1, 0, 1, -1, 0, 1});
-  EXPECT_TRUE(mat1 == resp1);
+  EXPECT_NEAR(mat1(0, 0), -1.22474, 1e-5);
+  EXPECT_NEAR(mat1(0, 2), 1.22474, 1e-5);
+  EXPECT_NEAR(mat1(1, 1), 0.0, 1e-5);
 }
 
 TEST(MatrixTest, AdditionMatrixMatrix) {

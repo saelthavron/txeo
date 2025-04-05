@@ -38,11 +38,12 @@ template <typename T>
   requires(std::floating_point<T>)
 void OlsGDTrainer<T>::train(size_t epochs, LossFunc metric) {
 
-  auto x_train = this->_data_table->x_train();
+  auto x_train = this->_is_norm_enabled ? this->_data_table_norm.x_train_normalized()
+                                        : this->_data_table->x_train();
   auto y_train = this->_data_table->y_train();
 
-  auto &x_eval = this->_data_table->x_eval() != nullptr ? *this->_data_table->x_eval() : x_train;
-  auto &y_eval = this->_data_table->y_eval() != nullptr ? *this->_data_table->y_eval() : y_train;
+  auto &x_eval = this->_data_table->has_eval() ? *this->_data_table->x_eval() : x_train;
+  auto &y_eval = this->_data_table->has_eval() ? *this->_data_table->y_eval() : y_train;
 
   // Input and Output data variables
   size_t n = x_train.shape().axis_dim(1);

@@ -237,9 +237,21 @@ class TensorFunc {
     static txeo::Tensor<T> normalize(const txeo::Tensor<T> &tensor, size_t axis,
                                      txeo::NormalizationType type);
 
+    /**
+     * @brief Construct the normalization functions for each dimension of the specified axis
+     *
+     * @param tensor Tensor to be inspected
+     * @param axis Axis from which the normalization functions will be computed
+     * @param type NOrmalization type
+     * @return std::vector<std::function<T(const T &)>>
+     *
+     *
+     * @throws std::TensorFuncError
+     *
+     */
     static std::vector<std::function<T(const T &)>>
-    compute_normalize_functions(const txeo::Tensor<T> &tensor, size_t axis,
-                                txeo::NormalizationType type);
+    make_normalize_functions(const txeo::Tensor<T> &tensor, size_t axis,
+                             txeo::NormalizationType type);
 
     /**
      * @brief Normalizes the entire tensor in-place (global normalization)
@@ -279,8 +291,19 @@ class TensorFunc {
      */
     static txeo::Tensor<T> normalize(const txeo::Tensor<T> &tensor, txeo::NormalizationType type);
 
-    static std::function<T(const T &)> compute_normalize_function(const txeo::Tensor<T> &tensor,
-                                                                  txeo::NormalizationType type);
+    /**
+     * @brief Construct the normalization function for the elements of the specified tensor
+     *
+     * @param tensor Tensor to be inspected
+     * @param type NOrmalization type
+     * @return std::function<T(const T &)>
+     *
+     *
+     * @throws std::TensorFuncError
+     *
+     */
+    static std::function<T(const T &)> make_normalize_function(const txeo::Tensor<T> &tensor,
+                                                               txeo::NormalizationType type);
 
     /**
      * @brief Transposes a matrix.
