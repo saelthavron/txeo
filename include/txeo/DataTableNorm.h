@@ -8,7 +8,7 @@
 namespace txeo {
 
 template <typename T>
-class DataTableNorm {
+class DataTableNorm { // TODO Documentar e Testar
   public:
     DataTableNorm() = default;
 
@@ -27,15 +27,11 @@ class DataTableNorm {
 
     [[nodiscard]] txeo::NormalizationType type() const { return _type; }
 
-    // txeo::Matrix<T> normalize(txeo::Matrix<T> &&x) const;
+    txeo::Matrix<T> normalize(txeo::Matrix<T> &&x) const;
 
-    // txeo::Matrix<T> normalize(const txeo::Matrix<T> &x) const {
-    //   return this->normalize(std::move(x.clone()));
-    // };
-
-    template <typename U>
-      requires std::is_convertible_v<U, txeo::Matrix<T>>
-    [[nodiscard]] txeo::Matrix<T> normalize(U &&x) const;
+    txeo::Matrix<T> normalize(const txeo::Matrix<T> &x) const {
+      return this->normalize(x.clone());
+    };
 
     txeo::Matrix<T> x_train_normalized();
 

@@ -346,6 +346,8 @@ class DataTable {
 
     [[nodiscard]] bool has_test() const { return _has_test; }
 
+    DataTable<T> clone() const;
+
   private:
     DataTable() = default;
 

@@ -69,6 +69,25 @@ class TensorShape {
      * @brief Constructs a tensor shape from a std::vector
      *
      * @param shape vector of dimensions
+     * * **Example Usage:**
+     * @code
+     * #include <iostream>
+     * #include "txeo/TensorShape.h"
+     *
+     * int main() {
+     *     txeo::TensorShape shape({3, 4, 5}); // Creates a 3D shape with dimensions 3x4x5
+     *
+     *     std::cout << "TensorShape created: " << shape << std::endl;
+     *     return 0;
+     * }
+     * @endcode
+     */
+    explicit TensorShape(std::vector<size_t> &&shape);
+
+    /**
+     * @brief Constructs a tensor shape from a std::vector
+     *
+     * @param shape vector of dimensions
      *
      * **Example Usage:**
      * @code
@@ -84,26 +103,8 @@ class TensorShape {
      * }
      * @endcode
      */
-    explicit TensorShape(const std::vector<size_t> &shape);
-
-    /**
-     * @brief Constructs a tensor shape from a std::vector
-     *
-     * @param shape vector of dimensions
-     * * **Example Usage:**
-     * @code
-     * #include <iostream>
-     * #include "txeo/TensorShape.h"
-     *
-     * int main() {
-     *     txeo::TensorShape shape({3, 4, 5}); // Creates a 3D shape with dimensions 3x4x5
-     *
-     *     std::cout << "TensorShape created: " << shape << std::endl;
-     *     return 0;
-     * }
-     * @endcode
-     */
-    explicit TensorShape(std::vector<size_t> &&shape);
+    explicit TensorShape(const std::vector<size_t> &shape)
+        : TensorShape(std::vector<size_t>(shape)) {};
 
     /**
      * @brief Constructs a tensor shape from an initializer list

@@ -252,6 +252,11 @@ size_t DataTable<T>::y_dim() const {
   return _y_train.col_size();
 }
 
+template <typename T>
+DataTable<T> DataTable<T>::clone() const {
+  return DataTable<T>{*this};
+}
+
 template class DataTable<size_t>;
 template class DataTable<short>;
 template class DataTable<int>;

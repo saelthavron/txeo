@@ -1,9 +1,9 @@
 #ifndef TRAINER_H
 #define TRAINER_H
-#include "txeo/DataTableNorm.h"
 #pragma once
 
 #include "txeo/DataTable.h"
+#include "txeo/DataTableNorm.h"
 #include "txeo/Tensor.h"
 #include "txeo/types.h"
 
@@ -38,10 +38,12 @@ class Trainer {
     /**
      * @brief Construct a new Trainer object from a data table.
      *
-     * @param data Training/Evaluation/Test data. If an rvalue is informed, no copy is made
+     * @param data Training/Evaluation/Test data.
      */
-    Trainer(const txeo::DataTable<T> &data)
+    Trainer(txeo::DataTable<T> &&data)
         : _data_table{std::make_unique<txeo::DataTable<T>>(std::move(data))} {};
+
+    Trainer(const txeo::DataTable<T> &data) : Trainer{data.clone()} {};
 
     /**
      * @brief Trains the model for specified number of epochs
@@ -96,9 +98,9 @@ class Trainer {
      */
     const txeo::DataTable<T> &data_table() const { return *_data_table; }
 
-    void enable_data_table_norm(txeo::NormalizationType type);
+    void enable_data_table_norm(txeo::NormalizationType type); // TODO Documentar e Testar
 
-    void disable_data_table_norm() { _is_norm_enabled = false; };
+    void disable_data_table_norm() { _is_norm_enabled = false; }; // TODO Documentar e Testar
 
   protected:
     Trainer() = default;

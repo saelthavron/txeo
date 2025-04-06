@@ -38,32 +38,36 @@ template <typename T>
   requires(std::floating_point<T>)
 void OlsGDTrainer<T>::train(size_t epochs, LossFunc metric) {
 
-  auto x_train = this->_is_norm_enabled ? this->_data_table_norm.x_train_normalized()
-                                        : this->_data_table->x_train();
-  auto y_train = this->_data_table->y_train();
+  auto &dt_norm = this->_data_table_norm;
+  auto &dt = *this->_data_table;
 
-  auto &x_eval = this->_data_table->has_eval() ? *this->_data_table->x_eval() : x_train;
-  auto &y_eval = this->_data_table->has_eval() ? *this->_data_table->y_eval() : y_train;
+  auto &&x_train = this->_is_norm_enabled ? dt_norm.x_train_normalized() : dt.x_train();
+  auto &&y_train = this->_data_table->y_train();
+
+  auto &&x_eval = dt.has_eval()
+                      ? (this->_is_norm_enabled ? dt_norm.x_eval_normalized() : *dt.x_eval())
+                      : x_train;
+  auto &&y_eval = dt.has_eval() ? *dt.y_eval() : y_train;
 
   // Input and Output data variables
   size_t n = x_train.shape().axis_dim(1);
   size_t m = y_train.shape().axis_dim(1);
 
-  auto X = Matrix<T>::to_matrix(TensorPart<T>::increase_dimension(x_train, 1, 1.0));
-  auto Y = Matrix<T>::to_matrix(y_train).transpose();
+  auto &&X = Matrix<T>::to_matrix(TensorPart<T>::increase_dimension(x_train, 1, 1.0));
+  auto &&Y = TensorFunc<T>::transpose(y_train);
 
-  auto Z = TensorFunc<T>::compute_gram_matrix(X);
-  auto K = Y.dot(X);
+  auto &&Z = TensorFunc<T>::compute_gram_matrix(X);
+  auto &&K = Y.dot(X);
 
   _is_converged = false;
 
   // Initializing the loss class
-  auto X_eval = Matrix<T>::to_matrix(TensorPart<T>::increase_dimension(x_eval, 1, 1.0));
+  auto &&X_eval = Matrix<T>::to_matrix(TensorPart<T>::increase_dimension(x_eval, 1, 1.0));
   Loss<T> loss{y_eval, metric};
 
   // Initial Guesses
-  auto norm_X = TensorAgg<T>::reduce_euclidean_norm(X, {0, 1})();
-  auto norm_Y = TensorAgg<T>::reduce_euclidean_norm(Y, {0, 1})();
+  T norm_X = TensorAgg<T>::reduce_euclidean_norm(X, {0, 1})();
+  T norm_Y = TensorAgg<T>::reduce_euclidean_norm(Y, {0, 1})();
   Matrix<T> B_prev{m, n + 1, norm_Y / norm_X};
 
   if (_variable_lr)
@@ -82,7 +86,7 @@ void OlsGDTrainer<T>::train(size_t epochs, LossFunc metric) {
 
   // Iterate OLS
   for (size_t e{0}; e < epochs; ++e) {
-    auto B_t = TensorFunc<T>::transpose(B);
+    auto &&B_t = TensorFunc<T>::transpose(B);
     loss_value = loss.get_loss(TensorOp<T>::product_tensors(X_eval, B_t));
     std::cout << "Epoch " << e << ", Loss: " << loss_value << ", Learning Rate: " << _learning_rate
               << std::endl;

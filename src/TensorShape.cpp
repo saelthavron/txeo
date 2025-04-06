@@ -27,10 +27,6 @@ TensorShape::TensorShape() : _impl{std::make_unique<Impl>()} {
   this->create_from_vector(std::vector<int64_t>{});
 }
 
-TensorShape::TensorShape(const std::vector<size_t> &shape) : _impl{std::make_unique<Impl>()} {
-  this->create_from_vector(detail::to_int64(shape));
-}
-
 TensorShape::TensorShape(std::vector<size_t> &&shape) : _impl{std::make_unique<Impl>()} {
   auto shp = std::move(shape);
   this->create_from_vector(detail::to_int64(shp));

@@ -15,32 +15,16 @@ void DataTableNorm<T>::set_data_table(const txeo::DataTable<T> &data) {
   _funcs = txeo::TensorFunc<T>::make_normalize_functions(data.x_train(), 0, _type);
 }
 
-// template <typename T>
-// txeo::Matrix<T> DataTableNorm<T>::normalize(txeo::Matrix<T> &&x) const {
-//   if (x.col_size() != _funcs.size())
-//     throw txeo::DataTableNormError("Inconsistent feature matrix.");
-
-//   txeo::Matrix<T> resp{std::move(x)};
-
-//   for (size_t j{0}; j < x.col_size(); ++j)
-//     for (size_t i{0}; i < x.row_size(); ++i)
-//       resp(i) = _funcs[j](x(i));
-
-//   return resp;
-// }
-
 template <typename T>
-template <typename U>
-  requires std::is_convertible_v<U, txeo::Matrix<T>>
-[[nodiscard]] txeo::Matrix<T> DataTableNorm<T>::normalize(U &&x) const {
+txeo::Matrix<T> DataTableNorm<T>::normalize(txeo::Matrix<T> &&x) const {
   if (x.col_size() != _funcs.size())
     throw txeo::DataTableNormError("Inconsistent feature matrix.");
 
-  txeo::Matrix<T> resp{std::forward<U>(x)};
+  txeo::Matrix<T> resp{std::move(x)};
 
-  for (size_t j{0}; j < resp.col_size(); ++j)
-    for (size_t i{0}; i < resp.row_size(); ++i)
-      resp(i) = _funcs[j](resp(i));
+  for (size_t j{0}; j < x.col_size(); ++j)
+    for (size_t i{0}; i < x.row_size(); ++i)
+      resp(i) = _funcs[j](x(i));
 
   return resp;
 }
