@@ -20,6 +20,7 @@ add_executable(
   tLoss.cpp
   tOlsGDTrainer.cpp
   tDataTable.cpp
+  tDataTableNorm.cpp
 )  
 
 target_precompile_headers(txeo_tests PRIVATE

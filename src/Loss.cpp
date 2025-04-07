@@ -26,8 +26,8 @@ void Loss<T>::set_loss(LossFunc func) {
 }
 
 template <typename T>
-Loss<T>::Loss(const Tensor<T> &valid, LossFunc func) : _valid{&valid} {
-  if (_valid->dim() == 0)
+Loss<T>::Loss(Tensor<T> &&valid, LossFunc func) : _label{std::move(valid)} {
+  if (_label.dim() == 0)
     throw LossError("Tensor has dimension zero.");
 
   this->set_loss(func);
@@ -37,7 +37,7 @@ template <typename T>
 void Loss<T>::verify_parameter(const Tensor<T> &pred) const {
   if (pred.dim() == 0)
     throw LossError("Tensor has dimension zero.");
-  if (pred.shape() != _valid->shape())
+  if (pred.shape() != _label.shape())
     throw LossError("Incompatible shape.");
 }
 
@@ -47,7 +47,7 @@ T Loss<T>::mean_squared_error(const Tensor<T> &pred) const {
 
   T resp = 0;
   auto pred_flat = pred.data();
-  auto valid_flat = _valid->data();
+  auto valid_flat = _label.data();
 
   for (size_t i{0}; i < pred.dim(); ++i) {
     auto aux = pred_flat[i] - valid_flat[i];
@@ -63,7 +63,7 @@ T Loss<T>::mean_absolute_error(const Tensor<T> &pred) const {
 
   T resp = 0;
   auto pred_flat = pred.data();
-  auto valid_flat = _valid->data();
+  auto valid_flat = _label.data();
 
   for (size_t i{0}; i < pred.dim(); ++i)
     resp += std::abs(pred_flat[i] - valid_flat[i]);
@@ -77,7 +77,7 @@ size_t Loss<size_t>::mean_absolute_error(const Tensor<size_t> &pred) const {
 
   size_t resp = 0;
   auto pred_flat = pred.data();
-  auto valid_flat = _valid->data();
+  auto valid_flat = _label.data();
 
   for (size_t i{0}; i < pred.dim(); ++i) {
     resp +=
@@ -93,7 +93,7 @@ T Loss<T>::mean_squared_logarithmic_error(const Tensor<T> &pred) const {
 
   T resp = 0;
   auto pred_flat = pred.data();
-  auto valid_flat = _valid->data();
+  auto valid_flat = _label.data();
 
   for (size_t i{0}; i < pred.dim(); ++i) {
     if (pred_flat[i] < 0 || valid_flat[i] < 0)
@@ -113,7 +113,7 @@ T Loss<T>::log_cosh_error(const Tensor<T> &pred) const {
 
   T resp = 0;
   auto pred_flat = pred.data();
-  auto valid_flat = _valid->data();
+  auto valid_flat = _label.data();
 
   for (size_t i{0}; i < pred.dim(); ++i)
     resp += std::log(std::cosh(pred_flat[i] - valid_flat[i]));

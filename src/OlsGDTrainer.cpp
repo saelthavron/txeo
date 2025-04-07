@@ -30,7 +30,9 @@ T OlsGDTrainer<T>::learning_rate() const {
 template <typename T>
   requires(std::floating_point<T>)
 Tensor<T> OlsGDTrainer<T>::predict(const Tensor<T> &input) const {
-  auto aux = TensorPart<T>::increase_dimension(input, 1, 1.0);
+  auto &&x = this->_is_norm_enabled ? this->_data_table_norm.normalize(Matrix<T>::to_matrix(input))
+                                    : input;
+  auto aux = TensorPart<T>::increase_dimension(x, 1, 1.0);
   return TensorOp<T>::product_tensors(aux, this->weight_bias());
 }
 
@@ -102,7 +104,10 @@ void OlsGDTrainer<T>::train(size_t epochs, LossFunc metric) {
         ++patience;
     } else {
       if (loss_value < _tolerance) {
+        found_best = true;
         _is_converged = true;
+        min_loss = loss_value;
+        B_best = B;
         break;
       }
       patience = 0;
@@ -125,7 +130,6 @@ void OlsGDTrainer<T>::train(size_t epochs, LossFunc metric) {
   if (found_best) {
     _min_loss = min_loss;
     _weight_bias = std::move(TensorFunc<T>::transpose_by(B_best));
-
   } else {
     _min_loss = loss_value;
     _weight_bias = std::move(TensorFunc<T>::transpose_by(B));

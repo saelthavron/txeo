@@ -22,9 +22,9 @@ txeo::Matrix<T> DataTableNorm<T>::normalize(txeo::Matrix<T> &&x) const {
 
   txeo::Matrix<T> resp{std::move(x)};
 
-  for (size_t j{0}; j < x.col_size(); ++j)
-    for (size_t i{0}; i < x.row_size(); ++i)
-      resp(i) = _funcs[j](x(i));
+  for (size_t j{0}; j < resp.col_size(); ++j)
+    for (size_t i{0}; i < resp.row_size(); ++i)
+      resp(i, j) = _funcs[j](resp(i, j));
 
   return resp;
 }

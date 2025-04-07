@@ -36,9 +36,9 @@ class Loss {
     ~Loss() = default;
 
     /**
-     * @brief Construct a new Loss object
+     * @brief Construct a new Loss object from a label rvalue
      *
-     * @param valid Validation tensor containing ground truth values
+     * @param label Labe tensor containing ground truth values
      * @param func Initial loss function (default: MSE)
      *
      * @par Example:
@@ -47,7 +47,22 @@ class Loss {
      * txeo::Loss<float> loss(validation_tensor, txeo::LossFunc::MAE);
      * @endcode
      */
-    explicit Loss(const txeo::Tensor<T> &valid, txeo::LossFunc func = txeo::LossFunc::MSE);
+    explicit Loss(txeo::Tensor<T> &&label, txeo::LossFunc func = txeo::LossFunc::MSE);
+
+    /**
+     * @brief Construct a new Loss object
+     *
+     * @param label Label tensor containing ground truth values
+     * @param func Initial loss function (default: MSE)
+     *
+     * @par Example:
+     * @code
+     * // Create with MAE as default loss
+     * txeo::Loss<float> loss(validation_tensor, txeo::LossFunc::MAE);
+     * @endcode
+     */
+    explicit Loss(const txeo::Tensor<T> &label, txeo::LossFunc func = txeo::LossFunc::MSE)
+        : Loss{label.clone(), func} {};
 
     /**
      * @brief Compute loss using currently selected function
@@ -118,6 +133,8 @@ class Loss {
      */
     T log_cosh_error(const txeo::Tensor<T> &pred) const;
 
+    const txeo::Tensor<T> &label() const { return _label; }
+
     /// @name Shorthand Aliases
     /// @{
     T mse(const txeo::Tensor<T> &pred) const {
@@ -139,7 +156,7 @@ class Loss {
 
   private:
     Loss() = default;
-    const txeo::Tensor<T> *_valid;
+    txeo::Tensor<T> _label{};
 
     void verify_parameter(const txeo::Tensor<T> &pred) const;
     std::function<T(const txeo::Tensor<T> &)> _loss_func;

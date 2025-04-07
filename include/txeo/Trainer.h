@@ -63,6 +63,17 @@ class Trainer {
     virtual void fit(size_t epochs, txeo::LossFunc metric, size_t patience);
 
     /**
+     * @brief Trains with early stopping based on validation performance and feature normalization
+     *
+     * @param epochs Maximum number of training iterations
+     * @param metric Loss function to optimize
+     * @param patience Number of epochs to wait without improvement before stopping
+     *@param type Type of normalization
+     */
+    virtual void fit(size_t epochs, txeo::LossFunc metric, size_t patience,
+                     txeo::NormalizationType type);
+
+    /**
      * @brief Evaluates test data based on a specified metric
      *
      *@ throws txeo::TrainerError
@@ -98,9 +109,19 @@ class Trainer {
      */
     const txeo::DataTable<T> &data_table() const { return *_data_table; }
 
-    void enable_data_table_norm(txeo::NormalizationType type); // TODO Documentar e Testar
+    /**
+     * @brief Enable feature normalization
+     *
+     * @param type Type of normalization
+     */
+    void enable_feature_norm(txeo::NormalizationType type);
 
-    void disable_data_table_norm() { _is_norm_enabled = false; }; // TODO Documentar e Testar
+    /**
+     * @brief Disable feature normalization
+     *
+     * @param type Type of normalization
+     */
+    void disable_feature_norm() { _is_norm_enabled = false; };
 
   protected:
     Trainer() = default;

@@ -53,6 +53,14 @@ Trains the model with early stopping.
 void fit(size_t epochs, txeo::LossFunc metric, size_t patience);
 ```
 
+### **fit(epochs, metric, patience, type)**
+
+Trains the model with early stopping and feature normalization.
+
+```cpp
+void fit(size_t epochs, txeo::LossFunc metric, size_t patience, txeo::NormalizationType type);
+```
+
 ### **predict(input)**
 
 Pure virtual method to generate predictions from a trained model.
@@ -84,6 +92,22 @@ Returns `std::DataTable` object owned by the trainer.
 
 ```cpp
 const txeo::DataTable<T> &data_table() const;
+```
+
+### **enable_feature_norm()**
+
+Enables normalization of feature data (input).
+
+```cpp
+void enable_feature_norm(txeo::NormalizationType type);
+```
+
+### **disable_feature_norm()**
+
+Disable normalization of feature data (input).
+
+```cpp
+void disable_feature_norm();
 ```
 
 ---

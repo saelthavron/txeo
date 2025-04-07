@@ -35,22 +35,22 @@ class Foo {
 
 int main() {
 
-  // txeo::Tensor<int> tensor({2, 2, 3}, {
-  //                                         // Shape: 2x2x3
-  //                                         1, 2, 3, 4, 5, 6,   // First 2x3 slice
-  //                                         7, 8, 9, 10, 11, 12 // Second 2x3 slice
-  //                                     });
+  txeo::Matrix<double> data(4, 2, {1, 3, 2, 6, 3, 9, 5, 15});
+  txeo::OlsGDTrainer<double> trainer{txeo::DataTable<double>{std::move(data), {1}}};
+  trainer.enable_feature_norm(txeo::NormalizationType::MIN_MAX);
+  trainer.enable_variable_lr();
+  trainer.fit(100, txeo::LossFunc::MAE, 5);
 
-  // auto norm_fns =
-  //     txeo::TensorFunc<int>::make_normalize_functions(tensor, 2,
-  //     txeo::NormalizationType::MIN_MAX);
+  txeo::Matrix<double> x(1, 1, {4});
 
-  txeo::Tensor<int> tensor({3, 2}, {1, 3, 2, 4, 2, 4});
+  std::cout << trainer.predict(x) << std::endl;
 
-  auto norm_fns =
-      txeo::TensorFunc<int>::make_normalize_functions(tensor, 1, txeo::NormalizationType::MIN_MAX);
+  trainer.disable_feature_norm();
+  trainer.fit(100, txeo::LossFunc::MAE, 5);
 
-  std::cout << norm_fns.size() << std::endl;
+  std::cout << trainer.predict(x) << std::endl;
+
+  std::cout << "Min loss: " << trainer.min_loss() << std::endl;
 
   // txeo::Matrix<double> data(5, 2, {1, 5, 2, 6, 3, 7, 5, 8, 10, 10});
 

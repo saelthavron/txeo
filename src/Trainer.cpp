@@ -19,7 +19,13 @@ void Trainer<T>::fit(size_t epochs, LossFunc metric, size_t patience) {
 }
 
 template <typename T>
-T Trainer<T>::compute_test_loss(txeo::LossFunc metric) const {
+void Trainer<T>::fit(size_t epochs, LossFunc metric, size_t patience, NormalizationType type) {
+  this->enable_feature_norm(type);
+  this->fit(epochs, metric, patience);
+}
+
+template <typename T>
+T Trainer<T>::compute_test_loss(LossFunc metric) const {
   if (!this->_is_trained)
     throw TrainerError("Trainer is not trained.");
 
@@ -35,9 +41,10 @@ T Trainer<T>::compute_test_loss(txeo::LossFunc metric) const {
 }
 
 template <typename T>
-void Trainer<T>::enable_data_table_norm(txeo::NormalizationType type) {
-  _data_table_norm = txeo::DataTableNorm<T>{*_data_table, type};
+void Trainer<T>::enable_feature_norm(NormalizationType type) {
+  _data_table_norm = DataTableNorm<T>{*_data_table, type};
   _is_norm_enabled = true;
+  _is_trained = false;
 }
 
 template class Trainer<size_t>;
