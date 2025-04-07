@@ -70,18 +70,8 @@ template <typename T>
 Tensor<T>::~Tensor() = default;
 
 template <typename T>
-Tensor<T>::Tensor(const TensorShape &shape) : _impl{std::make_unique<Impl>()} {
-  this->create_from_shape(shape);
-}
-
-template <typename T>
 Tensor<T>::Tensor(TensorShape &&shape) : _impl{std::make_unique<Impl>()} {
   this->create_from_shape(std::move(shape));
-}
-
-template <typename T>
-Tensor<T>::Tensor(const std::vector<size_t> &shape) : _impl{std::make_unique<Impl>()} {
-  this->create_from_shape(TensorShape(shape));
 }
 
 template <typename T>
@@ -90,21 +80,8 @@ Tensor<T>::Tensor(std::vector<size_t> &&shape) : _impl{std::make_unique<Impl>()}
 }
 
 template <typename T>
-Tensor<T>::Tensor(const TensorShape &shape, const T &fill_value) : _impl{std::make_unique<Impl>()} {
-  this->create_from_shape(shape);
-  this->fill(fill_value);
-}
-
-template <typename T>
 Tensor<T>::Tensor(TensorShape &&shape, const T &fill_value) : _impl{std::make_unique<Impl>()} {
   this->create_from_shape(std::move(shape));
-  this->fill(fill_value);
-}
-
-template <typename T>
-Tensor<T>::Tensor(const std::vector<size_t> &shape, const T &fill_value)
-    : _impl{std::make_unique<Impl>()} {
-  this->create_from_shape(TensorShape(shape));
   this->fill(fill_value);
 }
 
@@ -360,12 +337,14 @@ txeo::Tensor<T> &Tensor<T>::permute(const std::vector<size_t> &axes) {
 
 template <typename T>
 txeo::Tensor<T> &Tensor<T>::normalize(size_t axis, txeo::NormalizationType type) {
-  return TensorFunc<T>::normalize_by(*this, axis, type);
+  TensorFunc<T>::normalize_by(*this, axis, type);
+  return *this;
 }
 
 template <typename T>
 txeo::Tensor<T> &Tensor<T>::normalize(txeo::NormalizationType type) {
-  return TensorFunc<T>::normalize_by(*this, type);
+  TensorFunc<T>::normalize_by(*this, type);
+  return *this;
 }
 
 template <typename T>

@@ -7,7 +7,7 @@
 namespace txeo {
 
 template <typename T>
-DataTable<T>::DataTable(const txeo::Matrix<T> &data, std::vector<size_t> x_cols,
+DataTable<T>::DataTable(txeo::Matrix<T> &&data, std::vector<size_t> x_cols,
                         std::vector<size_t> y_cols, size_t eval_percent, size_t test_percent) {
   if (data.dim() == 0)
     throw DataTableError("Tensor has zero dimension.");
@@ -29,11 +29,12 @@ DataTable<T>::DataTable(const txeo::Matrix<T> &data, std::vector<size_t> x_cols,
   if (eval_size + test_size >= detail::to_size_t(data.shape().axis_dim(0)))
     throw DataTableError("Inconsistent combination of test and eval percentages.");
 
-  size_t train_size = data.shape().axis_dim(0) - eval_size - test_size;
+  auto my_data = std::move(data);
+  size_t train_size = my_data.shape().axis_dim(0) - eval_size - test_size;
 
-  Matrix<T> train{data.slice(0, train_size)};
-  Matrix<T> eval{data.slice(train_size, train_size + eval_size)};
-  Matrix<T> test{data.slice(train_size + eval_size, train_size + eval_size + test_size)};
+  Matrix<T> train{my_data.slice(0, train_size)};
+  Matrix<T> eval{my_data.slice(train_size, train_size + eval_size)};
+  Matrix<T> test{my_data.slice(train_size + eval_size, train_size + eval_size + test_size)};
 
   _x_train = std::move(TensorPart<T>::sub_matrix_cols(train, x_cols));
   _y_train = std::move(TensorPart<T>::sub_matrix_cols(train, y_cols));
@@ -45,8 +46,8 @@ DataTable<T>::DataTable(const txeo::Matrix<T> &data, std::vector<size_t> x_cols,
 }
 
 template <typename T>
-DataTable<T>::DataTable(const txeo::Matrix<T> &data, std::vector<size_t> y_cols,
-                        size_t eval_percent, size_t test_percent) {
+DataTable<T>::DataTable(txeo::Matrix<T> &&data, std::vector<size_t> y_cols, size_t eval_percent,
+                        size_t test_percent) {
 
   if (data.dim() == 0)
     throw DataTableError("Tensor has zero dimension.");
@@ -68,11 +69,12 @@ DataTable<T>::DataTable(const txeo::Matrix<T> &data, std::vector<size_t> y_cols,
   if (eval_size + test_size >= detail::to_size_t(data.shape().axis_dim(0)))
     throw DataTableError("Inconsistent combination of test and eval percentages.");
 
-  size_t train_size = data.shape().axis_dim(0) - eval_size - test_size;
+  auto my_data = std::move(data);
+  size_t train_size = my_data.shape().axis_dim(0) - eval_size - test_size;
 
-  Matrix<T> train{data.slice(0, train_size)};
-  Matrix<T> eval{data.slice(train_size, train_size + eval_size)};
-  Matrix<T> test{data.slice(train_size + eval_size, train_size + eval_size + test_size)};
+  Matrix<T> train{my_data.slice(0, train_size)};
+  Matrix<T> eval{my_data.slice(train_size, train_size + eval_size)};
+  Matrix<T> test{my_data.slice(train_size + eval_size, train_size + eval_size + test_size)};
 
   _x_train = std::move(TensorPart<T>::sub_matrix_cols_exclude(train, y_cols));
   _y_train = std::move(TensorPart<T>::sub_matrix_cols(train, y_cols));
@@ -84,7 +86,7 @@ DataTable<T>::DataTable(const txeo::Matrix<T> &data, std::vector<size_t> y_cols,
 }
 
 template <typename T>
-DataTable<T>::DataTable(const txeo::Matrix<T> &data, std::vector<size_t> x_cols,
+DataTable<T>::DataTable(txeo::Matrix<T> &&data, std::vector<size_t> x_cols,
                         std::vector<size_t> y_cols, size_t eval_percent) {
 
   if (data.dim() == 0)
@@ -97,10 +99,11 @@ DataTable<T>::DataTable(const txeo::Matrix<T> &data, std::vector<size_t> x_cols,
   if (eval_size == 0)
     throw DataTableError("Inconsistent evaluation percentage.");
 
-  size_t train_size = data.shape().axis_dim(0) - eval_size;
+  auto my_data = std::move(data);
+  size_t train_size = my_data.shape().axis_dim(0) - eval_size;
 
-  Matrix<T> train{data.slice(0, train_size)};
-  Matrix<T> eval{data.slice(train_size, train_size + eval_size)};
+  Matrix<T> train{my_data.slice(0, train_size)};
+  Matrix<T> eval{my_data.slice(train_size, train_size + eval_size)};
 
   _x_train = std::move(TensorPart<T>::sub_matrix_cols(train, x_cols));
   _y_train = std::move(TensorPart<T>::sub_matrix_cols(train, y_cols));
@@ -111,8 +114,7 @@ DataTable<T>::DataTable(const txeo::Matrix<T> &data, std::vector<size_t> x_cols,
 }
 
 template <typename T>
-DataTable<T>::DataTable(const txeo::Matrix<T> &data, std::vector<size_t> y_cols,
-                        size_t eval_percent) {
+DataTable<T>::DataTable(txeo::Matrix<T> &&data, std::vector<size_t> y_cols, size_t eval_percent) {
   if (data.dim() == 0)
     throw DataTableError("Tensor has zero dimension.");
 
@@ -123,10 +125,11 @@ DataTable<T>::DataTable(const txeo::Matrix<T> &data, std::vector<size_t> y_cols,
   if (eval_size == 0)
     throw DataTableError("Inconsistent evaluation percentage.");
 
-  size_t train_size = data.shape().axis_dim(0) - eval_size;
+  auto my_data = std::move(data);
+  size_t train_size = my_data.shape().axis_dim(0) - eval_size;
 
-  Matrix<T> train{data.slice(0, train_size)};
-  Matrix<T> eval{data.slice(train_size, train_size + eval_size)};
+  Matrix<T> train{my_data.slice(0, train_size)};
+  Matrix<T> eval{my_data.slice(train_size, train_size + eval_size)};
 
   _x_train = std::move(TensorPart<T>::sub_matrix_cols_exclude(train, y_cols));
   _y_train = std::move(TensorPart<T>::sub_matrix_cols(train, y_cols));
@@ -138,32 +141,34 @@ DataTable<T>::DataTable(const txeo::Matrix<T> &data, std::vector<size_t> y_cols,
 }
 
 template <typename T>
-DataTable<T>::DataTable(const txeo::Matrix<T> &data, std::vector<size_t> x_cols,
+DataTable<T>::DataTable(txeo::Matrix<T> &&data, std::vector<size_t> x_cols,
                         std::vector<size_t> y_cols) {
 
   if (data.dim() == 0)
     throw DataTableError("Tensor has zero dimension.");
 
-  _x_train = std::move(TensorPart<T>::sub_matrix_cols(data, x_cols));
-  _y_train = std::move(TensorPart<T>::sub_matrix_cols(data, y_cols));
+  auto my_data = std::move(data);
+  _x_train = std::move(TensorPart<T>::sub_matrix_cols(my_data, x_cols));
+  _y_train = std::move(TensorPart<T>::sub_matrix_cols(my_data, y_cols));
   _has_eval = _has_test = false;
 }
 
 template <typename T>
-DataTable<T>::DataTable(const txeo::Matrix<T> &data, std::vector<size_t> y_cols) {
+DataTable<T>::DataTable(txeo::Matrix<T> &&data, std::vector<size_t> y_cols) {
 
   if (data.dim() == 0)
     throw DataTableError("Tensor has zero dimension.");
 
-  _x_train = std::move(TensorPart<T>::sub_matrix_cols_exclude(data, y_cols));
-  _y_train = std::move(TensorPart<T>::sub_matrix_cols(data, y_cols));
+  auto my_data = std::move(data);
+  _x_train = std::move(TensorPart<T>::sub_matrix_cols_exclude(my_data, y_cols));
+  _y_train = std::move(TensorPart<T>::sub_matrix_cols(my_data, y_cols));
   _has_eval = _has_test = false;
 }
 
 template <typename T>
-DataTable<T>::DataTable(const txeo::Matrix<T> &x_train, const txeo::Matrix<T> &y_train,
-                        const txeo::Matrix<T> &x_eval, const txeo::Matrix<T> &y_eval,
-                        const txeo::Matrix<T> &x_test, const txeo::Matrix<T> &y_test) {
+DataTable<T>::DataTable(txeo::Matrix<T> &&x_train, txeo::Matrix<T> &&y_train,
+                        txeo::Matrix<T> &&x_eval, txeo::Matrix<T> &&y_eval,
+                        txeo::Matrix<T> &&x_test, txeo::Matrix<T> &&y_test) {
   if (x_train.dim() == 0 || y_train.dim() == 0 || x_eval.dim() == 0 || y_eval.dim() == 0)
     throw DataTableError("One of the tensors has zero dimension.");
 
@@ -182,8 +187,8 @@ DataTable<T>::DataTable(const txeo::Matrix<T> &x_train, const txeo::Matrix<T> &y
 }
 
 template <typename T>
-DataTable<T>::DataTable(const txeo::Matrix<T> &x_train, const txeo::Matrix<T> &y_train,
-                        const txeo::Matrix<T> &x_eval, const txeo::Matrix<T> &y_eval) {
+DataTable<T>::DataTable(txeo::Matrix<T> &&x_train, txeo::Matrix<T> &&y_train,
+                        txeo::Matrix<T> &&x_eval, txeo::Matrix<T> &&y_eval) {
   if (x_train.dim() == 0 || y_train.dim() == 0 || x_eval.dim() == 0 || y_eval.dim() == 0)
     throw DataTableError("One of the tensors has zero dimension.");
 
@@ -199,7 +204,7 @@ DataTable<T>::DataTable(const txeo::Matrix<T> &x_train, const txeo::Matrix<T> &y
 }
 
 template <typename T>
-DataTable<T>::DataTable(const txeo::Matrix<T> &x_train, const txeo::Matrix<T> &y_train) {
+DataTable<T>::DataTable(txeo::Matrix<T> &&x_train, txeo::Matrix<T> &&y_train) {
   if (x_train.dim() == 0 || y_train.dim() == 0)
     throw DataTableError("One of the tensors has zero dimension.");
 
@@ -245,6 +250,11 @@ size_t DataTable<T>::x_dim() const {
 template <typename T>
 size_t DataTable<T>::y_dim() const {
   return _y_train.col_size();
+}
+
+template <typename T>
+DataTable<T> DataTable<T>::clone() const {
+  return DataTable<T>{*this};
 }
 
 template class DataTable<size_t>;

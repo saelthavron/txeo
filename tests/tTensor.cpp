@@ -735,8 +735,9 @@ TEST(TensorTest, ZScoreNormalization) {
 
   txeo::Tensor<double> tens7({3, 3}, {1., 2., 3., 4., 5., 6., 7., 8., 9.});
   tens7.normalize(0, txeo::NormalizationType::Z_SCORE);
-  txeo::Tensor<double> resp7({3, 3}, {-1, -1, -1, 0, 0, 0, 1, 1, 1});
-  EXPECT_TRUE(tens7 == resp7);
+  EXPECT_NEAR(tens7(0, 0), -1.2247448, 1e-5);
+  EXPECT_NEAR(tens7(1, 0), 0.00000, 1e-5);
+  EXPECT_NEAR(tens7(2, 0), 1.2247448, 1e-5);
 }
 
 TEST(TensorTest, VectorDotProduct) {

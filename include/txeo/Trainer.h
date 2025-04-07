@@ -3,8 +3,9 @@
 #pragma once
 
 #include "txeo/DataTable.h"
+#include "txeo/DataTableNorm.h"
 #include "txeo/Tensor.h"
-#include "types.h"
+#include "txeo/types.h"
 
 #include <cstddef>
 #include <stdexcept>
@@ -28,19 +29,21 @@ enum class LossFunc;
 template <typename T>
 class Trainer {
   public:
-    Trainer(const Trainer &) = default;
+    Trainer(const Trainer &) = delete;
     Trainer(Trainer &&) = default;
-    Trainer &operator=(const Trainer &) = default;
+    Trainer &operator=(const Trainer &) = delete;
     Trainer &operator=(Trainer &&) = default;
     virtual ~Trainer() = default;
 
     /**
      * @brief Construct a new Trainer object from a data table.
      *
-     * @param data Training/Evaluation/Test data. If an rvalue is informed, no copy is made
+     * @param data Training/Evaluation/Test data.
      */
-    Trainer(const txeo::DataTable<T> &data)
+    Trainer(txeo::DataTable<T> &&data)
         : _data_table{std::make_unique<txeo::DataTable<T>>(std::move(data))} {};
+
+    Trainer(const txeo::DataTable<T> &data) : Trainer{data.clone()} {};
 
     /**
      * @brief Trains the model for specified number of epochs
@@ -58,6 +61,17 @@ class Trainer {
      * @param patience Number of epochs to wait without improvement before stopping
      */
     virtual void fit(size_t epochs, txeo::LossFunc metric, size_t patience);
+
+    /**
+     * @brief Trains with early stopping based on validation performance and feature normalization
+     *
+     * @param epochs Maximum number of training iterations
+     * @param metric Loss function to optimize
+     * @param patience Number of epochs to wait without improvement before stopping
+     *@param type Type of normalization
+     */
+    virtual void fit(size_t epochs, txeo::LossFunc metric, size_t patience,
+                     txeo::NormalizationType type);
 
     /**
      * @brief Evaluates test data based on a specified metric
@@ -95,6 +109,20 @@ class Trainer {
      */
     const txeo::DataTable<T> &data_table() const { return *_data_table; }
 
+    /**
+     * @brief Enable feature normalization
+     *
+     * @param type Type of normalization
+     */
+    void enable_feature_norm(txeo::NormalizationType type);
+
+    /**
+     * @brief Disable feature normalization
+     *
+     * @param type Type of normalization
+     */
+    void disable_feature_norm() { _is_norm_enabled = false; };
+
   protected:
     Trainer() = default;
 
@@ -103,6 +131,9 @@ class Trainer {
     size_t _patience{0};
 
     std::unique_ptr<txeo::DataTable<T>> _data_table;
+
+    txeo::DataTableNorm<T> _data_table_norm;
+    bool _is_norm_enabled{false};
 
     virtual void train(size_t epochs, txeo::LossFunc loss_func) = 0;
 };

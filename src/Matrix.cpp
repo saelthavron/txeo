@@ -55,6 +55,11 @@ Tensor<T> Matrix<T>::dot(const Vector<T> &vector) const {
 }
 
 template <typename T>
+Matrix<T> Matrix<T>::clone() const {
+  return Matrix<T>{*this};
+}
+
+template <typename T>
 Matrix<T> Matrix<T>::to_matrix(Tensor<T> &&tensor) {
   if (tensor.order() != 2)
     throw MatrixError("Tensor does not have order two.");

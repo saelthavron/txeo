@@ -50,7 +50,10 @@ class DataTable {
      * assert(dt.y_train().cols() == 1);
      * @endcode
      */
-    DataTable(const txeo::Matrix<T> &data, std::vector<size_t> x_cols, std::vector<size_t> y_cols);
+    DataTable(txeo::Matrix<T> &&data, std::vector<size_t> x_cols, std::vector<size_t> y_cols);
+
+    DataTable(const txeo::Matrix<T> &data, std::vector<size_t> x_cols, std::vector<size_t> y_cols)
+        : DataTable{std::move(data.clone()), x_cols, y_cols} {};
 
     /**
      * @brief Construct a DataTable with specified label columns. All the remaining columns are
@@ -72,7 +75,10 @@ class DataTable {
      * @endcode
      *
      */
-    DataTable(const txeo::Matrix<T> &data, std::vector<size_t> y_cols);
+    DataTable(txeo::Matrix<T> &&data, std::vector<size_t> y_cols);
+
+    DataTable(const txeo::Matrix<T> &data, std::vector<size_t> y_cols)
+        : DataTable{std::move(data.clone()), y_cols} {};
 
     /**
      * @brief Construct a DataTable with specified feature/label columns and evaluation split
@@ -96,8 +102,12 @@ class DataTable {
      * assert(dt.y_eval().has_value());
      * @endcode
      */
-    DataTable(const txeo::Matrix<T> &data, std::vector<size_t> x_cols, std::vector<size_t> y_cols,
+    DataTable(txeo::Matrix<T> &&data, std::vector<size_t> x_cols, std::vector<size_t> y_cols,
               size_t eval_percent);
+
+    DataTable(const txeo::Matrix<T> &data, std::vector<size_t> x_cols, std::vector<size_t> y_cols,
+              size_t eval_percent)
+        : DataTable{std::move(data.clone()), x_cols, y_cols, eval_percent} {};
 
     /**
      * @brief Construct a DataTable with specified label columns and evaluation split
@@ -121,7 +131,10 @@ class DataTable {
      * assert(dt.x_eval()->rows() == 1);
      * @endcode
      */
-    DataTable(const txeo::Matrix<T> &data, std::vector<size_t> y_cols, size_t eval_percent);
+    DataTable(txeo::Matrix<T> &&data, std::vector<size_t> y_cols, size_t eval_percent);
+
+    DataTable(const txeo::Matrix<T> &data, std::vector<size_t> y_cols, size_t eval_percent)
+        : DataTable{std::move(data.clone()), y_cols, eval_percent} {};
 
     /**
      * @brief Construct a DataTable with specified feature/label columns and evaluation/test split
@@ -146,8 +159,12 @@ class DataTable {
      * assert(dt.x_test()->rows() == 100);
      * @endcode
      */
-    DataTable(const txeo::Matrix<T> &data, std::vector<size_t> x_cols, std::vector<size_t> y_cols,
+    DataTable(txeo::Matrix<T> &&data, std::vector<size_t> x_cols, std::vector<size_t> y_cols,
               size_t eval_percent, size_t eval_test);
+
+    DataTable(const txeo::Matrix<T> &data, std::vector<size_t> x_cols, std::vector<size_t> y_cols,
+              size_t eval_percent, size_t eval_test)
+        : DataTable{std::move(data.clone()), x_cols, y_cols, eval_percent, eval_test} {};
 
     /**
      * @brief Construct a DataTable with specified label columns and evaluation/test split
@@ -172,12 +189,15 @@ class DataTable {
      * assert(dt.x_test()->rows() == 75);   // 15% of 500
      * @endcode
      */
-    DataTable(const txeo::Matrix<T> &data, std::vector<size_t> y_cols, size_t eval_percent,
+    DataTable(txeo::Matrix<T> &&data, std::vector<size_t> y_cols, size_t eval_percent,
               size_t eval_test);
 
+    DataTable(const txeo::Matrix<T> &data, std::vector<size_t> y_cols, size_t eval_percent,
+              size_t eval_test)
+        : DataTable<T>{std::move(data.clone()), y_cols, eval_percent, eval_test} {};
+
     /**
-     * @brief Construct a DataTable with explicit training/evaluation/test splits. If rvalues are
-     * passed, no copy is performed.
+     * @brief Construct a DataTable with explicit training/evaluation/test splits.
      *
      * @param x_train Training input matrix (features)
      * @param y_train Training output matrix (labels)
@@ -199,13 +219,18 @@ class DataTable {
      * DataTable<double> dt_full(X_train, y_train, X_eval, y_eval, X_test, y_test);
      * @endcode
      */
+    DataTable(txeo::Matrix<T> &&x_train, txeo::Matrix<T> &&y_train, txeo::Matrix<T> &&x_eval,
+              txeo::Matrix<T> &&y_eval, txeo::Matrix<T> &&x_test, txeo::Matrix<T> &&y_test);
+
     DataTable(const txeo::Matrix<T> &x_train, const txeo::Matrix<T> &y_train,
               const txeo::Matrix<T> &x_eval, const txeo::Matrix<T> &y_eval,
-              const txeo::Matrix<T> &x_test, const txeo::Matrix<T> &y_test);
+              const txeo::Matrix<T> &x_test, const txeo::Matrix<T> &y_test)
+        : DataTable<T>{std::move(x_train.clone()), std::move(y_train.clone()),
+                       std::move(x_eval.clone()),  std::move(y_eval.clone()),
+                       std::move(x_test.clone()),  std::move(y_test.clone())} {};
 
     /**
-     * @brief Construct a DataTable with explicit training and evaluation splits. If rvalues are
-     * passed, no copy is performed.
+     * @brief Construct a DataTable with explicit training and evaluation splits.
      *
      * @param x_train Training input matrix (features)
      * @param y_train Training output matrix (labels)
@@ -223,12 +248,16 @@ class DataTable {
      * DataTable<double> dt_eval(X_train, y_train, X_eval, y_eval);
      * @endcode
      */
+    DataTable(txeo::Matrix<T> &&x_train, txeo::Matrix<T> &&y_train, txeo::Matrix<T> &&x_eval,
+              txeo::Matrix<T> &&y_eval);
+
     DataTable(const txeo::Matrix<T> &x_train, const txeo::Matrix<T> &y_train,
-              const txeo::Matrix<T> &x_eval, const txeo::Matrix<T> &y_eval);
+              const txeo::Matrix<T> &x_eval, const txeo::Matrix<T> &y_eval)
+        : DataTable(std::move(x_train.clone()), std::move(y_train.clone()),
+                    std::move(x_eval.clone()), std::move(y_eval.clone())) {};
 
     /**
-     * @brief Construct a DataTable with training data only. If rvalues are
-     * passed, no copy is performed.
+     * @brief Construct a DataTable with training data only.
      *
      * @param x_train Training input matrix (features)
      * @param y_train Training output matrix (labels)
@@ -245,7 +274,10 @@ class DataTable {
      * assert(!dt_simple.x_eval().has_value());
      * @endcode
      */
-    DataTable(const txeo::Matrix<T> &x_train, const txeo::Matrix<T> &y_train);
+    DataTable(txeo::Matrix<T> &&x_train, txeo::Matrix<T> &&y_train);
+
+    DataTable(const txeo::Matrix<T> &x_train, const txeo::Matrix<T> &y_train)
+        : DataTable{std::move(x_train.clone()), std::move(y_train.clone())} {};
 
     /**
      * @brief Returns training inputs matrix.
@@ -309,6 +341,12 @@ class DataTable {
      * @return Number of training samples.
      */
     [[nodiscard]] size_t row_size() const;
+
+    [[nodiscard]] bool has_eval() const { return _has_eval; }
+
+    [[nodiscard]] bool has_test() const { return _has_test; }
+
+    DataTable<T> clone() const;
 
   private:
     DataTable() = default;

@@ -70,6 +70,8 @@ class OlsGDTrainer : public txeo::Trainer<T> {
      *
      * @param data Training/Evaluation/Test data
      */
+    OlsGDTrainer(txeo::DataTable<T> &&data) : txeo::Trainer<T>(std::move(data)) {};
+
     OlsGDTrainer(const txeo::DataTable<T> &data) : txeo::Trainer<T>(data) {};
 
     /**

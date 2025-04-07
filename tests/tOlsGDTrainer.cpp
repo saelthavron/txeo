@@ -128,6 +128,26 @@ TEST(OlsGDTrainerTest, EvaluateTestWithValidData) {
   EXPECT_LT(loss, 2.0);
 }
 
+TEST(OlsGDTrainerTest, EvaluatePrediction) {
+
+  txeo::Matrix<double> data(4, 2, {1, 3, 2, 6, 3, 9, 5, 15});
+  txeo::OlsGDTrainer<double> trainer{txeo::DataTable<double>{std::move(data), {1}}};
+  trainer.enable_feature_norm(txeo::NormalizationType::MIN_MAX);
+  trainer.enable_variable_lr();
+  trainer.fit(100, txeo::LossFunc::MAE, 5);
+
+  txeo::Matrix<double> x(1, 1, {4});
+  auto &&res1 = trainer.predict(x);
+
+  EXPECT_NEAR(res1(), 12.0, 1e-4);
+
+  trainer.disable_feature_norm();
+  trainer.fit(100, txeo::LossFunc::MAE, 5);
+
+  auto &&res2 = trainer.predict(x);
+  EXPECT_NEAR(res2(), 12.0, 1e-3);
+}
+
 TEST(OlsGDTrainerTest, EvaluateTestWithoutTestSplit) {
 
   Matrix<double> X{{1.0}, {2.0}};

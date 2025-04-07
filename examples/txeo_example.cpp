@@ -23,7 +23,43 @@
 namespace tf = tensorflow;
 using namespace tensorflow::ops;
 
+class Foo {
+  private:
+    const int *_num;
+
+  public:
+    Foo(const int &num) : _num{&num} {};
+
+    [[nodiscard]] const int &num() const { return *_num; }
+};
+
 int main() {
+
+  txeo::Matrix<double> data(4, 2, {1, 3, 2, 6, 3, 9, 5, 15});
+  txeo::OlsGDTrainer<double> trainer{txeo::DataTable<double>{std::move(data), {1}}};
+  trainer.enable_feature_norm(txeo::NormalizationType::MIN_MAX);
+  trainer.enable_variable_lr();
+  trainer.fit(100, txeo::LossFunc::MAE, 5);
+
+  txeo::Matrix<double> x(1, 1, {4});
+
+  std::cout << trainer.predict(x) << std::endl;
+
+  trainer.disable_feature_norm();
+  trainer.fit(100, txeo::LossFunc::MAE, 5);
+
+  std::cout << trainer.predict(x) << std::endl;
+
+  std::cout << "Min loss: " << trainer.min_loss() << std::endl;
+
+  // txeo::Matrix<double> data(5, 2, {1, 5, 2, 6, 3, 7, 5, 8, 10, 10});
+
+  // auto funcs = txeo::TensorFunc<double>::normalize_by(data, 0, txeo::NormalizationType::MIN_MAX);
+
+  // std::cout << "Size: " << funcs.size() << std::endl;
+
+  // std::cout << funcs[0](4) << std::endl;
+  // std::cout << funcs[1](9) << std::endl;
 
   // txeo::Matrix<double> data(100, 5);
   // txeo::DataTable<double> dt(data, {0, 1, 2}, {3, 4}, 30);
