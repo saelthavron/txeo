@@ -1,5 +1,7 @@
 #ifndef TRAINER_H
 #define TRAINER_H
+#include "txeo/Logger.h"
+#include "txeo/LoggerConsole.h"
 #pragma once
 
 #include "txeo/DataTable.h"
@@ -30,9 +32,9 @@ template <typename T>
 class Trainer {
   public:
     Trainer(const Trainer &) = delete;
-    Trainer(Trainer &&) = default;
+    Trainer(Trainer &&) = delete;
     Trainer &operator=(const Trainer &) = delete;
-    Trainer &operator=(Trainer &&) = default;
+    Trainer &operator=(Trainer &&) = delete;
     virtual ~Trainer() = default;
 
     /**
@@ -40,8 +42,8 @@ class Trainer {
      *
      * @param data Training/Evaluation/Test data.
      */
-    Trainer(txeo::DataTable<T> &&data)
-        : _data_table{std::make_unique<txeo::DataTable<T>>(std::move(data))} {};
+    Trainer(txeo::DataTable<T> &&data, txeo::Logger &logger = txeo::LoggerConsole::instance())
+        : _data_table{std::make_unique<txeo::DataTable<T>>(std::move(data))}, _logger{&logger} {};
 
     Trainer(const txeo::DataTable<T> &data) : Trainer{data.clone()} {};
 
@@ -131,6 +133,7 @@ class Trainer {
     size_t _patience{0};
 
     std::unique_ptr<txeo::DataTable<T>> _data_table;
+    txeo::Logger *_logger{nullptr};
 
     txeo::DataTableNorm<T> _data_table_norm;
     bool _is_norm_enabled{false};

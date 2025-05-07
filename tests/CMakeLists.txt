@@ -21,6 +21,7 @@ add_executable(
   tOlsGDTrainer.cpp
   tDataTable.cpp
   tDataTableNorm.cpp
+  tLoggerConsole.cpp
 )  
 
 target_precompile_headers(txeo_tests PRIVATE

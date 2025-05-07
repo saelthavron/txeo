@@ -19,6 +19,7 @@ Matrix<T> MatrixIO::read_text_file(bool has_header) const {
 
   std::ifstream rf{_path};
   if (rf.is_open()) {
+    _logger->info("Reading text file...");
     while (std::getline(rf, line)) {
       if (line.empty())
         continue;
@@ -73,8 +74,10 @@ template <typename T>
 void MatrixIO::write_text_file(const Matrix<T> &tensor) const {
   if (tensor.order() != 2)
     throw MatrixIOError("Tensor is not a matrix!");
+
   std::ofstream wf{_path, std::ios::out};
   if (wf.is_open()) {
+    _logger->info("Writing text file...");
     size_t n_rows = detail::to_size_t(tensor.shape().axis_dim(0));
     size_t n_cols = detail::to_size_t(tensor.shape().axis_dim(1));
     auto iterator = std::cbegin(tensor);
@@ -105,6 +108,7 @@ void MatrixIO::write_text_file(const Matrix<T> &tensor, size_t precision) const 
     throw MatrixIOError("Tensor is not a matrix!");
   std::ofstream wf{_path, std::ios::out};
   if (wf.is_open()) {
+    _logger->info("Writing text file...");
     size_t n_rows = detail::to_size_t(tensor.shape().axis_dim(0));
     size_t n_cols = detail::to_size_t(tensor.shape().axis_dim(1));
     auto iterator = std::cbegin(tensor);
@@ -221,9 +225,10 @@ std::string MatrixIO::build_target_header(
   return resp;
 }
 
-MatrixIO MatrixIO::one_hot_encode_text_file(const std::filesystem::path &source_path,
-                                            char separator, bool has_header,
-                                            const std::filesystem::path &target_path) {
+txeo::MatrixIO MatrixIO::one_hot_encode_text_file(const std::filesystem::path &source_path,
+                                                  char separator, bool has_header,
+                                                  const std::filesystem::path &target_path,
+                                                  txeo::Logger &logger) {
   if (source_path == target_path)
     throw MatrixIOError("Source and target paths cannot be equal!");
 
@@ -240,6 +245,8 @@ MatrixIO MatrixIO::one_hot_encode_text_file(const std::filesystem::path &source_
 
   auto target_header =
       MatrixIO::build_target_header(source_path, separator, has_header, lookups_map);
+
+  logger.info("Building one-hot-encoded file...");
 
   wf << target_header << "\n";
 

@@ -2,23 +2,23 @@
 #define TXEO_UTILS_H
 #pragma once
 
-#include <stdint.h>                              // for int64_t
+#include <cstdint> // for int64_t
+#include <cstdlib> // for size_t, abs
+#include <limits>  // for numeric_limits
+#include <string>  // for string
 #include <tensorflow/core/framework/tensor.h>
 #include <tensorflow/core/framework/tensor_shape.h>
-#include <tensorflow/core/framework/types.h>     // for DataTypeToEnum, Enum...
-#include <tensorflow/core/framework/types.pb.h>  // for DataType
-#include <cstdlib>                               // for size_t, abs
-#include <limits>                                // for numeric_limits
-#include <string>                                // for string
-#include <type_traits>                           // for is_floating_point_v
-#include <vector>                                // for vector
+#include <tensorflow/core/framework/types.h>    // for DataTypeToEnum, Enum...
+#include <tensorflow/core/framework/types.pb.h> // for DataType
+#include <type_traits>                          // for is_floating_point_v
+#include <vector>                               // for vector
 
-#include "txeo/TensorShape.h"                    // for TensorShape
+#include "txeo/TensorShape.h" // for TensorShape
 
 namespace tensorflow {
 class TensorShape;
 class TensorShapeProto;
-}  // namespace tensorflow
+} // namespace tensorflow
 
 namespace tf = tensorflow;
 
@@ -74,6 +74,8 @@ bool is_zero(T value) {
 }
 
 bool is_numeric(const std::string &word);
+
+std::string current_time();
 
 } // namespace txeo::detail
 

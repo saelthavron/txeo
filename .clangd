@@ -1,6 +1,5 @@
-# CompileFlags:
-# Add: [-Xclang, -include-pch, pch.h]
-# Remove: [-include, pch.h]
+CompileFlags:
+  Add: [-I/opt/clang/lib/clang/20/include/] # Do not specify pch flags for clangd, just include the missed headers
 
 Diagnostics:
   ClangTidy:
@@ -45,4 +44,4 @@ InlayHints: # Turning off parameter hints (boring)
   Designators: true
   Enabled: true
   ParameterNames: false
-  DeducedTypes: false
+  DeducedTypes: true

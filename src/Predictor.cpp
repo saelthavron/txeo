@@ -1,8 +1,9 @@
+#include "txeo/Logger.h"
 #include "txeo/detail/PredictorPrivate.h"
 #include "txeo/detail/TensorHelper.h"
 #include "txeo/detail/TensorPrivate.h"
-
 #include "txeo/detail/utils.h"
+
 #include <tensorflow/cc/saved_model/tag_constants.h>
 #include <tensorflow/core/framework/tensor.h>
 #include <utility>
@@ -47,10 +48,13 @@ void Predictor<T>::load_model() {
     else if (info.has_name())
       _impl->out_name_shape_map.emplace_back(info.name(), TensorShape({0}));
   }
+
+  _logger->info("Model loaded successfully");
 }
 
 template <typename T>
-Predictor<T>::Predictor(std::filesystem::path model_path) : _impl{std::make_unique<Impl>()} {
+Predictor<T>::Predictor(std::filesystem::path model_path, txeo::Logger &logger)
+    : _impl{std::make_unique<Impl>()}, _logger{&logger} {
   _impl->model_path = model_path;
   this->load_model();
 }
@@ -89,10 +93,13 @@ Tensor<T> Predictor<T>::predict(const Tensor<T> &input) const {
   const auto &tf_tensor = *input._impl->tf_tensor;
   std::vector<tf::Tensor> outputs;
 
-  auto status = _impl->model.session->Run({{input_name, tf_tensor}}, {output_name}, {}, &outputs);
+  _logger->info("Prediction started...");
 
+  auto status = _impl->model.session->Run({{input_name, tf_tensor}}, {output_name}, {}, &outputs);
   if (!status.ok())
     PredictorError("Error running model: " + status.ToString());
+
+  _logger->info("Prediction finished...");
 
   auto resp = detail::TensorHelper::to_txeo_tensor<T>(std::move(outputs[0]));
 
@@ -133,9 +140,13 @@ std::vector<Tensor<T>> Predictor<T>::predict_batch(const Predictor<T>::TensorIde
   std::vector<tf::Tensor> outputs;
   auto output_name = _impl->out_name_shape_map[0].first;
 
+  _logger->info("Batch prediction started...");
+
   auto status = _impl->model.session->Run(tf_inputs, {output_name}, {}, &outputs);
   if (!status.ok())
     PredictorError("Error running model: " + status.ToString());
+
+  _logger->info("Batch prediction finished...");
 
   std::vector<Tensor<T>> resp;
   for (auto &item : outputs)

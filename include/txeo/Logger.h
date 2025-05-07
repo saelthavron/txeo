@@ -6,7 +6,7 @@
 
 namespace txeo {
 
-enum class LogLevel { DEBUG, INFO, WARNING, ERROR, ALL };
+enum class LogLevel { DEBUG, INFO, WARNING, ERROR };
 
 class Logger {
   public:
@@ -32,8 +32,9 @@ class Logger {
 
   protected:
     bool _is_turned_on{true};
-    txeo::LogLevel _output_level{txeo::LogLevel::ALL};
+    txeo::LogLevel _output_level{txeo::LogLevel::DEBUG};
 
+    static std::string log_level_str(txeo::LogLevel level);
     virtual void write(txeo::LogLevel level, std::string message) = 0;
 };
 

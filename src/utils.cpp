@@ -106,4 +106,15 @@ bool is_numeric(const std::string &word) {
   return (word_stream >> val) && !(word_stream >> c);
 }
 
+std::string current_time() {
+  auto now = std::chrono::system_clock::now();
+  auto local_now = std::chrono::current_zone()->to_local(now);
+  auto local_midnight = std::chrono::floor<std::chrono::days>(local_now);
+  auto current_time = local_now - local_midnight;
+
+  const std::chrono::hh_mm_ss hms{duration_cast<std::chrono::milliseconds>(current_time)};
+
+  return std::format("{:%T}", hms);
+}
+
 } // namespace txeo::detail
