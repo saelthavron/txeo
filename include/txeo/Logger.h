@@ -10,7 +10,6 @@ enum class LogLevel { DEBUG, INFO, WARNING, ERROR };
 
 class Logger {
   public:
-    Logger() = default;
     Logger(const Logger &) = delete;
     Logger(Logger &&) = delete;
     Logger &operator=(const Logger &) = delete;
@@ -31,11 +30,12 @@ class Logger {
     void error(const std::string &message);
 
   protected:
+    Logger() = default;
     bool _is_turned_on{true};
     txeo::LogLevel _output_level{txeo::LogLevel::DEBUG};
 
     static std::string log_level_str(txeo::LogLevel level);
-    virtual void write(txeo::LogLevel level, std::string message) = 0;
+    virtual void write(txeo::LogLevel level, const std::string &message) = 0;
 };
 
 } // namespace txeo

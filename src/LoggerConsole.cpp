@@ -12,7 +12,7 @@ LoggerConsole &txeo::LoggerConsole::instance() {
   return logger;
 }
 
-void LoggerConsole::write(txeo::LogLevel level, std::string message) {
+void LoggerConsole::write(txeo::LogLevel level, const std::string &message) {
   std::lock_guard<std::mutex> ld{_mutex};
   std::cout << "[" << txeo::detail::current_time() << "] - " << txeo::Logger::log_level_str(level)
             << ": " << message << std::endl;

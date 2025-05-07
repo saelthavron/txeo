@@ -18,7 +18,8 @@ set(TXEO_SOURCES
     DataTable.cpp
     DataTableNorm.cpp
     Logger.cpp
-    LoggerConsole.cpp)
+    LoggerConsole.cpp
+    LoggerFile.cpp)
 
 
 #################################################### Finding Tensorflow ####################################################
