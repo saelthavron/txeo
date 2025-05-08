@@ -7,7 +7,6 @@
 #include "txeo/TensorPart.h"
 
 #include <cmath>
-#include <iostream>
 #include <limits>
 #include <utility>
 
@@ -39,6 +38,8 @@ Tensor<T> OlsGDTrainer<T>::predict(const Tensor<T> &input) const {
 template <typename T>
   requires(std::floating_point<T>)
 void OlsGDTrainer<T>::train(size_t epochs, LossFunc metric) {
+
+  this->_logger->info("OLS training started...");
 
   auto &dt_norm = this->_data_table_norm;
   auto &dt = *this->_data_table;
@@ -90,8 +91,8 @@ void OlsGDTrainer<T>::train(size_t epochs, LossFunc metric) {
   for (size_t e{0}; e < epochs; ++e) {
     auto &&B_t = TensorFunc<T>::transpose(B);
     loss_value = loss.get_loss(TensorOp<T>::product_tensors(X_eval, B_t));
-    std::cout << "Epoch " << e << ", Loss: " << loss_value << ", Learning Rate: " << _learning_rate
-              << std::endl;
+    this->_logger->debug(
+        std::format("Epoch {}, Loss {}, Learning Rate {}", e, loss_value, _learning_rate));
     if (std::isnan(loss_value)) {
       _is_converged = false;
       break;
@@ -134,6 +135,8 @@ void OlsGDTrainer<T>::train(size_t epochs, LossFunc metric) {
     _min_loss = loss_value;
     _weight_bias = std::move(TensorFunc<T>::transpose_by(B));
   }
+
+  this->_logger->info("OLS training finished...");
 }
 
 template <typename T>

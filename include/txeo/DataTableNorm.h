@@ -1,5 +1,6 @@
 #ifndef DATATABLENORM_H
 #define DATATABLENORM_H
+#include <functional>
 #pragma once
 
 #include "txeo/DataTable.h"

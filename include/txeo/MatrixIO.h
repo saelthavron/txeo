@@ -2,6 +2,8 @@
 #define MATRIXIO_H
 #pragma once
 
+#include "txeo/Logger.h"
+#include "txeo/LoggerConsole.h"
 #include "txeo/Matrix.h"
 
 #include <cstddef>
@@ -27,8 +29,9 @@ class MatrixIO {
      * @param path Path to the file
      * @param separator Character delimiting each element in a row
      */
-    explicit MatrixIO(const std::filesystem::path &path, char separator = ',')
-        : _path(std::move(path)), _separator(separator) {};
+    explicit MatrixIO(const std::filesystem::path &path, char separator = ',',
+                      txeo::Logger &logger = txeo::LoggerConsole::instance())
+        : _path(std::move(path)), _separator(separator), _logger{&logger} {};
 
     [[nodiscard]] std::filesystem::path path() const { return _path; }
 
@@ -199,13 +202,15 @@ class MatrixIO {
      * }
      * @endcode
      */
-    static txeo::MatrixIO one_hot_encode_text_file(const std::filesystem::path &source_path,
-                                                   char separator, bool has_header,
-                                                   const std::filesystem::path &target_path);
+    static txeo::MatrixIO
+    one_hot_encode_text_file(const std::filesystem::path &source_path, char separator,
+                             bool has_header, const std::filesystem::path &target_path,
+                             txeo::Logger &logger = txeo::LoggerConsole::instance());
 
   private:
     std::filesystem::path _path;
     char _separator;
+    txeo::Logger *_logger{nullptr};
 
     static std::map<size_t, std::unordered_set<std::string>>
     build_lookups_map(const std::filesystem::path &source_path, char separator, bool has_header);

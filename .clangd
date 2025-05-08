@@ -1,13 +1,11 @@
 CompileFlags:
-  Add: [-Xclang, -include-pch, -Xclang, pch.h]
-  #Remove: [-include, pch.h]
+  Add: [-I/opt/clang/lib/clang/20/include/] # Do not specify pch flags for clangd, just include the missed headers
 
 Diagnostics:
   ClangTidy:
     Add:
       [
         modernize*,
-        clang-diagnostic-*,
         clang-diagnostic-*,
         clang-analyzer-*,
         cppcoreguidelines-*,
@@ -16,7 +14,6 @@ Diagnostics:
     Remove:
       [
         cppcoreguidelines-pro-type-vararg,
-        modernize-use-trailing-return-type,
         modernize-use-trailing-return-type,
         cppcoreguidelines-avoid-magic-numbers,
         cppcoreguidelines-non-private-member-variables-in-classes,
@@ -44,7 +41,7 @@ Diagnostics:
       modernize-use-nullptr.NullMacros: "NULL"
 
 InlayHints: # Turning off parameter hints (boring)
-  Designators: Yes
-  Enabled: Yes
-  ParameterNames: No
-  DeducedTypes: No
+  Designators: true
+  Enabled: true
+  ParameterNames: false
+  DeducedTypes: true

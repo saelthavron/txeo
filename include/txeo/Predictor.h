@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include "txeo/Logger.h"
+#include "txeo/LoggerConsole.h"
 #include "txeo/Tensor.h"
 #include "txeo/TensorShape.h"
 #include "types.h"
@@ -61,7 +63,8 @@ class Predictor {
      * )
      * @endcode
      */
-    explicit Predictor(std::filesystem::path model_path);
+    explicit Predictor(std::filesystem::path model_path,
+                       txeo::Logger &logger = txeo::LoggerConsole::instance());
 
     /**
      * @brief Returns the input tensor metadata for the loaded model
@@ -189,6 +192,7 @@ class Predictor {
   private:
     struct Impl;
     std::unique_ptr<Impl> _impl{nullptr};
+    txeo::Logger *_logger;
 
     void load_model();
 };

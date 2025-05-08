@@ -11,7 +11,7 @@
         "CMAKE_INSTALL_PREFIX": "${sourceDir}/.out/install/${presetName}",
         "CMAKE_C_COMPILER": "$env{Clang_HOME}/bin/clang",
         "CMAKE_CXX_COMPILER": "$env{Clang_HOME}/bin/clang++",
-        "CMAKE_CXX_FLAGS": "-g -O0",
+        "CMAKE_CXX_FLAGS": "-stdlib=libstdc++ -g -O0",
         "CMAKE_BUILD_TYPE": "Debug",
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
         "BUILD_TESTING": true
@@ -28,7 +28,7 @@
       "displayName": "gcovr-clang",
       "inherits": "debugClang",
       "cacheVariables": {
-        "CMAKE_CXX_FLAGS": "-O0 -coverage",
+        "CMAKE_CXX_FLAGS": "-stdlib=libstdc++ -O0 -coverage",
         "BUILD_TESTING": true,
         "TXEO_ENABLE_COVERAGE": true
       },
@@ -49,7 +49,7 @@
         "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
         "CMAKE_C_COMPILER": "$env{CLANG_HOME}/bin/clang",
         "CMAKE_CXX_COMPILER": "$env{CLANG_HOME}/bin/clang++",
-        "CMAKE_CXX_FLAGS": "-O3",
+        "CMAKE_CXX_FLAGS": "-stdlib=libstdc++ -O3",
         "CMAKE_BUILD_TYPE": "Release"
       },
       "environment": {
@@ -69,7 +69,7 @@
         "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
         "CMAKE_C_COMPILER": "gcc",
         "CMAKE_CXX_COMPILER": "g++",
-        "CMAKE_CXX_FLAGS": "-O3",
+        "CMAKE_CXX_FLAGS": "-stdlib=libstdc++ -O3",
         "CMAKE_BUILD_TYPE": "Release"
       },
       "environment": {
@@ -88,7 +88,7 @@
       "cacheVariables": {
         "CMAKE_C_COMPILER": "icx",
         "CMAKE_CXX_COMPILER": "icpx",
-        "CMAKE_CXX_FLAGS": "-O3",
+        "CMAKE_CXX_FLAGS": "-stdlib=libstdc++ -O3",
         "CMAKE_BUILD_TYPE": "Release"
       },
       "environment": {

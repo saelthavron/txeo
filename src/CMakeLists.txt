@@ -16,7 +16,10 @@ set(TXEO_SOURCES
     OlsGDTrainer.cpp
     Loss.cpp
     DataTable.cpp
-    DataTableNorm.cpp)
+    DataTableNorm.cpp
+    Logger.cpp
+    LoggerConsole.cpp
+    LoggerFile.cpp)
 
 
 #################################################### Finding Tensorflow ####################################################
