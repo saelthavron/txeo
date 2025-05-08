@@ -53,6 +53,9 @@ nav:
       - DataTableNorm: api-reference/data-table-norm.md
       - Trainer: api-reference/trainer.md
       - OlsTrainer: api-reference/ols_gd_trainer.md
+      - Logger: api-reference/logger.md
+      - LoggerConsole: api-reference/logger-console.md
+      - LoggerFile: api-reference/logger-file.md
   # - Tutorials:
   #     - Intro to Tensors: tutorials/intro-to-tensors.md
   #     - Matrix Math: tutorials/matrix-math.md
